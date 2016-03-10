@@ -1,15 +1,16 @@
 #ifndef CATEGORY_H
 #define CATEGORY_H
 
+using namespace std;
 
 class Category
 {
 private:
-    QString *name;
-    QString *color;
+    string *name;
+    string *color;
 
 public:
-    Category(QString *name, QString *color) {
+    Category(string *name, string *color) {
         this->name = name;
         this->color = color;
     }
@@ -19,8 +20,8 @@ public:
         delete color;
     }
 
-    QString* getName() { return name; }
-    QString* getColor() { return color; }
+    string* getName() { return name; }
+    string* getColor() { return color; }
 };
 
 #endif // CATEGORY_H

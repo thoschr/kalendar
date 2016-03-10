@@ -7,17 +7,16 @@
 PManager::PManager()
 {
     /* Open the database (will be created if it doesn't exist) */
-    QString path = QDir::homePath() + QString("/" FOLDER_NAME "/") + QString(DATABASE_NAME);
-    QFile dbfile(path);
-    QDir dir;
-    bool db_no_exists = !dbfile.exists();
+    string path = string(getpwuid(getuid())->pw_dir) + string("/" FOLDER_NAME "/" DATABASE_NAME);
+    ifstream dbfile(path.c_str());
+    bool db_no_exists = !dbfile;
     if (db_no_exists) {
-        dir.mkdir(QDir::homePath() + QString("/" FOLDER_NAME));
-        dbfile.open(QIODevice::WriteOnly);
-        dbfile.close();
+        mkdir((string(getpwuid(getuid())->pw_dir) + string("/" FOLDER_NAME)).c_str(), S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
+        ofstream new_dbfile(path.c_str());
+        new_dbfile.close();
     }
 
-    int rc = sqlite3_open(path.toUtf8().constData(), &this->db);
+    int rc = sqlite3_open(path.c_str(), &this->db);
     char *err_msg = 0;
 
     if (rc != SQLITE_OK) {
@@ -48,7 +47,7 @@ PManager::~PManager() {
 bool PManager::add_event(Event *e) {
     char *err_msg = 0;
     char sql[1024];
-    snprintf(sql, 1024, "INSERT INTO Events VALUES(%d, '%s', '%s', '%s', '%lu', '%lu');", e->getId(), e->getName()->toUtf8().data(), e->getDescription()->toUtf8().data(), e->getCategory()->toUtf8().data(), e->getStart(), e->getEnd());
+    snprintf(sql, 1024, "INSERT INTO Events VALUES(%d, '%s', '%s', '%s', '%lu', '%lu');", e->getId(), e->getName()->c_str(), e->getDescription()->c_str(), e->getCategory()->c_str(), e->getStart(), e->getEnd());
     int rc = sqlite3_exec(this->db, sql, 0, 0, &err_msg);
     if (rc != SQLITE_OK ) {
         fprintf(stderr, "SQL error: %s\n", err_msg);
@@ -82,9 +81,9 @@ std::list<Event*> PManager::get_events_of_month(int month, int year) {
     while (rc = sqlite3_step(res) == SQLITE_ROW) {
 
         Event *e = new Event( sqlite3_column_int(res, 0),
-                              new QString((const char*)sqlite3_column_text(res, 1)),
-                              new QString((const char*)sqlite3_column_text(res, 2)),
-                              new QString((const char*)sqlite3_column_text(res, 3)),
+                              new string((const char*)sqlite3_column_text(res, 1)),
+                              new string((const char*)sqlite3_column_text(res, 2)),
+                              new string((const char*)sqlite3_column_text(res, 3)),
                               (unsigned long)sqlite3_column_int64(res, 4),
                               (unsigned long)sqlite3_column_int64(res, 5));
 
