@@ -13,6 +13,9 @@
 #include "../event.h"
 #include "../category.h"
 
+#define FOLDER_NAME "kalendar"
+#define DATABASE_NAME "events.sql"
+
 using namespace std;
 
 class PManager

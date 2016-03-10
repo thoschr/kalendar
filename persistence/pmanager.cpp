@@ -1,9 +1,6 @@
 #include <QDebug>
 #include "pmanager.h"
 
-#define FOLDER_NAME "kalendar"
-#define DATABASE_NAME "events.sql"
-
 PManager::PManager()
 {
     /* Open the database (will be created if it doesn't exist) */

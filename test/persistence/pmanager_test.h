@@ -1,6 +1,8 @@
 #ifndef PMANAGERTEST_H
 #define PMANAGERTEST_H
 
+#include <stdlib.h>
+
 #include "../test.h"
 #include "../../persistence/pmanager.h"
 

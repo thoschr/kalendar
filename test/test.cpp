@@ -10,6 +10,7 @@ void Test::test_all() {
 }
 
 void Test::test_persistence() {
-    print("Starting persistence test");
-
+    print("Starting persistence test\n");
+    PManagerTest pmt;
+    pmt.test_all();
 }
