@@ -4,3 +4,12 @@ Test::Test()
 {
 
 }
+
+void Test::test_all() {
+    test_persistence();
+}
+
+void Test::test_persistence() {
+    print("Starting persistence test");
+
+}

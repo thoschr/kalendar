@@ -15,13 +15,15 @@ TEMPLATE = app
 SOURCES += main.cpp\
         kalendar.cpp \
     persistence/pmanager.cpp \
-    test/test.cpp
+    test/test.cpp \
+    test/persistence/pmanager_test.cpp
 
 HEADERS  += kalendar.h \
     event.h \
     persistence/pmanager.h \
     category.h \
-    test/test.h
+    test/test.h \
+    test/persistence/pmanager_test.h
 
 FORMS    += kalendar.ui
 

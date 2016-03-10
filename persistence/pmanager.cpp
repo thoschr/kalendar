@@ -92,5 +92,3 @@ std::list<Event*> PManager::get_events_of_month(int month, int year) {
     sqlite3_finalize(res);
     return result;
 }
-
-//ADD category func & test

@@ -24,7 +24,8 @@ public:
     bool remove_event(Event *e);
     list<Event *> get_events_of_month(int month, int year);
     bool add_category (Category *c);
-    list<Category*> get_Categories();
+    bool remove_category(Category *c);
+    list<Category*> get_categories();
 private:
     sqlite3 *db;
 };
