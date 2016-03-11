@@ -23,7 +23,9 @@ HEADERS  += kalendar.h \
     persistence/pmanager.h \
     category.h \
     test/test.h \
-    test/persistence/pmanager_test.h
+    test/persistence/pmanager_test.h \
+    model/category.h \
+    model/event.h
 
 FORMS    += kalendar.ui
 

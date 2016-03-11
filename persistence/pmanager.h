@@ -10,8 +10,8 @@
 #include <pwd.h>
 #include <sys/stat.h>
 #include <fstream>
-#include "../event.h"
-#include "../category.h"
+#include "../model/event.h"
+#include "../model/category.h"
 
 #define FOLDER_NAME "kalendar"
 #define DATABASE_NAME "events.sql"
