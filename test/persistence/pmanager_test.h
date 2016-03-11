@@ -8,11 +8,12 @@
 
 class PManagerTest
 {
+private:
+    Event *event;
 public:
     PManagerTest();
+    ~PManagerTest();
     void test_all();
-    void test_pmanager_initialization_with_db();
-    void test_pmanager_initialization_without_db();
     void test_pmanager_add_event();
     void test_pmanager_remove_event();
     void test_pmanager_add_category();

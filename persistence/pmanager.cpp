@@ -23,8 +23,8 @@ PManager::PManager()
     }
 
     if (db_no_exists) {
-        const char *sql = "CREATE TABLE Categories(id INT PRIMARY KEY, name TEXT, colour TEXT);"
-                          "CREATE TABLE Events(id INT PRIMARY KEY, name TEXT, description TEXT, category TEXT, start DATETIME, end DATETIME);"
+        const char *sql = "CREATE TABLE Categories(id INT, name TEXT, colour TEXT);"
+                          "CREATE TABLE Events(id INT, name TEXT, description TEXT, category TEXT, start DATETIME, end DATETIME);"
                           "INSERT INTO Categories VALUES(1, 'Default', '#1022A0');";
 
         rc = sqlite3_exec(this->db, sql, 0, 0, &err_msg);
