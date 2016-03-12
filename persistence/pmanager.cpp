@@ -44,7 +44,7 @@ PManager::~PManager() {
 bool PManager::add_event(Event *e) {
     char *err_msg = 0;
     char sql[1024];
-    snprintf(sql, 1024, "INSERT INTO Events VALUES(%d, '%s', '%s', '%s', '%lu', '%lu');", e->getId(), e->getName().c_str(), e->getDescription().c_str(), e->getCategory().c_str(), e->getStart(), e->getEnd());
+    snprintf(sql, 1024, "INSERT INTO Events VALUES(%u, '%s', '%s', '%s', '%lu', '%lu');", e->getId(), e->getName().c_str(), e->getDescription().c_str(), e->getCategory().c_str(), e->getStart(), e->getEnd());
     int rc = sqlite3_exec(this->db, sql, 0, 0, &err_msg);
     if (rc != SQLITE_OK ) {
         fprintf(stderr, "SQL error: %s\n", err_msg);

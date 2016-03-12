@@ -6,7 +6,7 @@ using namespace std;
 class Event
 {
 private:
-    int id;
+    unsigned int id;
     string name;
     string description;
     string category;
@@ -14,12 +14,14 @@ private:
     unsigned long end;
 
 public:
-    Event(int id, string name, string description, string category, unsigned long start, unsigned long end) {
+    Event(unsigned int id, string name, string description, string category, unsigned long start, unsigned long end) {
         this->name = name;
         this->description = description;
         this->category = category;
         if (id == 0)
-            this->id = static_cast<int> (hash<string>()(this->name + this->description + this->category));
+            /* The returned value from the hash function could be bigger than an integer, so be careful with normal integers.
+             * I use an unsigned integer to have always a positive number (also with the overflow). */
+            this->id = static_cast<unsigned int> (hash<string>()(this->name + this->description + this->category));
         else
             this->id = id;
         this->start = start;
@@ -29,7 +31,7 @@ public:
     ~Event() {
     }
 
-    int getId() { return id; }
+    unsigned int getId() { return id; }
     string getName() { return name; }
     string getDescription() { return description; }
     string getCategory() { return category; }
