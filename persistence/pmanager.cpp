@@ -44,7 +44,7 @@ PManager::~PManager() {
 bool PManager::add_event(Event *e) {
     char *err_msg = 0;
     char sql[1024];
-    snprintf(sql, 1024, "INSERT INTO Events VALUES(%d, '%s', '%s', '%s', '%lu', '%lu');", e->getId(), e->getName()->c_str(), e->getDescription()->c_str(), e->getCategory()->c_str(), e->getStart(), e->getEnd());
+    snprintf(sql, 1024, "INSERT INTO Events VALUES(%d, '%s', '%s', '%s', '%lu', '%lu');", e->getId(), e->getName().c_str(), e->getDescription().c_str(), e->getCategory().c_str(), e->getStart(), e->getEnd());
     int rc = sqlite3_exec(this->db, sql, 0, 0, &err_msg);
     if (rc != SQLITE_OK ) {
         fprintf(stderr, "SQL error: %s\n", err_msg);
@@ -78,9 +78,9 @@ std::list<Event*> PManager::get_events_of_month(int month, int year) {
     while (rc = sqlite3_step(res) == SQLITE_ROW) {
 
         Event *e = new Event( sqlite3_column_int(res, 0),
-                              new string((const char*)sqlite3_column_text(res, 1)),
-                              new string((const char*)sqlite3_column_text(res, 2)),
-                              new string((const char*)sqlite3_column_text(res, 3)),
+                              string((const char*)sqlite3_column_text(res, 1)),
+                              string((const char*)sqlite3_column_text(res, 2)),
+                              string((const char*)sqlite3_column_text(res, 3)),
                               (unsigned long)sqlite3_column_int64(res, 4),
                               (unsigned long)sqlite3_column_int64(res, 5));
 

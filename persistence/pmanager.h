@@ -25,7 +25,7 @@ public:
     ~PManager();
     bool add_event (Event *e);
     bool remove_event(Event *e);
-    list<Event *> get_events_of_month(int month, int year);
+    list<Event*> get_events_of_month(int month, int year);
     bool add_category (Category *c);
     bool remove_category(Category *c);
     list<Category*> get_categories();

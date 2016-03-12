@@ -4,7 +4,7 @@ PManagerTest::PManagerTest()
 {
     unsigned long timestamp = (unsigned long) time(NULL);
     string test("test");
-    this->event = new Event(1, &test, &test, &test, timestamp, timestamp + 100);
+    this->event = new Event(0, test, test, test, timestamp, timestamp + 100);
 }
 
 PManagerTest::~PManagerTest() {

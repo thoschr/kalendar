@@ -30,3 +30,4 @@ HEADERS  += kalendar.h \
 FORMS    += kalendar.ui
 
 QMAKE_LIBS += -lsqlite3
+QMAKE_CXXFLAGS += -std=c++11
