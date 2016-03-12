@@ -23,8 +23,8 @@ PManager::PManager()
     }
 
     if (db_no_exists) {
-        const char *sql = "CREATE TABLE Categories(id INT PRIMARY KEY, name TEXT, colour TEXT);"
-                          "CREATE TABLE Events(id INT PRIMARY KEY, name TEXT, description TEXT, category TEXT, start DATETIME, end DATETIME);"
+        const char *sql = "CREATE TABLE Categories(id UNSIGNED INTEGER PRIMARY KEY, name TEXT, color TEXT);"
+                          "CREATE TABLE Events(id UNSIGNED INTEGER PRIMARY KEY, name TEXT, description TEXT, category TEXT, start DATETIME, end DATETIME);"
                           "INSERT INTO Categories VALUES(1, 'Default', '#1022A0');";
 
         rc = sqlite3_exec(this->db, sql, 0, 0, &err_msg);
@@ -100,6 +100,57 @@ bool PManager::remove_event(Event *e) {
     char *err_msg = 0;
     char sql[1024];
     snprintf(sql, 1024, "DELETE FROM Events WHERE id = %u;", e->getId());
+    int rc = sqlite3_exec(this->db, sql, 0, 0, &err_msg);
+    if (rc != SQLITE_OK ) {
+        fprintf(stderr, "SQL error: %s\n", err_msg);
+        sqlite3_free(err_msg);
+        sqlite3_close(this->db);
+        return false;
+    }
+    return true;
+}
+
+bool PManager::add_category(Category *c) {
+    char *err_msg = 0;
+    char sql[1024];
+    if (c->getName().length() < 6) return false;
+    snprintf(sql, 1024, "INSERT INTO Categories VALUES(%u, '%s', '%s');", c->getId(), c->getName().c_str(), c->getColor().c_str());
+    int rc = sqlite3_exec(this->db, sql, 0, 0, &err_msg);
+    if (rc != SQLITE_OK ) {
+        fprintf(stderr, "SQL error: %s\n", err_msg);
+        sqlite3_free(err_msg);
+        sqlite3_close(this->db);
+        return false;
+    }
+    return true;
+}
+
+list<Category*> PManager::get_categories() {
+    list<Category*> result;
+    sqlite3_stmt *res;
+    char sql[1024];
+    snprintf(sql, 1024, "SELECT * FROM Categories;");
+    int rc = sqlite3_prepare_v2(this->db, sql, -1, &res, 0);
+    if (rc != SQLITE_OK) {
+        fprintf(stderr, "Failed to fetch data: %s\n", sqlite3_errmsg(db));
+        return result;
+    }
+    while (rc = sqlite3_step(res) == SQLITE_ROW) {
+
+        Category *c = new Category( sqlite3_column_int(res, 0),
+                              string((const char*)sqlite3_column_text(res, 1)),
+                              string((const char*)sqlite3_column_text(res, 2)));
+
+        result.push_front(c);
+    }
+    sqlite3_finalize(res);
+    return result;
+}
+
+bool PManager::remove_category(Category *c) {
+    char *err_msg = 0;
+    char sql[1024];
+    snprintf(sql, 1024, "DELETE FROM Categories WHERE id = %u;", c->getId());
     int rc = sqlite3_exec(this->db, sql, 0, 0, &err_msg);
     if (rc != SQLITE_OK ) {
         fprintf(stderr, "SQL error: %s\n", err_msg);
