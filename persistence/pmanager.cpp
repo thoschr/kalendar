@@ -4,16 +4,16 @@
 PManager::PManager()
 {
     /* Open the database (will be created if it doesn't exist) */
-    string path = string(getpwuid(getuid())->pw_dir) + string("/" FOLDER_NAME "/" DATABASE_NAME);
-    ifstream dbfile(path.c_str());
+    this->db_path = string(getpwuid(getuid())->pw_dir) + string("/" FOLDER_NAME "/" DATABASE_NAME);
+    ifstream dbfile(this->db_path.c_str());
     bool db_no_exists = !dbfile;
     if (db_no_exists) {
         mkdir((string(getpwuid(getuid())->pw_dir) + string("/" FOLDER_NAME)).c_str(), S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
-        ofstream new_dbfile(path.c_str());
+        ofstream new_dbfile(this->db_path.c_str());
         new_dbfile.close();
     }
 
-    int rc = sqlite3_open(path.c_str(), &this->db);
+    int rc = sqlite3_open(this->db_path.c_str(), &this->db);
     char *err_msg = 0;
 
     if (rc != SQLITE_OK) {
@@ -23,8 +23,8 @@ PManager::PManager()
     }
 
     if (db_no_exists) {
-        const char *sql = "CREATE TABLE Categories(id INT, name TEXT, colour TEXT);"
-                          "CREATE TABLE Events(id INT, name TEXT, description TEXT, category TEXT, start DATETIME, end DATETIME);"
+        const char *sql = "CREATE TABLE Categories(id INT PRIMARY KEY, name TEXT, colour TEXT);"
+                          "CREATE TABLE Events(id INT PRIMARY KEY, name TEXT, description TEXT, category TEXT, start DATETIME, end DATETIME);"
                           "INSERT INTO Categories VALUES(1, 'Default', '#1022A0');";
 
         rc = sqlite3_exec(this->db, sql, 0, 0, &err_msg);
@@ -44,6 +44,7 @@ PManager::~PManager() {
 bool PManager::add_event(Event *e) {
     char *err_msg = 0;
     char sql[1024];
+    if ((e->getName().length() < 3) || (e->getStart() > e->getEnd())) return false;
     snprintf(sql, 1024, "INSERT INTO Events VALUES(%u, '%s', '%s', '%s', '%lu', '%lu');", e->getId(), e->getName().c_str(), e->getDescription().c_str(), e->getCategory().c_str(), e->getStart(), e->getEnd());
     int rc = sqlite3_exec(this->db, sql, 0, 0, &err_msg);
     if (rc != SQLITE_OK ) {
@@ -88,4 +89,9 @@ std::list<Event*> PManager::get_events_of_month(int month, int year) {
     }
     sqlite3_finalize(res);
     return result;
+}
+
+bool PManager::remove_all() {
+    /* Delete the database file, but not the folder */
+    return (std::remove(this->db_path.c_str()) == 0);
 }

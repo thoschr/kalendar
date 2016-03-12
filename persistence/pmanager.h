@@ -20,17 +20,19 @@ using namespace std;
 
 class PManager
 {
+private:
+    sqlite3 *db;
+    string db_path;
 public:
     PManager();
     ~PManager();
     bool add_event (Event *e);
     bool remove_event(Event *e);
+    bool remove_all();
     list<Event*> get_events_of_month(int month, int year);
     bool add_category (Category *c);
     bool remove_category(Category *c);
     list<Category*> get_categories();
-private:
-    sqlite3 *db;
 };
 
 #endif // PMANAGER_H
