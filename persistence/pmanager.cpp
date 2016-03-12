@@ -95,3 +95,17 @@ bool PManager::remove_all() {
     /* Delete the database file, but not the folder */
     return (std::remove(this->db_path.c_str()) == 0);
 }
+
+bool PManager::remove_event(Event *e) {
+    char *err_msg = 0;
+    char sql[1024];
+    snprintf(sql, 1024, "DELETE FROM Events WHERE id = %u;", e->getId());
+    int rc = sqlite3_exec(this->db, sql, 0, 0, &err_msg);
+    if (rc != SQLITE_OK ) {
+        fprintf(stderr, "SQL error: %s\n", err_msg);
+        sqlite3_free(err_msg);
+        sqlite3_close(this->db);
+        return false;
+    }
+    return true;
+}

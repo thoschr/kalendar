@@ -25,8 +25,8 @@ public:
         return (this->name.compare(c.getName()) == 0) && (this->color.compare(c.getColor()) == 0);
     }
 
-    int hashcode() {
-        return static_cast<int> (hash<string>()(this->name + this->color));
+    long hashcode() {
+        return static_cast<long> (hash<string>()(this->name + this->color));
     }
 };
 

@@ -44,8 +44,8 @@ public:
                (this->end == e.getEnd());
     }
 
-    int hashcode() {
-        return this->id + static_cast<int> ((this->start / 1000) + (this->end - this->start));
+    long hashcode() {
+        return this->id + static_cast<long> ((this->start / 1000) + (this->end - this->start));
     }
 };
 

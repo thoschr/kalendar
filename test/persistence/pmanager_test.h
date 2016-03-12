@@ -10,6 +10,7 @@ class PManagerTest
 {
 private:
     Event *valid_event;
+    Event *valid_event_2;
     Event *noname_event;
     Event *invalid_time_event;
 public:
