@@ -14,9 +14,10 @@ public:
     Test();
     void test_all();
     void test_persistence();
-    static void print_green(string s) { cout << "\033[32m" << s << "\033[39m" << endl; }
-    static void print_red(string s) { cout << "\033[31m" << s << "\033[39m" << endl; }
-    static void print(string s) { cout << s << endl; }
+    /* fflush needed to see the output on the Application Output of QT Creator */
+    static void print_green(string s) { printf("\033[32m%s\033[39m", s.c_str()); fflush(stdout); }
+    static void print_red(string s) { printf("\033[31m%s\033[39m", s.c_str()); fflush(stdout); }
+    static void print(string s) { printf("%s", s.c_str()); fflush(stdout); }
 };
 
 #endif // TEST_H
