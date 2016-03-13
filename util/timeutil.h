@@ -28,6 +28,7 @@ class TimeUtil
 public:
     TimeUtil();
     Time get_current_time();
+    string get_literal_month(int m); /* 1 => January, ... */
     string get_literal_day_of_week(int d); /* Monday => 1, Tuesday => 2, ... */
     int get_numeric_day_of_week(string d); /* 1 => Monday, 2 => Tuesday, ... */
 };
