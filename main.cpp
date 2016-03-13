@@ -2,16 +2,18 @@
 #include "persistence/pmanager.h"
 #include <QApplication>
 #include <QDebug>
+#include <QPushButton>
+#include <QHBoxLayout>
 #include "test/test.h"
 
 int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
-    //kalendar w;
-    //w.show();
+    Kalendar window;
+    window.show();
     //PManager pm;
-    Test t;
-    t.test_persistence();
-    qDebug() << "end" << endl;
+    //Test t;
+    //t.test_persistence();
+
     return a.exec();
 }

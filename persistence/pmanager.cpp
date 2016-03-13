@@ -63,8 +63,8 @@ std::list<Event*> PManager::get_events_of_month(int month, int year) {
     tm.tm_min = 0;
     tm.tm_hour = 0;
     tm.tm_mday = 1;
-    tm.tm_mon = month - 1;    // Assuming your month represents Jan with 1
-    tm.tm_year = year - 1900; // Assuming your year is the AD year number
+    tm.tm_mon = month - 1;    // Assuming month represents Jan with 1
+    tm.tm_year = year - 1900; // Assuming year is the AD year number
     long start_time = static_cast<long> (mktime(&tm));
     tm.tm_mon = tm.tm_mon + 1;
     long end_time = static_cast<long> (mktime(&tm));

@@ -16,7 +16,8 @@ SOURCES += main.cpp\
         kalendar.cpp \
     persistence/pmanager.cpp \
     test/test.cpp \
-    test/persistence/pmanager_test.cpp
+    test/persistence/pmanager_test.cpp \
+    util/timeutil.cpp
 
 HEADERS  += kalendar.h \
     event.h \
@@ -25,7 +26,8 @@ HEADERS  += kalendar.h \
     test/test.h \
     test/persistence/pmanager_test.h \
     model/category.h \
-    model/event.h
+    model/event.h \
+    util/timeutil.h
 
 FORMS    += kalendar.ui
 
