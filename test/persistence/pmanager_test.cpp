@@ -29,35 +29,32 @@ PManagerTest::~PManagerTest() {
 }
 
 void PManagerTest::test_all() {
-    test_pmanager_remove_all();
-    test_pmanager_add_event();
-    test_pmanager_get_events_of_month();
-    test_pmanager_remove_event();
-    test_pmanager_add_category();
-    test_pmanager_get_categories();
-    test_pmanager_remove_category();
+    test_remove_all();
+    test_add_event();
+    test_get_events_of_month();
+    test_remove_event();
+    test_add_category();
+    test_get_categories();
+    test_remove_category();
 }
 
-void PManagerTest::test_pmanager_remove_all() {
-    Test::print("test_pmanager_remove_all ");
+void PManagerTest::test_remove_all() {
+    Test::print("test_remove_all ");
     PManager pm;
-    pm.remove_all() ? Test::print_green("passed\n") : Test::print_red("failed\n");
+    ASSERT (pm.remove_all())
 }
 
-void PManagerTest::test_pmanager_add_event() {
-    Test::print("test_pmanager_add_event ");
+void PManagerTest::test_add_event() {
+    Test::print("test_add_event ");
     PManager pm;
-    if ((!(pm.add_event(this->noname_event))) &&
-       (!(pm.add_event(this->invalid_time_event))) &&
-       (pm.add_event(this->valid_event)))
-           Test::print_green("passed\n");
-    else
-           Test::print_red("failed\n");
+    ASSERT ((!(pm.add_event(this->noname_event))) &&
+           (!(pm.add_event(this->invalid_time_event))) &&
+           (pm.add_event(this->valid_event)))
     pm.remove_all();
 }
 
-void PManagerTest::test_pmanager_get_events_of_month() {
-    Test::print("test_pmanager_get_events_of_month ");
+void PManagerTest::test_get_events_of_month() {
+    Test::print("test_get_events_of_month ");
     bool ret = false;
     PManager pm;
     pm.add_event(this->valid_event);
@@ -69,12 +66,12 @@ void PManagerTest::test_pmanager_get_events_of_month() {
         ret = this->valid_event->equals(**it); // *it has type Event*
         delete *it;
     }
-    ret ? Test::print_green("passed\n") : Test::print_red("failed\n");
+    ASSERT (ret)
     pm.remove_all();
 }
 
-void PManagerTest::test_pmanager_remove_event() {
-    Test::print("test_pmanager_remove_event ");
+void PManagerTest::test_remove_event() {
+    Test::print("test_remove_event ");
     bool ret = false;
     PManager pm;
     pm.add_event(this->valid_event);
@@ -88,23 +85,19 @@ void PManagerTest::test_pmanager_remove_event() {
         ret = this->valid_event_2->equals(**it); // *it has type Event*
         delete *it;
     }
-    ret ? Test::print_green("passed\n") : Test::print_red("failed\n");
+    ASSERT (ret)
     pm.remove_all();
 }
 
-void PManagerTest::test_pmanager_add_category() {
-    Test::print("test_pmanager_add_category ");
+void PManagerTest::test_add_category() {
+    Test::print("test_add_category ");
     PManager pm;
-    if ((!(pm.add_category(this->noname_category))) &&
-       (pm.add_category(this->valid_category)))
-           Test::print_green("passed\n");
-    else
-           Test::print_red("failed\n");
+    ASSERT ((!(pm.add_category(this->noname_category))) && (pm.add_category(this->valid_category)))
     pm.remove_all();
 }
 
-void PManagerTest::test_pmanager_get_categories() {
-    Test::print("test_pmanager_get_categories ");
+void PManagerTest::test_get_categories() {
+    Test::print("test_get_categories ");
     bool ret = false;
     PManager pm;
     pm.add_category(this->valid_category);
@@ -114,12 +107,12 @@ void PManagerTest::test_pmanager_get_categories() {
         ret = this->valid_category->equals(**it); // *it has type Category*
         delete *it;
     }
-    ret ? Test::print_green("passed\n") : Test::print_red("failed\n");
+    ASSERT (ret)
     pm.remove_all();
 }
 
-void PManagerTest::test_pmanager_remove_category() {
-    Test::print("test_pmanager_remove_category ");
+void PManagerTest::test_remove_category() {
+    Test::print("test_remove_category ");
     bool ret = false;
     PManager pm;
     pm.add_category(this->valid_category);
@@ -132,6 +125,6 @@ void PManagerTest::test_pmanager_remove_category() {
         ret = this->valid_category_2->equals(**it); // *it has type Category*
         delete *it;
     }
-    ret ? Test::print_green("passed\n") : Test::print_red("failed\n");
+    ASSERT (ret)
     pm.remove_all();
 }

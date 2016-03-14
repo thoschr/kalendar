@@ -21,13 +21,13 @@ public:
     PManagerTest();
     ~PManagerTest();
     void test_all();
-    void test_pmanager_add_event();
-    void test_pmanager_remove_event();
-    void test_pmanager_add_category();
-    void test_pmanager_get_events_of_month();
-    void test_pmanager_remove_category();
-    void test_pmanager_get_categories();
-    void test_pmanager_remove_all();
+    void test_add_event();
+    void test_remove_event();
+    void test_add_category();
+    void test_get_events_of_month();
+    void test_remove_category();
+    void test_get_categories();
+    void test_remove_all();
 };
 
 #endif // PMANAGERTEST_H

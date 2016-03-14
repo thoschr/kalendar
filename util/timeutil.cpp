@@ -16,14 +16,14 @@ Time TimeUtil::get_current_time() {
 
 string TimeUtil::get_literal_month(int m) {
     if ((m < 1) || (m > 12))
-        return NULL;
+        return string("");
     else
         return months[m-1];
 }
 
 string TimeUtil::numeric2literal_day_of_week(int d) {
     if ((d < 1) || (d > 7))
-        return NULL;
+        return string("");
     else
         return week_days[d-1];
 }

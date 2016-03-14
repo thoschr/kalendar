@@ -7,17 +7,17 @@
 class TimeUtilTest
 {
 private:
-    Time *nowdays;
-    Time *old;
+    Time *march_2016;
+    Time *sep_1927;
     Time *leap_year;
     Time *firstday_of_year;
     Time *lastday_of_year;
-    Time *future;
+    Time *may_2102;
 public:
     TimeUtilTest();
     ~TimeUtilTest();
     void test_all();
-    void test_timeutil_get_literal_month();
+    void test_get_literal_month();
     void test_numeric2literal_day_of_week();
     void test_literal2numeric_day_of_week();
     void test_get_days_in_month();
