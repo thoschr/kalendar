@@ -6,5 +6,9 @@ Kalendar is a calendar application written in C++ with the QT library for the gu
 
 The final result should be something similar to gnome-calendar.
 
+TODO:
+* External plugins support
+* Support iCalendar format
+
 ### License
 GPLv3
