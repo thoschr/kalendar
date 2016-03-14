@@ -12,8 +12,8 @@ int main(int argc, char *argv[])
     Kalendar window;
     window.show();
     //PManager pm;
-    //Test t;
-    //t.test_persistence();
+    Test t;
+    t.test_persistence();
 
     return a.exec();
 }
