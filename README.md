@@ -4,6 +4,7 @@ Kalendar is a calendar application written in C++ with the QT library for the gu
 
 <font color="#FF0000">The project is currently under heavly development</font> and requires a lot of work to be ready for the first release. Stay tuned.
 
+The final result should be something similar to gnome-calendar.
 
 ### License
 GPLv3
