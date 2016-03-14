@@ -24,7 +24,13 @@ public:
     int getWeekDay() { return wday; }
     int getMonth() { return month; }
     int getYear() { return year; }
-    Time& operator=(const Time& t);
+    Time& operator=(Time t) {
+        this->mday = t.getMonthDay();
+        this->wday = t.getWeekDay();
+        this->month = t.getMonth();
+        this->year = t.getYear();
+        return *this;
+    }
 };
 
 class TimeUtil

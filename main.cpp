@@ -11,9 +11,9 @@ int main(int argc, char *argv[])
     QApplication a(argc, argv);
     Kalendar window;
     window.show();
-    //PManager pm;
-    Test t;
-    t.test_persistence();
+
+    //Test t;
+    //t.test_persistence();
 
     return a.exec();
 }
