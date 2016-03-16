@@ -1,4 +1,4 @@
-#include "kalendar.h"
+#include "view/monthview.h"
 #include "persistence/pmanager.h"
 #include <QApplication>
 #include <QDebug>
@@ -9,7 +9,7 @@
 int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
-    Kalendar window;
+    MonthView window;
     window.show();
 
     //Test t;

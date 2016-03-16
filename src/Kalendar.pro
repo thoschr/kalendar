@@ -13,25 +13,26 @@ TEMPLATE = app
 
 
 SOURCES += main.cpp\
-        kalendar.cpp \
     persistence/pmanager.cpp \
     test/test.cpp \
     test/persistence/pmanager_test.cpp \
     util/timeutil.cpp \
-    test/util/timeutil_test.cpp
+    test/util/timeutil_test.cpp \
+    view/monthview.cpp
 
-HEADERS  += kalendar.h \
-    event.h \
+HEADERS  += model/event.h \
     persistence/pmanager.h \
-    category.h \
+    model/category.h \
     test/test.h \
     test/persistence/pmanager_test.h \
     model/category.h \
     model/event.h \
     util/timeutil.h \
-    test/util/timeutil_test.h
+    test/util/timeutil_test.h \
+    view/monthview.h
 
-FORMS    += kalendar.ui
+FORMS    += kalendar.ui \
+    view/monthview.ui
 
 QMAKE_LIBS += -lsqlite3
 QMAKE_CXXFLAGS += -std=c++11
