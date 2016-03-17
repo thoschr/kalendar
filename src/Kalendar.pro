@@ -31,8 +31,5 @@ HEADERS  += model/event.h \
     test/util/timeutil_test.h \
     view/monthview.h
 
-FORMS    += kalendar.ui \
-    view/monthview.ui
-
 QMAKE_LIBS += -lsqlite3
 QMAKE_CXXFLAGS += -std=c++11
