@@ -3,29 +3,50 @@
 
 #include "../util/timeutil.h"
 
+#include "qframe_extended.h"
+
 #include <QDebug>
 
 #include <QPushButton>
 #include <QHBoxLayout>
 #include <QVBoxLayout>
-#include <QGridLayout>
 #include <QLabel>
 #include <QFrame>
 
 #define CELL_STYLE "QFrame { background-color: #FFFFFF; border: 1px solid #555555; }" \
-                   "QLabel { border: none; font-size: 16px; padding: 5px; }" \
-                   "QLabel#today { background-color: #FFFF66; }" \
+                   "QLabel { border: none; font-size: 16px; padding: 5px; background-color:rgba(0,0,0,0); }" \
+                   "QLabel#today { background-color: #FFFF88; }" \
+                   "QFrame#day:hover { background-color: #EEEEFF; }" \
                    "QLabel#header { background-color: #EEEEEE; padding: auto; font-weight: bold; }"
 
+
+void MonthView::on_mouse_press(QFrameExtended *frame) {
+    this->selection_start = frame->getTime();
+}
+
+void MonthView::on_mouse_release(QFrameExtended *frame) {
+    this->selection_end = frame->getTime();
+    //TODO: Show the window to add an event with the start and the end already setted
+}
 
 MonthView::MonthView(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MonthView)
 {
     Time current_time = TimeUtil::get_current_time();
-    int tot_days = TimeUtil::get_days_in_month(current_time.getMonth(), current_time.getYear());
-    QLabel *label_date = new QLabel(QString(TimeUtil::get_literal_month(current_time.getMonth()).c_str()) + QString(" ") + QString::number(current_time.getYear()));
-    QGridLayout *grid_layout = new QGridLayout;
+    display_days(current_time);
+}
+
+MonthView::~MonthView()
+{
+    delete ui;
+}
+
+void MonthView::display_days(Time time) {
+    Time current_time = TimeUtil::get_current_time();
+    int tot_days = TimeUtil::get_days_in_month(time.getMonth(), time.getYear());
+    QLabel *label_date = new QLabel(QString(TimeUtil::get_literal_month(time.getMonth()).c_str()) + QString(" ") + QString::number(time.getYear()));
+    this->grid_layout = new QGridLayout;
     QVBoxLayout *layout = new QVBoxLayout;
     label_date->setMaximumHeight(20);
     layout->addWidget(label_date);
@@ -46,22 +67,23 @@ MonthView::MonthView(QWidget *parent) :
         grid_layout->addWidget(frame, 0, j);
     }
     //weekday of the first day of the current month
-    start_wday = current_time.getWeekDay() - (current_time.getMonthDay() % 7) + 1;
+    start_wday = time.getWeekDay() - (time.getMonthDay() % 7) + 1;
     x = 1;
     for (i = 1; i < 7; i++) {
         for (j = 0; j < 7; j++) {
-            QFrame *frame = new QFrame;
+            QFrameExtended *frame = new QFrameExtended(Time(x, ((start_wday + (x-1)) % 7) + 1, time.getMonth(), time.getYear()));
             QVBoxLayout *vl = new QVBoxLayout;
             if (((i > 1) || (j >= start_wday-1)) && (x <= tot_days)) {
                 QLabel *day = new QLabel(QString::number(x));
-                if (x == current_time.getMonthDay())
+                if ((x == current_time.getMonthDay()) && (time.getMonth() == current_time.getMonth()) && (time.getYear() == current_time.getYear()))
                     day->setObjectName("today");
-                else
-                    day->setObjectName("day");
+                frame->setObjectName("day");
                 day->setMaximumHeight(25);
                 vl->setAlignment(Qt::AlignTop | Qt::AlignRight);
                 vl->addWidget(day);
                 vl->setMargin(0);
+                connect(frame, &QFrameExtended::pressed, this, &MonthView::on_mouse_press);
+                connect(frame, &QFrameExtended::released, this, &MonthView::on_mouse_release);
                 x++;
             }
             frame->setMinimumWidth(150);
@@ -84,9 +106,4 @@ MonthView::MonthView(QWidget *parent) :
 
      // Set QWidget as the central layout of the main window
      setCentralWidget(window);
-}
-
-MonthView::~MonthView()
-{
-    delete ui;
 }

@@ -18,7 +18,8 @@ SOURCES += main.cpp\
     test/persistence/pmanager_test.cpp \
     util/timeutil.cpp \
     test/util/timeutil_test.cpp \
-    view/monthview.cpp
+    view/monthview.cpp \
+    view/qframe_extended.cpp
 
 HEADERS  += model/event.h \
     persistence/pmanager.h \
@@ -29,7 +30,8 @@ HEADERS  += model/event.h \
     model/event.h \
     util/timeutil.h \
     test/util/timeutil_test.h \
-    view/monthview.h
+    view/monthview.h \
+    view/qframe_extended.h
 
 QMAKE_LIBS += -lsqlite3
 QMAKE_CXXFLAGS += -std=c++11
