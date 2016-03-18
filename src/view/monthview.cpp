@@ -40,9 +40,11 @@ MonthView::MonthView(QWidget *parent) :
 MonthView::~MonthView()
 {
     delete ui;
+    delete this->grid_layout;
 }
 
 void MonthView::display_days(Time time) {
+    //The current time is needed to highlight the current day
     Time current_time = TimeUtil::get_current_time();
     int tot_days = TimeUtil::get_days_in_month(time.getMonth(), time.getYear());
     QLabel *label_date = new QLabel(QString(TimeUtil::get_literal_month(time.getMonth()).c_str()) + QString(" ") + QString::number(time.getYear()));
@@ -66,15 +68,19 @@ void MonthView::display_days(Time time) {
         frame->setStyleSheet(CELL_STYLE);
         grid_layout->addWidget(frame, 0, j);
     }
-    //weekday of the first day of the current month
+    //first week day of the current month
     start_wday = time.getWeekDay() - (time.getMonthDay() % 7) + 1;
     x = 1;
-    for (i = 1; i < 7; i++) {
-        for (j = 0; j < 7; j++) {
+    //Next rows contain the days of the selected month
+    for (i = 1; i < 7; i++) { //rows
+        for (j = 0; j < 7; j++) { //columns
+            //Map a Time object to each frame
             QFrameExtended *frame = new QFrameExtended(Time(x, ((start_wday + (x-1)) % 7) + 1, time.getMonth(), time.getYear()));
             QVBoxLayout *vl = new QVBoxLayout;
+            //Checks right cells that will contain the days
             if (((i > 1) || (j >= start_wday-1)) && (x <= tot_days)) {
                 QLabel *day = new QLabel(QString::number(x));
+                //Checks current day
                 if ((x == current_time.getMonthDay()) && (time.getMonth() == current_time.getMonth()) && (time.getYear() == current_time.getYear()))
                     day->setObjectName("today");
                 frame->setObjectName("day");
