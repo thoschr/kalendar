@@ -39,6 +39,7 @@ class TimeUtil
 public:
     TimeUtil();
     static Time get_current_time();
+    static int get_first_weekday_of_month(Time &time);
     static string get_literal_month(int m); /* 1 => January, ... */
     static string numeric2literal_day_of_week(int d); /* Monday => 1, Tuesday => 2, ... */
     static int literal2numeric_day_of_week(string d); /* 1 => Monday, 2 => Tuesday, ... */

@@ -26,6 +26,7 @@ void TimeUtilTest::test_all() {
     test_literal2numeric_day_of_week();
     test_numeric2literal_day_of_week();
     test_get_literal_month();
+    get_first_weekday_of_month();
 }
 
 void TimeUtilTest::test_get_days_in_month() {
@@ -59,4 +60,10 @@ void TimeUtilTest::test_get_literal_month() {
             (TimeUtil::get_literal_month(8) == string("August")) &&
             (TimeUtil::get_literal_month(0) == string("")) &&
             (TimeUtil::get_literal_month(13) == string("")))
+}
+
+void TimeUtilTest::get_first_weekday_of_month() {
+    Test::print("get_first_weekday_of_month ");
+    ASSERT ((TimeUtil::get_first_weekday_of_month(*this->firstday_of_year) == this->firstday_of_year->getWeekDay()) &&
+            (TimeUtil::get_first_weekday_of_month(*this->may_2102)) == this->may_2102->getWeekDay())
 }

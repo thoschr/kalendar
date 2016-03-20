@@ -114,7 +114,7 @@ void MonthView::display_days(Time time) {
     int i,x,start_wday;
 
     //first week day of the current month
-    start_wday = time.getWeekDay() - (time.getMonthDay() % 7) + 1; //TODO: put this function into timeutil
+    start_wday = TimeUtil::get_first_weekday_of_month(time);
 
     x = 1;
     for (i = 0; i < 42; i++) {

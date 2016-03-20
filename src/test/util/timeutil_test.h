@@ -22,6 +22,7 @@ public:
     void test_literal2numeric_day_of_week();
     void test_get_days_in_month();
     void test_time_from_timestamp();
+    void get_first_weekday_of_month();
 };
 
 #endif // TIMEUTILTEST_H

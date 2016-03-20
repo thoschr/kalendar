@@ -60,3 +60,7 @@ Time TimeUtil::time_from_timestamp(unsigned long timestamp) {
     //free(tm); segfault?
     return time;
 }
+
+int TimeUtil::get_first_weekday_of_month(Time &time) {
+    return time.getWeekDay() - (time.getMonthDay() % 7) + 1;
+}
