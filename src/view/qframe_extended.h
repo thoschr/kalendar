@@ -11,9 +11,11 @@ class QFrameExtended : public QFrame
 
 private:
     Time time;
+
 public:
-    explicit QFrameExtended(Time time, QWidget *parent = 0);
+    explicit QFrameExtended(QWidget *parent = 0);
     Time getTime() { return time; }
+    void setTime(Time t) { this->time = t; }
 
 signals:
     void mousePressEvent(QMouseEvent *);

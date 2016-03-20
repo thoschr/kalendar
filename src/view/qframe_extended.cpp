@@ -2,7 +2,7 @@
 
 #include <QDebug>
 
-QFrameExtended::QFrameExtended(Time time, QWidget *parent) : QFrame(parent), time(time)
+QFrameExtended::QFrameExtended(QWidget *parent) : QFrame(parent)
 {
     connect( this, SIGNAL( mousePressEvent(QMouseEvent*) ), this, SLOT( on_mouse_press() ) );
     connect( this, SIGNAL( mouseReleaseEvent(QMouseEvent*) ), this, SLOT( on_mouse_release() ) );
