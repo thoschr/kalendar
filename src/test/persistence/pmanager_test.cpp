@@ -1,5 +1,4 @@
 #include "pmanager_test.h"
-#include <QDebug>
 
 PManagerTest::PManagerTest()
 {

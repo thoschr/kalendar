@@ -1,5 +1,4 @@
 #include "timeutil_test.h"
-#include <QDebug>
 
 TimeUtilTest::TimeUtilTest()
 {

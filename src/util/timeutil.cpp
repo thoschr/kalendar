@@ -64,3 +64,30 @@ Time TimeUtil::time_from_timestamp(unsigned long timestamp) {
 int TimeUtil::get_first_weekday_of_month(Time &time) {
     return time.getWeekDay() - (time.getMonthDay() % 7) + 1;
 }
+
+//TODO write tests
+//TODO fix this functions, when you change month (and/or year) you need to change alse the weekday and put it to the right week day
+//for example 16 of march has a differente week day from 16 of february
+//Assume to get a valid time (i.e. no negative numbers, etc.)
+Time TimeUtil::increase_month(Time time) {
+    if (time.getMonth() < 12) {
+        time.setMonth(time.getMonth() + 1);
+        return time;
+    } else { //Go to next year
+        time.setMonth(1);
+        time.setYear(time.getYear() + 1);
+        return time;
+    }
+}
+
+//Assume to get a valid time (i.e. no negative numbers, etc.)
+Time TimeUtil::decrease_month(Time time) {
+    if (time.getMonth() > 1) {
+        time.setMonth(time.getMonth() - 1);
+        return time;
+    } else { //Go to previous year
+        time.setMonth(12);
+        time.setYear(time.getYear() - 1);
+        return time;
+    }
+}

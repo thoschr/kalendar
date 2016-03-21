@@ -1,4 +1,3 @@
-#include <QDebug>
 #include "pmanager.h"
 
 PManager::PManager()
