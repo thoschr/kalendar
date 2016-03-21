@@ -36,6 +36,12 @@ public:
         this->year = t.getYear();
         return *this;
     }
+    bool operator==(Time &t) {
+        return (this->mday == t.getMonthDay()) &&
+               (this->wday == t.getWeekDay()) &&
+               (this->month == t.getMonth()) &&
+               (this->year == t.getYear());
+    }
 };
 
 class TimeUtil
@@ -49,7 +55,7 @@ public:
     static int get_days_in_month(int month, int year);
     static Time time_from_timestamp(unsigned long timestamp);
     static list<int> get_special_days_in_month(int month, int year); /* TODO: implement this [priority: low] */
-    static int get_first_weekday_of_month(Time &time);
+    static Time get_first_day_of_month(Time &time);
     static Time increase_month(Time time);
     static Time decrease_month(Time time);
 };

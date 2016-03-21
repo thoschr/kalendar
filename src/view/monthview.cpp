@@ -134,7 +134,7 @@ void MonthView::display_days(Time time) { //TODO clean today cell
     int i,x,start_wday;
 
     //first week day of the current month
-    start_wday = TimeUtil::get_first_weekday_of_month(time);
+    start_wday = TimeUtil::get_first_day_of_month(time).getWeekDay();
     qDebug() << start_wday;
     x = 1;
     for (i = 0; i < 42; i++) {

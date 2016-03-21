@@ -8,6 +8,8 @@ TimeUtilTest::TimeUtilTest()
     this->firstday_of_year = new Time(1, 4, 1, 2015);
     this->lastday_of_year = new Time(31, 3, 12, 2014);
     this->leap_year = new Time(29, 1, 2, 2016);
+    this->first_march_2016 = new Time(1, 2, 3, 2016);
+    this->first_sep_1927 = new Time(1, 4, 9, 1927);
 }
 
 TimeUtilTest::~TimeUtilTest()
@@ -18,6 +20,8 @@ TimeUtilTest::~TimeUtilTest()
     delete this->firstday_of_year;
     delete this->lastday_of_year;
     delete this->leap_year;
+    delete this->first_march_2016;
+    delete this->first_sep_1927;
 }
 
 void TimeUtilTest::test_all() {
@@ -25,7 +29,9 @@ void TimeUtilTest::test_all() {
     test_literal2numeric_day_of_week();
     test_numeric2literal_day_of_week();
     test_get_literal_month();
-    get_first_weekday_of_month();
+    test_get_first_day_of_month();
+    test_increase_month();
+    test_decrease_month();
 }
 
 void TimeUtilTest::test_get_days_in_month() {
@@ -61,8 +67,17 @@ void TimeUtilTest::test_get_literal_month() {
             (TimeUtil::get_literal_month(13) == string("")))
 }
 
-void TimeUtilTest::get_first_weekday_of_month() {
-    Test::print("get_first_weekday_of_month ");
-    ASSERT ((TimeUtil::get_first_weekday_of_month(*this->firstday_of_year) == this->firstday_of_year->getWeekDay()) &&
-            (TimeUtil::get_first_weekday_of_month(*this->may_2102)) == this->may_2102->getWeekDay())
+void TimeUtilTest::test_get_first_day_of_month() {
+    Test::print("test_get_first_day_of_month ");
+    ASSERT ((TimeUtil::get_first_day_of_month(*this->firstday_of_year) == *this->firstday_of_year) &&
+            (TimeUtil::get_first_day_of_month(*this->march_2016) == *this->first_march_2016) &&
+            (TimeUtil::get_first_day_of_month(*this->sep_1927) == *this->first_sep_1927))
+}
+
+void TimeUtilTest::test_increase_month() {
+    Test::print("test_increase_month ");
+}
+
+void TimeUtilTest::test_decrease_month() {
+    Test::print("test_decrease_month ");
 }

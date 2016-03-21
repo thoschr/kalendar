@@ -61,8 +61,9 @@ Time TimeUtil::time_from_timestamp(unsigned long timestamp) {
     return time;
 }
 
-int TimeUtil::get_first_weekday_of_month(Time &time) {
-    return time.getWeekDay() - (time.getMonthDay() % 7) + 1;
+Time TimeUtil::get_first_day_of_month(Time &time) {
+    int week_day = time.getWeekDay() - (time.getMonthDay() % 7) + 1;
+    return Time(1, week_day, time.getMonth(), time.getYear());
 }
 
 //TODO write tests
@@ -70,6 +71,8 @@ int TimeUtil::get_first_weekday_of_month(Time &time) {
 //for example 16 of march has a differente week day from 16 of february
 //Assume to get a valid time (i.e. no negative numbers, etc.)
 Time TimeUtil::increase_month(Time time) {
+    //The months haven't the same number of days, so I need to use a day that have all months, like the first day.
+    time = get_first_day_of_month(time);
     if (time.getMonth() < 12) {
         time.setMonth(time.getMonth() + 1);
         return time;
