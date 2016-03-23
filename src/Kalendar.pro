@@ -31,7 +31,8 @@ HEADERS  += model/event.h \
     util/timeutil.h \
     test/util/timeutil_test.h \
     view/monthview.h \
-    view/qframe_extended.h
+    view/qframe_extended.h \
+    model/date.h
 
 QMAKE_LIBS += -lsqlite3
 QMAKE_CXXFLAGS += -std=c++11
