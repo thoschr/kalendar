@@ -9,12 +9,15 @@ class TimeUtilTest
 private:
     Time *march_2016;
     Time *sep_1927;
-    Time *leap_year;
-    Time *firstday_of_year;
-    Time *lastday_of_year;
+    Time *leap_year_2016;
+    Time *firstday_of_year_2015;
+    Time *lastday_of_year_2014;
     Time *may_2102;
     Time *first_march_2016;
     Time *first_sep_1927;
+    Time *jan_2015;
+    Time *feb_2016;
+    Time *first_feb_2016;
 public:
     TimeUtilTest();
     ~TimeUtilTest();
@@ -25,6 +28,7 @@ public:
     void test_get_days_in_month();
     void test_time_from_timestamp();
     void test_get_first_day_of_month();
+    void test_get_last_day_of_month();
     void test_increase_month();
     void test_decrease_month();
 };

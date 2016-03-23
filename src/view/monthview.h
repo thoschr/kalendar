@@ -3,6 +3,7 @@
 
 #include <QMainWindow>
 #include <QGridLayout>
+#include <QLabel>
 #include "util/timeutil.h"
 #include "qframe_extended.h"
 
@@ -16,6 +17,7 @@ class MonthView : public QMainWindow
 
 private:
     QVBoxLayout *layout;
+    QLabel *label_date;
     Time selection_start;
     Time selection_end;
     Ui::MonthView *ui;

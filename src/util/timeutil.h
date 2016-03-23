@@ -7,7 +7,7 @@
 
 using namespace std;
 
-class Time {
+class Time { //TODO move to model && rename into Date
 private:
     int mday; //month day
     int wday; //week day
@@ -42,6 +42,9 @@ public:
                (this->month == t.getMonth()) &&
                (this->year == t.getYear());
     }
+    string toString() {
+        return to_string(this->mday) + "/" + to_string(this->month) + "/" + to_string(this->year) + " Week-day: " + to_string(this->wday);
+    }
 };
 
 class TimeUtil
@@ -56,6 +59,7 @@ public:
     static Time time_from_timestamp(unsigned long timestamp);
     static list<int> get_special_days_in_month(int month, int year); /* TODO: implement this [priority: low] */
     static Time get_first_day_of_month(Time &time);
+    static Time get_last_day_of_month(Time &time);
     static Time increase_month(Time time);
     static Time decrease_month(Time time);
 };

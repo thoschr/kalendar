@@ -45,7 +45,7 @@ MonthView::MonthView(QWidget *parent) :
 {
     Time current_time = TimeUtil::get_current_time();
 
-    QLabel *label_date = new QLabel(QString(TimeUtil::get_literal_month(current_time.getMonth()).c_str()) + QString("    ") + QString::number(current_time.getYear()));
+    this->label_date = new QLabel;
     this->layout = new QVBoxLayout;
     label_date->setMaximumHeight(20);
     label_date->setStyleSheet("QLabel { padding-left: 100px; padding-right: 100px; font-size: 20px; } ");
@@ -128,6 +128,8 @@ MonthView::~MonthView()
 }
 
 void MonthView::display_days(Time time) { //TODO clean today cell
+    //Update the label that contains month and year
+    this->label_date->setText(QString(TimeUtil::get_literal_month(time.getMonth()).c_str()) + QString("    ") + QString::number(time.getYear()));
     //The current time is needed to highlight the current day
     Time current_time = TimeUtil::get_current_time();
     int tot_days = TimeUtil::get_days_in_month(time.getMonth(), time.getYear());
@@ -135,10 +137,9 @@ void MonthView::display_days(Time time) { //TODO clean today cell
 
     //first week day of the current month
     start_wday = TimeUtil::get_first_day_of_month(time).getWeekDay();
-    qDebug() << start_wday;
     x = 1;
     for (i = 0; i < 42; i++) {
-        this->frames[i]->setTime(Time(x, ((start_wday + (x-1)) % 7) + 1, time.getMonth(), time.getYear()));
+        this->frames[i]->setTime(Time(x, (start_wday + (x-1)) % 7, time.getMonth(), time.getYear()));
         QLabel *day = static_cast<QLabel*> (this->frames[i]->children().at(1));
         //First clean and then overwrite
         day->setObjectName("");

@@ -1,5 +1,7 @@
 #include "timeutil.h"
 
+#include <QDebug>
+
 static string months[] = {"January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"};
 static string week_days[] = {"Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"};
 
@@ -62,8 +64,18 @@ Time TimeUtil::time_from_timestamp(unsigned long timestamp) {
 }
 
 Time TimeUtil::get_first_day_of_month(Time &time) {
-    int week_day = time.getWeekDay() - (time.getMonthDay() % 7) + 1;
-    return Time(1, week_day, time.getMonth(), time.getYear());
+    int wday = time.getWeekDay() - (time.getMonthDay() % 7) + 1;
+    //Normalization
+    if (wday <= 0) wday += 7;
+    else if (wday > 7) wday -= 7;
+    return Time(1, wday, time.getMonth(), time.getYear());
+}
+
+Time TimeUtil::get_last_day_of_month(Time &time) {
+    Time first_day = get_first_day_of_month(time);
+    int tot_days = get_days_in_month(time.getMonth(), time.getYear());
+    int wday = (tot_days % 7 ?: 7) + first_day.getWeekDay() - 1;
+    return Time(tot_days, wday, time.getMonth(), time.getYear());
 }
 
 //TODO write tests
@@ -71,26 +83,25 @@ Time TimeUtil::get_first_day_of_month(Time &time) {
 //for example 16 of march has a differente week day from 16 of february
 //Assume to get a valid time (i.e. no negative numbers, etc.)
 Time TimeUtil::increase_month(Time time) {
-    //The months haven't the same number of days, so I need to use a day that have all months, like the first day.
-    time = get_first_day_of_month(time);
+    Time last_day_curr_month = get_last_day_of_month(time);
+    Time first_day_next_month;
     if (time.getMonth() < 12) {
-        time.setMonth(time.getMonth() + 1);
-        return time;
+        first_day_next_month = Time(1, (last_day_curr_month.getWeekDay() % 7) + 1, time.getMonth() + 1, time.getYear());
     } else { //Go to next year
-        time.setMonth(1);
-        time.setYear(time.getYear() + 1);
-        return time;
+        first_day_next_month = Time(1, (last_day_curr_month.getWeekDay() % 7) + 1, 1, time.getYear() + 1);
     }
+    return Time(time.getMonthDay(), (time.getMonthDay() % 7 ?: 7) + first_day_next_month.getWeekDay() - 1, first_day_next_month.getMonth(), first_day_next_month.getYear());
 }
 
 //Assume to get a valid time (i.e. no negative numbers, etc.)
 Time TimeUtil::decrease_month(Time time) {
+    Time first_day_curr_month = get_first_day_of_month(time);
+    Time last_day_prev_month;
     if (time.getMonth() > 1) {
-        time.setMonth(time.getMonth() - 1);
-        return time;
+        last_day_prev_month = Time(get_days_in_month(time.getMonth() - 1, time.getYear()), first_day_curr_month.getWeekDay() - 1 ?: 7, time.getMonth() - 1, time.getYear());
     } else { //Go to previous year
-        time.setMonth(12);
-        time.setYear(time.getYear() - 1);
-        return time;
+        last_day_prev_month = Time(get_days_in_month(12, time.getYear() - 1), first_day_curr_month.getWeekDay() - 1 ?: 7, 12, time.getYear() - 1);
     }
+    Time first_day_prev_month = get_first_day_of_month(last_day_prev_month);
+    return Time(time.getMonthDay(), (time.getMonthDay() % 7 ?: 7) + first_day_prev_month.getWeekDay() - 1, last_day_prev_month.getMonth(), last_day_prev_month.getYear());
 }
