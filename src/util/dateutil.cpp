@@ -55,7 +55,7 @@ int DateUtil::get_days_in_month(int month, int year) {
     return numberOfDays;
 }
 
-Date DateUtil::time_from_timestamp(unsigned long timestamp) {
+Date DateUtil::date_from_timestamp(unsigned long timestamp) {
     const time_t t = static_cast<const time_t> (timestamp);
     struct tm *tm = localtime(&t);
     Date date(tm->tm_mday, tm->tm_wday + 1, tm->tm_mon + 1, tm->tm_year + 1900);
