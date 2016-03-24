@@ -3,19 +3,19 @@
 
 #include <QObject>
 #include <QFrame>
-#include "util/timeutil.h"
+#include "util/dateutil.h"
 
 class QFrameExtended : public QFrame
 {
     Q_OBJECT
 
 private:
-    Time time;
+    Date date;
 
 public:
     explicit QFrameExtended(QWidget *parent = 0);
-    Time getTime() { return time; }
-    void setTime(Time t) { this->time = t; }
+    Date getDate() { return date; }
+    void setDate(Date d) { this->date = d; }
 
 signals:
     void mousePressEvent(QMouseEvent *);

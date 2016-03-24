@@ -3,7 +3,7 @@
 
 #include <iostream>
 #include "persistence/pmanager_test.h"
-#include "util/timeutil_test.h"
+#include "util/dateutil_test.h"
 
 #define ASSERT(X) X ?  Test::print_green("passed\n") :  Test::print_red("fail\n");
 

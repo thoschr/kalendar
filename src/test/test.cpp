@@ -17,6 +17,6 @@ void Test::test_persistence() {
 }
 void Test::test_util() {
     print("\nStarting util tests\n");
-    TimeUtilTest tut;
+    DateUtilTest tut;
     tut.test_all();
 }

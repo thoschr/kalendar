@@ -7,15 +7,15 @@
 
 using namespace std;
 
-class Time { //TODO move to model && rename into Date
+class Date {
 private:
     int mday; //month day
     int wday; //week day
     int month;
     int year;
 public:
-    Time() {}
-    Time(int mday, int wday, int month, int year) {
+    Date() {}
+    Date(int mday, int wday, int month, int year) {
         this->mday = mday;
         this->wday = wday;
         this->month = month;
@@ -29,18 +29,18 @@ public:
     void setWeekDay(int wday) { this->wday = wday; }
     void setMonth(int month) { this->month = month; }
     void setYear(int year) { this->year = year; }
-    Time& operator=(Time t) {
-        this->mday = t.getMonthDay();
-        this->wday = t.getWeekDay();
-        this->month = t.getMonth();
-        this->year = t.getYear();
+    Date& operator=(Date d) {
+        this->mday = d.getMonthDay();
+        this->wday = d.getWeekDay();
+        this->month = d.getMonth();
+        this->year = d.getYear();
         return *this;
     }
-    bool operator==(Time &t) {
-        return (this->mday == t.getMonthDay()) &&
-               (this->wday == t.getWeekDay()) &&
-               (this->month == t.getMonth()) &&
-               (this->year == t.getYear());
+    bool operator==(Date &d) {
+        return (this->mday == d.getMonthDay()) &&
+               (this->wday == d.getWeekDay()) &&
+               (this->month == d.getMonth()) &&
+               (this->year == d.getYear());
     }
     string toString() {
         return to_string(this->mday) + "/" + to_string(this->month) + "/" + to_string(this->year) + " Week-day: " + to_string(this->wday);

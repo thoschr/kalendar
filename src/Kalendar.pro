@@ -16,10 +16,10 @@ SOURCES += main.cpp\
     persistence/pmanager.cpp \
     test/test.cpp \
     test/persistence/pmanager_test.cpp \
-    util/timeutil.cpp \
-    test/util/timeutil_test.cpp \
     view/monthview.cpp \
-    view/qframe_extended.cpp
+    view/qframe_extended.cpp \
+    util/dateutil.cpp \
+    test/util/dateutil_test.cpp
 
 HEADERS  += model/event.h \
     persistence/pmanager.h \
@@ -28,11 +28,11 @@ HEADERS  += model/event.h \
     test/persistence/pmanager_test.h \
     model/category.h \
     model/event.h \
-    util/timeutil.h \
-    test/util/timeutil_test.h \
     view/monthview.h \
     view/qframe_extended.h \
-    model/date.h
+    model/date.h \
+    util/dateutil.h \
+    test/util/dateutil_test.h
 
 QMAKE_LIBS += -lsqlite3
 QMAKE_CXXFLAGS += -std=c++11

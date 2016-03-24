@@ -1,7 +1,7 @@
 #include "monthview.h"
 #include "ui_monthview.h"
 
-#include "../util/timeutil.h"
+#include "../util/dateutil.h"
 
 #include "qframe_extended.h"
 
@@ -21,29 +21,29 @@
 
 
 void MonthView::on_mouse_press(QFrameExtended *frame) {
-    this->selection_start = frame->getTime();
+    this->selection_start = frame->getDate();
 }
 
 void MonthView::on_mouse_release(QFrameExtended *frame) {
-    this->selection_end = frame->getTime();
+    this->selection_end = frame->getDate();
     //TODO: Show the window to add an event with the start and the end already setted
 }
 
 void MonthView::on_back_button_click() {
     /* Gets the current month displayed using an hack. Infact, the cell in the middle will have always a value setted. */
-    display_days(TimeUtil::decrease_month(this->frames[21]->getTime()));
+    display_days(DateUtil::decrease_month(this->frames[21]->getDate()));
 }
 
 void MonthView::on_next_button_click() {
     /* Gets the current month displayed using an hack. Infact, the cell in the middle will have always a value setted. */
-    display_days(TimeUtil::increase_month(this->frames[21]->getTime()));
+    display_days(DateUtil::increase_month(this->frames[21]->getDate()));
 }
 
 MonthView::MonthView(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MonthView)
 {
-    Time current_time = TimeUtil::get_current_time();
+    Date current_date = DateUtil::get_current_date();
 
     this->label_date = new QLabel;
     this->layout = new QVBoxLayout;
@@ -72,7 +72,7 @@ MonthView::MonthView(QWidget *parent) :
         QVBoxLayout *vl = new QVBoxLayout;
         frame->setMinimumWidth(150);
         frame->setMinimumHeight(100);
-        QLabel *wday_name = new QLabel(TimeUtil::numeric2literal_day_of_week(j+1).c_str());
+        QLabel *wday_name = new QLabel(DateUtil::numeric2literal_day_of_week(j+1).c_str());
         wday_name->setObjectName("header");
         vl->addWidget(wday_name);
         vl->setMargin(0);
@@ -107,7 +107,7 @@ MonthView::MonthView(QWidget *parent) :
     grid_layout->setVerticalSpacing(0);
 
     //Fill the grid with the days of the default month (i.e. the current month)
-    display_days(current_time);
+    display_days(current_date);
 
     this->layout->addLayout(grid_layout);
 
@@ -127,19 +127,19 @@ MonthView::~MonthView()
     delete this->layout;
 }
 
-void MonthView::display_days(Time time) { //TODO clean today cell
+void MonthView::display_days(Date date) { //TODO clean today cell
     //Update the label that contains month and year
-    this->label_date->setText(QString(TimeUtil::get_literal_month(time.getMonth()).c_str()) + QString("    ") + QString::number(time.getYear()));
+    this->label_date->setText(QString(DateUtil::get_literal_month(date.getMonth()).c_str()) + QString("    ") + QString::number(date.getYear()));
     //The current time is needed to highlight the current day
-    Time current_time = TimeUtil::get_current_time();
-    int tot_days = TimeUtil::get_days_in_month(time.getMonth(), time.getYear());
+    Date current_date = DateUtil::get_current_date();
+    int tot_days = DateUtil::get_days_in_month(date.getMonth(), date.getYear());
     int i,x,start_wday;
 
     //first week day of the current month
-    start_wday = TimeUtil::get_first_day_of_month(time).getWeekDay();
+    start_wday = DateUtil::get_first_day_of_month(date).getWeekDay();
     x = 1;
     for (i = 0; i < 42; i++) {
-        this->frames[i]->setTime(Time(x, (start_wday + (x-1)) % 7, time.getMonth(), time.getYear()));
+        this->frames[i]->setDate(Date(x, (start_wday + (x-1)) % 7, date.getMonth(), date.getYear()));
         QLabel *day = static_cast<QLabel*> (this->frames[i]->children().at(1));
         //First clean and then overwrite
         day->setObjectName("");
@@ -151,7 +151,7 @@ void MonthView::display_days(Time time) { //TODO clean today cell
             //I'll insert into the label the number of the day
             day->setText(QString::number(x));
             //Checks current day
-            if ((x == current_time.getMonthDay()) && (time.getMonth() == current_time.getMonth()) && (time.getYear() == current_time.getYear()))
+            if ((x == current_date.getMonthDay()) && (date.getMonth() == current_date.getMonth()) && (date.getYear() == current_date.getYear()))
                 day->setObjectName("today");
             x++;
         }

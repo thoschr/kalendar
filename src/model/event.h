@@ -10,6 +10,7 @@ private:
     string name;
     string description;
     string category;
+    /* Timestamp */
     unsigned long start;
     unsigned long end;
 
