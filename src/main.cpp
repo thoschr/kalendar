@@ -10,10 +10,10 @@ int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
     MonthView window;
-    window.show();
+    //window.show();
 
-    //Test t;
-    //t.test_util();
+    Test t;
+    t.test_util();
 
     return a.exec();
 }

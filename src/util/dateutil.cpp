@@ -11,9 +11,7 @@ DateUtil::DateUtil()
 }
 
 Date DateUtil::get_current_date() {
-    time_t timestamp = time(NULL);
-    struct tm *current_time = localtime(&timestamp);
-    return Date(current_time->tm_mday, current_time->tm_wday ?: 7, current_time->tm_mon + 1, current_time->tm_year + 1900);
+    return date_from_timestamp(static_cast <unsigned long> (time(NULL)));
 }
 
 string DateUtil::get_literal_month(int m) {
@@ -55,10 +53,11 @@ int DateUtil::get_days_in_month(int month, int year) {
     return numberOfDays;
 }
 
+/* Assume to receive a valid timestamp */
 Date DateUtil::date_from_timestamp(unsigned long timestamp) {
     const time_t t = static_cast<const time_t> (timestamp);
     struct tm *tm = localtime(&t);
-    Date date(tm->tm_mday, tm->tm_wday + 1, tm->tm_mon + 1, tm->tm_year + 1900);
+    Date date(tm->tm_mday, tm->tm_wday ?: 7, tm->tm_mon + 1, tm->tm_year + 1900);
     //free(tm); segfault?
     return date;
 }
@@ -79,6 +78,7 @@ Date DateUtil::get_last_day_of_month(Date &date) {
 }
 
 //TODO write tests
+//TODO attention: each month has a different number of days (e.g. 31 doesn't exist in february)
 //Assume to get a valid time (i.e. no negative numbers, etc.)
 Date DateUtil::increase_month(Date date) {
     Date last_day_curr_month = get_last_day_of_month(date);

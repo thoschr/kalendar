@@ -1,5 +1,7 @@
 #include "dateutil_test.h"
 
+#include <QDebug>
+
 DateUtilTest::DateUtilTest()
 {
     this->march_2016 = new Date(10, 4, 3, 2016);
@@ -35,6 +37,7 @@ void DateUtilTest::test_all() {
     test_literal2numeric_day_of_week();
     test_numeric2literal_day_of_week();
     test_get_literal_month();
+    test_date_from_timestamp();
     test_get_first_day_of_month();
     test_increase_month();
     test_decrease_month();
@@ -80,6 +83,15 @@ void DateUtilTest::test_get_first_day_of_month() {
             (DateUtil::get_first_day_of_month(*this->sep_1927) == *this->first_sep_1927) &&
             (DateUtil::get_first_day_of_month(*this->jan_2015)) == *this->firstday_of_year_2015 &&
             (DateUtil::get_first_day_of_month(*this->feb_2016)) == *this->first_feb_2016)
+}
+
+void DateUtilTest::test_date_from_timestamp() {
+    Test::print("test_date_from_timestamp ");
+    ASSERT ((DateUtil::date_from_timestamp(1420070400)) == *this->firstday_of_year_2015 &&
+            (DateUtil::date_from_timestamp(1419984000)) == *this->lastday_of_year_2014 &&
+            (DateUtil::date_from_timestamp(1456012800)) == *this->feb_2016 &&
+            (DateUtil::date_from_timestamp(4175884800)) == *this->may_2102 &&
+            (DateUtil::date_from_timestamp(-1333670400)) == *this->sep_1927)
 }
 
 void DateUtilTest::test_get_last_day_of_month() {

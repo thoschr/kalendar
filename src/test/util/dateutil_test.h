@@ -26,7 +26,7 @@ public:
     void test_numeric2literal_day_of_week();
     void test_literal2numeric_day_of_week();
     void test_get_days_in_month();
-    void test_time_from_timestamp();
+    void test_date_from_timestamp();
     void test_get_first_day_of_month();
     void test_get_last_day_of_month();
     void test_increase_month();
