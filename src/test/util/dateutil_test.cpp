@@ -91,6 +91,7 @@ void DateUtilTest::test_date_from_timestamp() {
             (DateUtil::date_from_timestamp(1419984000)) == *this->lastday_of_year_2014 &&
             (DateUtil::date_from_timestamp(1456012800)) == *this->feb_2016 &&
             (DateUtil::date_from_timestamp(4175884800)) == *this->may_2102 &&
+            /* remember: the timestamp will be converted into an unsigned long */
             (DateUtil::date_from_timestamp(-1333670400)) == *this->sep_1927)
 }
 

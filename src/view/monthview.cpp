@@ -155,5 +155,7 @@ void MonthView::display_days(Date date) { //TODO clean today cell
                 day->setObjectName("today");
             x++;
         }
+        //Refresh the css rules
+        this->frames[i]->setStyleSheet(CELL_STYLE);
     }
 }
