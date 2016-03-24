@@ -29,6 +29,21 @@ public:
     void setWeekDay(int wday) { this->wday = wday; }
     void setMonth(int month) { this->month = month; }
     void setYear(int year) { this->year = year; }
+
+    int compareTo (Date &d) {
+        int ret;
+        ret = this->year - d.getYear();
+        if (ret != 0) return ret;
+        else { //Same year, compare months
+            ret = this->month - d.getMonth();
+            if (ret != 0) return ret;
+            else { //Same year and month, compare days
+                ret = this->mday - d.getMonthDay();
+                return ret;
+            }
+        }
+    }
+
     Date& operator=(Date d) {
         this->mday = d.getMonthDay();
         this->wday = d.getWeekDay();
@@ -36,12 +51,14 @@ public:
         this->year = d.getYear();
         return *this;
     }
+
     bool operator==(Date &d) {
         return (this->mday == d.getMonthDay()) &&
                (this->wday == d.getWeekDay()) &&
                (this->month == d.getMonth()) &&
                (this->year == d.getYear());
     }
+
     string toString() {
         return to_string(this->mday) + "/" + to_string(this->month) + "/" + to_string(this->year) + " Week-day: " + to_string(this->wday);
     }

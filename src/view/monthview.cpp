@@ -22,13 +22,21 @@
 
 void MonthView::on_mouse_press(QFrameExtended *frame) {
     this->selection_start = frame->getDate();
+    frame->releaseMouse();
 }
 
 void MonthView::on_mouse_release(QFrameExtended *frame) {
     this->selection_end = frame->getDate();
-    //TODO: Show the window to add an event with the start and the end already setted
-    EventDialog *eventDialog = new EventDialog;
-    eventDialog->show();
+    /* The following lines will popup the dialog to add an event with the start and the end already setted,
+     * but only if the user selects a valid range.
+     */
+    //FIXME, press event grab mouse events!
+    qDebug() << "START: " << this->selection_start.toString().c_str() << endl;
+    qDebug() << "END: " << this->selection_end.toString().c_str() << endl;
+    if (this->selection_end.compareTo(this->selection_start) >= 0) {
+        EventDialog *eventDialog = new EventDialog;
+        eventDialog->show();
+    }
 }
 
 void MonthView::on_back_button_click() {
