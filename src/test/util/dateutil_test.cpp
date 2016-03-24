@@ -13,8 +13,10 @@ DateUtilTest::DateUtilTest()
     this->first_march_2016 = new Date(1, 2, 3, 2016);
     this->first_sep_1927 = new Date(1, 4, 9, 1927);
     this->jan_2015 = new Date(12, 1, 1, 2015);
+    this->lastday_jan_2015 = new Date(31, 6, 1, 2015);
     this->feb_2016 = new Date(21, 7, 2, 2016);
     this->first_feb_2016 = new Date(1, 1, 2, 2016);
+    this->dec_2014 = new Date(14, 7, 12, 2014);
 }
 
 DateUtilTest::~DateUtilTest()
@@ -30,6 +32,7 @@ DateUtilTest::~DateUtilTest()
     delete this->jan_2015;
     delete this->feb_2016;
     delete this->first_feb_2016;
+    delete this->dec_2014;
 }
 
 void DateUtilTest::test_all() {
@@ -39,6 +42,7 @@ void DateUtilTest::test_all() {
     test_get_literal_month();
     test_date_from_timestamp();
     test_get_first_day_of_month();
+    test_get_last_day_of_month();
     test_increase_month();
     test_decrease_month();
 }
@@ -96,13 +100,19 @@ void DateUtilTest::test_date_from_timestamp() {
 }
 
 void DateUtilTest::test_get_last_day_of_month() {
-
+    Test::print("test_get_last_day_of_month ");
+    ASSERT ((DateUtil::get_last_day_of_month(*this->feb_2016)) == *this->leap_year_2016 &&
+            (DateUtil::get_last_day_of_month(*this->dec_2014)) == *this->lastday_of_year_2014)
 }
 
 void DateUtilTest::test_increase_month() {
     Test::print("test_increase_month ");
+    ASSERT (DateUtil::increase_month(*this->first_feb_2016) == *this->first_march_2016 &&
+            DateUtil::increase_month(*this->lastday_of_year_2014) == *this->lastday_jan_2015)
 }
 
 void DateUtilTest::test_decrease_month() {
     Test::print("test_decrease_month ");
+    ASSERT (DateUtil::decrease_month(*this->first_march_2016) == *this->first_feb_2016 &&
+            DateUtil::decrease_month(*this->lastday_jan_2015) == *this->lastday_of_year_2014)
 }

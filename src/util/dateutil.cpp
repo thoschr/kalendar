@@ -77,8 +77,7 @@ Date DateUtil::get_last_day_of_month(Date &date) {
     return Date(tot_days, wday, date.getMonth(), date.getYear());
 }
 
-//TODO write tests
-//TODO attention: each month has a different number of days (e.g. 31 doesn't exist in february)
+//Attention: each month has a different number of days (e.g. 31 doesn't exist in february)
 //Assume to get a valid time (i.e. no negative numbers, etc.)
 Date DateUtil::increase_month(Date date) {
     Date last_day_curr_month = get_last_day_of_month(date);

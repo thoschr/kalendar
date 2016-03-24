@@ -5,7 +5,7 @@
 #include "persistence/pmanager_test.h"
 #include "util/dateutil_test.h"
 
-#define ASSERT(X) X ?  Test::print_green("passed\n") :  Test::print_red("fail\n");
+#define ASSERT(X) if (X) Test::print_green("passed\n"); else { Test::print_red("fail\n"); exit(1); }
 
 using namespace std;
 

@@ -18,6 +18,8 @@ private:
     Date *jan_2015;
     Date *feb_2016;
     Date *first_feb_2016;
+    Date *dec_2014;
+    Date *lastday_jan_2015;
 public:
     DateUtilTest();
     ~DateUtilTest();
