@@ -19,7 +19,8 @@ SOURCES += main.cpp\
     view/monthview.cpp \
     view/qframe_extended.cpp \
     util/dateutil.cpp \
-    test/util/dateutil_test.cpp
+    test/util/dateutil_test.cpp \
+    view/eventdialog.cpp
 
 HEADERS  += model/event.h \
     persistence/pmanager.h \
@@ -32,7 +33,10 @@ HEADERS  += model/event.h \
     view/qframe_extended.h \
     model/date.h \
     util/dateutil.h \
-    test/util/dateutil_test.h
+    test/util/dateutil_test.h \
+    view/eventdialog.h
 
 QMAKE_LIBS += -lsqlite3
 QMAKE_CXXFLAGS += -std=c++11
+
+FORMS +=

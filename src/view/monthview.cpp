@@ -2,7 +2,7 @@
 #include "ui_monthview.h"
 
 #include "../util/dateutil.h"
-
+#include "eventdialog.h"
 #include "qframe_extended.h"
 
 #include <QDebug>
@@ -27,6 +27,8 @@ void MonthView::on_mouse_press(QFrameExtended *frame) {
 void MonthView::on_mouse_release(QFrameExtended *frame) {
     this->selection_end = frame->getDate();
     //TODO: Show the window to add an event with the start and the end already setted
+    EventDialog *eventDialog = new EventDialog;
+    eventDialog->show();
 }
 
 void MonthView::on_back_button_click() {
