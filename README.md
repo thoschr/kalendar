@@ -12,6 +12,10 @@ TODO:
 * Notify system [as plugin]
 * Year view for long-term events
 
+### Screenshot
+
+![screenshot](https://raw.githubusercontent.com/echo-devim/kalendar/master/screenshot.png)
+
 ### Motivation
 I need to schedule my time in a more efficient way. I don't like online calendar like google calendar for the privacy issues. I looked for some good calendar application, but seems there are just a couple of such calendar. Two main calendar applications are: gnome-desktop and korganizer. Their problems are a lot of dependencies and complicated compilation. So I decided to develop a simple but powerful calendar with painless compilation, without dependencies and desktop environment independent.
 
