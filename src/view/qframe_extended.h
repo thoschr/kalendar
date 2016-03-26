@@ -13,7 +13,7 @@ private:
     Date *date;
 
 public:
-    explicit QFrameExtended(QWidget *parent = 0) : QFrame(parent) {}
+    explicit QFrameExtended(QWidget *parent = 0) : QFrame(parent), date(NULL) { }
     Date* getDate() { return date; }
     void setDate(Date *d) { this->date = d; }
 

@@ -23,13 +23,13 @@
 
 void MonthView::on_mouse_move(QFrameExtended *frame) {
     if ((frame->getDate() != NULL) && //Checks if the frame is valid
-        (this->selection_start != NULL)) { //and if the selection is already started
-        bool selected = false;
+        (this->selection_start != NULL) && //and if the selection is already started
+        (!this->selection_end || frame->getDate()->compareTo(*this->selection_end) != 0)) { //and if this is a new cell
+        this->selection_end = frame->getDate(); //Keeps in memory where we're arrived
         for (int i = 0; i < 42; i++) {
             if (this->frames[i]->getDate() != NULL) {
-                if (this->selection_start->compareTo(*this->frames[i]->getDate()) == 0) selected = true;
-                if (this->frames[i]->getDate()->compareTo(*frame->getDate()) > 0) selected = false;
-                if (selected) {
+                if ((this->frames[i]->getDate()->compareTo(*this->selection_start) >= 0) &&
+                    (this->frames[i]->getDate()->compareTo(*frame->getDate()) <= 0)) {
                     this->frames[i]->setObjectName("selected");
                     this->frames[i]->setStyleSheet(CELL_STYLE);
                 } else {
