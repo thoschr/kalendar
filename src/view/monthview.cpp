@@ -18,8 +18,28 @@
                    "QLabel { border: none; font-size: 16px; padding: 5px; background-color:rgba(0,0,0,0); }" \
                    "QLabel#today { background-color: #FFFF88; }" \
                    "QFrame#day:hover { background-color: #EEEEFF; }" \
+                   "QFrame#selected { background-color: #EEEEFF; }" \
                    "QLabel#header { background-color: #EEEEEE; padding: auto; font-weight: bold; }"
 
+void MonthView::on_mouse_move(QFrameExtended *frame) {
+    if ((frame->getDate() != NULL) && //Checks if the frame is valid
+        (this->selection_start != NULL)) { //and if the selection is already started
+        bool selected = false;
+        for (int i = 0; i < 42; i++) {
+            if (this->frames[i]->getDate() != NULL) {
+                if (this->selection_start->compareTo(*this->frames[i]->getDate()) == 0) selected = true;
+                if (this->frames[i]->getDate()->compareTo(*frame->getDate()) > 0) selected = false;
+                if (selected) {
+                    this->frames[i]->setObjectName("selected");
+                    this->frames[i]->setStyleSheet(CELL_STYLE);
+                } else {
+                    this->frames[i]->setObjectName("day");
+                    this->frames[i]->setStyleSheet(CELL_STYLE);
+                }
+            }
+        }
+    }
+}
 
 void MonthView::on_mouse_press(QFrameExtended *frame) {
     if (frame->getDate() != NULL) //Checks if the frame is valid
@@ -30,6 +50,13 @@ void MonthView::on_mouse_release(QFrameExtended *frame) {
     if ((frame->getDate() != NULL) && //Checks if the frame is valid
         (this->selection_start != NULL)) { //and if the selection is already started
         this->selection_end = frame->getDate();
+        /* Clean the selection */
+        for (int i = 0; i < 42; i++) {
+            if (this->frames[i]->getDate() != NULL) {
+                this->frames[i]->setObjectName("day");
+                this->frames[i]->setStyleSheet(CELL_STYLE);
+            }
+        }
         /* The following lines will popup the dialog to add an event with the start and the end already setted,
          * but only if the user selects a valid range.
          */
@@ -130,8 +157,9 @@ MonthView::MonthView(QWidget *parent) :
      window->setMinimumHeight(700);
      window->setMinimumWidth(1200);
 
-     connect(window, &QWidgetExtended::pressed, this, &MonthView::on_mouse_press);
-     connect(window, &QWidgetExtended::released, this, &MonthView::on_mouse_release);
+     connect(window, &QWidgetExtended::mousePress, this, &MonthView::on_mouse_press);
+     connect(window, &QWidgetExtended::mouseRelease, this, &MonthView::on_mouse_release);
+     connect(window, &QWidgetExtended::mouseMove, this, &MonthView::on_mouse_move);
 
      // Set QWidget as the central layout of the main window
      setCentralWidget(window);

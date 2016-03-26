@@ -30,6 +30,7 @@ public:
 public slots:
     void on_mouse_press(QFrameExtended *frame);
     void on_mouse_release(QFrameExtended *frame);
+    void on_mouse_move(QFrameExtended *frame);
     void on_back_button_click();
     void on_next_button_click();
 };

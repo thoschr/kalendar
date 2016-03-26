@@ -7,7 +7,7 @@ QWidgetExtended::QWidgetExtended(QWidget *parent) : QWidget(parent)
 
 }
 
-void QWidgetExtended::mousePressEvent(QMouseEvent *event) {
+void QWidgetExtended::signalEvent(QMouseEvent *event, int code) {
     QFrameExtended frame;
     QWidget *widget = this->childAt(event->pos());
     if (widget != NULL) {
@@ -15,20 +15,29 @@ void QWidgetExtended::mousePressEvent(QMouseEvent *event) {
         //I don't use explicitly the string because if one day someone changes the name of the class, the compiler will output an error
         QString className(frame.metaObject()->className());
         if (widgetClassName == className) {
-            emit pressed(dynamic_cast<QFrameExtended*> (widget));
+            switch(code) {
+                case PRESSED:
+                    emit mousePress(dynamic_cast<QFrameExtended*> (widget));
+                    break;
+                case RELEASED:
+                    emit mouseRelease(dynamic_cast<QFrameExtended*> (widget));
+                    break;
+                case MOVED:
+                    emit mouseMove(dynamic_cast<QFrameExtended*> (widget));
+                    break;
+            }
         }
     }
 }
 
+void QWidgetExtended::mousePressEvent(QMouseEvent *event) {
+    signalEvent(event, PRESSED);
+}
+
 void QWidgetExtended::mouseReleaseEvent(QMouseEvent *event) {
-    QFrameExtended frame;
-    QWidget *widget = this->childAt(event->pos());
-    if (widget != NULL) {
-        QString widgetClassName(widget->metaObject()->className());
-        //I don't use explicitly the string because if one day someone changes the name of the class, the compiler will output an error
-        QString className(frame.metaObject()->className());
-        if (widgetClassName == className) {
-            emit released(dynamic_cast<QFrameExtended*> (widget));
-        }
-    }
+    signalEvent(event, RELEASED);
+}
+
+void QWidgetExtended::mouseMoveEvent(QMouseEvent *event) {
+    signalEvent(event, MOVED);
 }
