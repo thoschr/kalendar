@@ -1,7 +1,9 @@
 #include "eventdialog.h"
 #include "ui_eventdialog.h"
 
-EventDialog::EventDialog(QWidget *parent) :
+#include <QDateTimeEdit>
+
+EventDialog::EventDialog(Date *start_date, Date *end_date, QWidget *parent) :
     QDialog(parent),
     ui(new Ui::EventDialog)
 {
@@ -27,13 +29,17 @@ EventDialog::EventDialog(QWidget *parent) :
     main_layout->addLayout(second_row);
     QHBoxLayout *third_row = new QHBoxLayout;
     QLabel *label_start = new QLabel("Start: ");
-    QLineEdit *edit_start = new QLineEdit;
+    QDateTimeEdit *edit_start = new QDateTimeEdit;
+    edit_start->setCalendarPopup(true);
+    edit_start->setDateTime(QDateTime(QDate(start_date->getYear(), start_date->getMonth(), start_date->getMonthDay())));
     third_row->addWidget(label_start);
     third_row->addWidget(edit_start);
     main_layout->addLayout(third_row);
     QHBoxLayout *fourth_row = new QHBoxLayout;
     QLabel *label_end = new QLabel("End: ");
-    QLineEdit *edit_end = new QLineEdit;
+    QDateTimeEdit *edit_end = new QDateTimeEdit;
+    edit_end->setCalendarPopup(true);
+    edit_end->setDateTime(QDateTime(QDate(end_date->getYear(), end_date->getMonth(), end_date->getMonthDay())));
     fourth_row->addWidget(label_end);
     fourth_row->addWidget(edit_end);
     main_layout->addLayout(fourth_row);

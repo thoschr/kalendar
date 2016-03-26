@@ -60,9 +60,8 @@ void MonthView::on_mouse_release(QFrameExtended *frame) {
          * but only if the user selects a valid range.
          */
         if (this->selection_end->compareTo(*this->selection_start) >= 0) {
-            EventDialog *eventDialog = new EventDialog;
+            EventDialog *eventDialog = new EventDialog(this->selection_start, this->selection_end);
             eventDialog->show();
-            //TODO: set start and end date to the dialog
         }
         this->selection_start = NULL;
     }
