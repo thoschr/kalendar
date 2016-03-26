@@ -4,6 +4,7 @@
 #include "../util/dateutil.h"
 #include "eventdialog.h"
 #include "qframe_extended.h"
+#include "qwidget_extended.h"
 
 #include <QDebug>
 
@@ -21,32 +22,34 @@
 
 
 void MonthView::on_mouse_press(QFrameExtended *frame) {
-    this->selection_start = frame->getDate();
-    frame->releaseMouse();
+    if (frame->getDate() != NULL) //Checks if the frame is valid
+        this->selection_start = frame->getDate();
 }
 
 void MonthView::on_mouse_release(QFrameExtended *frame) {
-    this->selection_end = frame->getDate();
-    /* The following lines will popup the dialog to add an event with the start and the end already setted,
-     * but only if the user selects a valid range.
-     */
-    //FIXME, press event grab mouse events!
-    qDebug() << "START: " << this->selection_start.toString().c_str() << endl;
-    qDebug() << "END: " << this->selection_end.toString().c_str() << endl;
-    if (this->selection_end.compareTo(this->selection_start) >= 0) {
-        EventDialog *eventDialog = new EventDialog;
-        eventDialog->show();
+    if ((frame->getDate() != NULL) && //Checks if the frame is valid
+        (this->selection_start != NULL)) { //and if the selection is already started
+        this->selection_end = frame->getDate();
+        /* The following lines will popup the dialog to add an event with the start and the end already setted,
+         * but only if the user selects a valid range.
+         */
+        if (this->selection_end->compareTo(*this->selection_start) >= 0) {
+            EventDialog *eventDialog = new EventDialog;
+            eventDialog->show();
+            //TODO: set start and end date to the dialog
+        }
+        this->selection_start = NULL;
     }
 }
 
 void MonthView::on_back_button_click() {
     /* Gets the current month displayed using an hack. Infact, the cell in the middle will have always a value setted. */
-    display_days(DateUtil::decrease_month(this->frames[21]->getDate()));
+    display_days(DateUtil::decrease_month(*this->frames[21]->getDate()));
 }
 
 void MonthView::on_next_button_click() {
     /* Gets the current month displayed using an hack. Infact, the cell in the middle will have always a value setted. */
-    display_days(DateUtil::increase_month(this->frames[21]->getDate()));
+    display_days(DateUtil::increase_month(*this->frames[21]->getDate()));
 }
 
 MonthView::MonthView(QWidget *parent) :
@@ -54,7 +57,8 @@ MonthView::MonthView(QWidget *parent) :
     ui(new Ui::MonthView)
 {
     Date current_date = DateUtil::get_current_date();
-
+    this->selection_start = NULL;
+    this->selection_end = NULL;
     this->label_date = new QLabel;
     this->layout = new QVBoxLayout;
     label_date->setMaximumHeight(20);
@@ -98,13 +102,12 @@ MonthView::MonthView(QWidget *parent) :
             QFrameExtended *frame = new QFrameExtended;
             QVBoxLayout *vl = new QVBoxLayout;
             QLabel *day = new QLabel;
+            frame->setDate(NULL);
             frame->setObjectName("day");
             day->setMaximumHeight(25);
             vl->setAlignment(Qt::AlignTop | Qt::AlignRight);
             vl->addWidget(day);
             vl->setMargin(0);
-            connect(frame, &QFrameExtended::pressed, this, &MonthView::on_mouse_press);
-            connect(frame, &QFrameExtended::released, this, &MonthView::on_mouse_release);
             frame->setMinimumWidth(150);
             frame->setMinimumHeight(100);
             frame->setLayout(vl);
@@ -122,10 +125,13 @@ MonthView::MonthView(QWidget *parent) :
     this->layout->addLayout(grid_layout);
 
      // Set layout in QWidget
-     QWidget *window = new QWidget();
+     QWidgetExtended *window = new QWidgetExtended;
      window->setLayout(this->layout);
      window->setMinimumHeight(700);
      window->setMinimumWidth(1200);
+
+     connect(window, &QWidgetExtended::pressed, this, &MonthView::on_mouse_press);
+     connect(window, &QWidgetExtended::released, this, &MonthView::on_mouse_release);
 
      // Set QWidget as the central layout of the main window
      setCentralWidget(window);
@@ -135,6 +141,8 @@ MonthView::~MonthView()
 {
     delete ui; //seems this frees also this->frames
     delete this->layout;
+    delete this->selection_start;
+    delete this->selection_end;
 }
 
 void MonthView::display_days(Date date) { //TODO clean today cell
@@ -149,7 +157,11 @@ void MonthView::display_days(Date date) { //TODO clean today cell
     start_wday = DateUtil::get_first_day_of_month(date).getWeekDay();
     x = 1;
     for (i = 0; i < 42; i++) {
-        this->frames[i]->setDate(Date(x, (start_wday + (x-1)) % 7, date.getMonth(), date.getYear()));
+        //Set an invalid date
+        if (this->frames[i]->getDate() != NULL) {
+            delete this->frames[i]->getDate();
+            this->frames[i]->setDate(NULL);
+        }
         QLabel *day = static_cast<QLabel*> (this->frames[i]->children().at(1));
         //First clean and then overwrite
         day->setObjectName("");
@@ -158,6 +170,7 @@ void MonthView::display_days(Date date) { //TODO clean today cell
         if (( i > 6 || //if I'm after the first week or
             (i % 7 >= start_wday-1)) && //if I'm in the first week and I'm in the right days
             (x <= tot_days)) { //and I'm not out of bound
+            this->frames[i]->setDate(new Date(x, (start_wday + (x-1)) % 7, date.getMonth(), date.getYear()));
             //I'll insert into the label the number of the day
             day->setText(QString::number(x));
             //Checks current day
