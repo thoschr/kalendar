@@ -17,7 +17,6 @@
 #define CELL_STYLE "QFrame { background-color: #FFFFFF; border: 1px solid #555555; }" \
                    "QLabel { border: none; font-size: 16px; padding: 5px; background-color:rgba(0,0,0,0); }" \
                    "QLabel#today { background-color: #FFFF88; }" \
-                   "QFrame#day:hover { background-color: #EEEEFF; }" \
                    "QFrame#selected { background-color: #EEEEFF; }" \
                    "QLabel#header { background-color: #EEEEEE; padding: auto; font-weight: bold; }"
 
