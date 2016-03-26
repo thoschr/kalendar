@@ -3,6 +3,7 @@
 
 #include <QWidget>
 #include <QString>
+#include <QMouseEvent>
 #include "qframe_extended.h"
 
 class QWidgetExtended : public QWidget

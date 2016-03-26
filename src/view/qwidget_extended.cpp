@@ -1,6 +1,4 @@
 #include "qwidget_extended.h"
-
-#include <QMouseEvent>
 #include "qframe_extended.h"
 #include <QDebug>
 
