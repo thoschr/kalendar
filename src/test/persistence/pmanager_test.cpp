@@ -4,11 +4,13 @@ PManagerTest::PManagerTest()
 {
     unsigned long timestamp = (unsigned long) time(NULL);
     string test("test_string");
+    string specialchars("'/--\"#@");
     this->valid_event = new Event(0, test, test, test, timestamp, timestamp + 100);
     this->valid_event_2 = new Event(100, test, test, test, timestamp, timestamp + 100000);
     /* Invalid Events */
     this->noname_event = new Event(1, string(""), test, test, timestamp, timestamp + 100);
     this->invalid_time_event = new Event(1, test, test, test, timestamp, timestamp - 100);
+    this->specialchars_event = new Event(1, specialchars, specialchars, specialchars, timestamp, timestamp + 100);
     /* Categories */
     this->valid_default_category = new Category(1, test, test);
     this->valid_category = new Category(0, test, test);
@@ -25,6 +27,7 @@ PManagerTest::~PManagerTest() {
     delete this->valid_category;
     delete this->valid_category_2;
     delete this->valid_default_category;
+    delete this->specialchars_event;
 }
 
 void PManagerTest::test_all() {
@@ -48,6 +51,7 @@ void PManagerTest::test_add_event() {
     PManager pm;
     ASSERT ((!(pm.add_event(this->noname_event))) &&
            (!(pm.add_event(this->invalid_time_event))) &&
+           (pm.add_event(this->specialchars_event)) &&
            (pm.add_event(this->valid_event)))
     pm.remove_all();
 }

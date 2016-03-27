@@ -1,5 +1,7 @@
 #include "pmanager.h"
 
+#include <QDebug>
+
 PManager::PManager()
 {
     /* Open the database (will be created if it doesn't exist) */
@@ -40,18 +42,45 @@ PManager::~PManager() {
     sqlite3_close(this->db);
 }
 
+string PManager::filterSpecialChars(string str) {
+    int start_pos = 0;
+    string to = "\\'";
+    while((str.find('\'', start_pos)) != std::string::npos) {
+        start_pos = str.find('\'', start_pos);
+        str.replace(start_pos, 1, to);
+        start_pos += to.length();
+    }
+    return str;
+}
+
 bool PManager::add_event(Event *e) {
-    char *err_msg = 0;
-    char sql[1024];
+    sqlite3_stmt *stmt;
+    string filteredName, filteredDescription, filteredCategory;
     if ((e->getName().length() < 3) || (e->getStart() > e->getEnd())) return false;
-    snprintf(sql, 1024, "INSERT INTO Events VALUES(%u, '%s', '%s', '%s', '%lu', '%lu');", e->getId(), e->getName().c_str(), e->getDescription().c_str(), e->getCategory().c_str(), e->getStart(), e->getEnd());
-    int rc = sqlite3_exec(this->db, sql, 0, 0, &err_msg);
+    int rc = sqlite3_prepare_v2(this->db, "INSERT INTO Events VALUES(?, ?, ?, ?, ?, ?);", -1, &stmt, NULL);
     if (rc != SQLITE_OK ) {
-        fprintf(stderr, "SQL error: %s\n", err_msg);
-        sqlite3_free(err_msg);
+        fprintf(stderr, "SQL error in prepare\n");
         sqlite3_close(this->db);
         return false;
     }
+    sqlite3_bind_int64 (stmt, 1, e->getId());
+    filteredName = filterSpecialChars(e->getName());
+    sqlite3_bind_text(stmt, 2, filteredName.c_str(), filteredName.length(), 0);
+    filteredDescription = filterSpecialChars(e->getDescription());
+    sqlite3_bind_text(stmt, 3, filteredDescription.c_str(), filteredDescription.length(), 0);
+    filteredCategory = filterSpecialChars(e->getCategory());
+    sqlite3_bind_text(stmt, 4, filteredCategory.c_str(), e->getCategory().length(), 0);
+    sqlite3_bind_int64(stmt, 5, e->getStart());
+    sqlite3_bind_int64(stmt, 6, e->getEnd());
+    //commit
+    rc = sqlite3_step(stmt);
+    if (rc != SQLITE_DONE ) {
+        fprintf(stderr, "SQL error in commit\n");
+        sqlite3_close(this->db);
+        return false;
+    }
+    //free memory
+    sqlite3_finalize(stmt);
     return true;
 }
 
@@ -68,13 +97,13 @@ std::list<Event*> PManager::get_events_of_month(int month, int year) {
     tm.tm_mon = tm.tm_mon + 1;
     long end_time = static_cast<long> (mktime(&tm));
     sqlite3_stmt *res;
-    char sql[1024];
-    snprintf(sql, 1024, "SELECT * FROM Events WHERE start >= %lu AND start < %lu;", start_time, end_time);
-    int rc = sqlite3_prepare_v2(this->db, sql, -1, &res, 0);
+    int rc = sqlite3_prepare_v2(this->db, "SELECT * FROM Events WHERE start >= ? AND start < ?", -1, &res, NULL);
     if (rc != SQLITE_OK) {
         fprintf(stderr, "Failed to fetch data: %s\n", sqlite3_errmsg(db));
         return result;
     }
+    sqlite3_bind_int64(res, 1, start_time);
+    sqlite3_bind_int64(res, 2, end_time);
     while (rc = sqlite3_step(res) == SQLITE_ROW) {
 
         Event *e = new Event( sqlite3_column_int(res, 0),
@@ -113,7 +142,7 @@ bool PManager::add_category(Category *c) {
     char *err_msg = 0;
     char sql[1024];
     if (c->getName().length() < 6) return false;
-    snprintf(sql, 1024, "INSERT INTO Categories VALUES(%u, '%s', '%s');", c->getId(), c->getName().c_str(), c->getColor().c_str());
+    snprintf(sql, 1024, "INSERT INTO Categories VALUES(%u, '%s', '%s');", c->getId(), filterSpecialChars(c->getName()).c_str(), filterSpecialChars(c->getColor()).c_str());
     int rc = sqlite3_exec(this->db, sql, 0, 0, &err_msg);
     if (rc != SQLITE_OK ) {
         fprintf(stderr, "SQL error: %s\n", err_msg);

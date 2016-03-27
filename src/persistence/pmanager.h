@@ -23,6 +23,8 @@ class PManager
 private:
     sqlite3 *db;
     string db_path;
+    string filterSpecialChars(string str);
+
 public:
     PManager();
     ~PManager();

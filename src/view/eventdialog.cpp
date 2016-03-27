@@ -76,15 +76,20 @@ void EventDialog::on_button_cancel_click() {
 }
 
 void EventDialog::on_button_save_click() {
+    QMessageBox msg;
+    msg.setWindowTitle("Error");
+    msg.setIconPixmap(QIcon::fromTheme("error").pixmap(40,40));
     if (this->edit_name->text().length() < 3) {
-        QMessageBox msg;
-        msg.setWindowTitle("Error");
         msg.setText("The name must have a length greater than 2.");
-        msg.setIconPixmap(QIcon::fromTheme("error").pixmap(40,40));
         msg.exec();
         return;
     }
     Event newEvent(0, this->edit_name->text().toStdString(), this->edit_description->toPlainText().toStdString(), this->edit_category->currentText().toStdString(), this->edit_start->dateTime().toTime_t(), this->edit_end->dateTime().toTime_t());
-    this->pm->add_event(&newEvent);
-    this->close();
+    if (this->pm->add_event(&newEvent))
+        this->close();
+    else {
+        msg.setText("Persistence error");
+        msg.exec();
+    }
+
 }

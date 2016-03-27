@@ -12,11 +12,13 @@ private:
     Event *valid_event;
     Event *valid_event_2;
     Event *noname_event;
+    Event *specialchars_event;
     Event *invalid_time_event;
     Category *valid_category;
     Category *valid_category_2;
     Category *valid_default_category;
     Category *noname_category;
+
 public:
     PManagerTest();
     ~PManagerTest();

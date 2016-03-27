@@ -13,6 +13,7 @@ int main(int argc, char *argv[])
     window.show();
 
     //Test t;
+    //t.test_persistence();
     //t.test_util();
 
     return a.exec();
