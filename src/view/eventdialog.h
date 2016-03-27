@@ -7,9 +7,13 @@
 #include <QPushButton>
 #include <QLabel>
 #include <QLineEdit>
-#include <QTextEdit>
+#include <QPlainTextEdit>
 #include <QDateTimeEdit>
 #include <QComboBox>
+#include <QMessageBox>
+#include <QIconEngine>
+#include <QPixmap>
+#include <QIcon>
 #include "model/date.h"
 #include "model/category.h"
 #include "model/event.h"
@@ -25,6 +29,12 @@ class EventDialog : public QDialog
 
 private:
     Ui::EventDialog *ui;
+    QLineEdit *edit_name;
+    QComboBox *edit_category;
+    QDateTimeEdit *edit_start;
+    QDateTimeEdit *edit_end;
+    QPlainTextEdit *edit_description;
+    PManager *pm;
 
 public:
     explicit EventDialog(Date *start_date, Date *end_date, QWidget *parent = 0);
