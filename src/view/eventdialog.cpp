@@ -4,7 +4,7 @@
 #include <QDebug>
 
 
-EventDialog::EventDialog(Date *start_date, Date *end_date, QWidget *parent) :
+EventDialog::EventDialog(Date start_date, Date end_date, QWidget *parent) :
     QDialog(parent),
     ui(new Ui::EventDialog)
 {
@@ -28,8 +28,8 @@ EventDialog::EventDialog(Date *start_date, Date *end_date, QWidget *parent) :
     QHBoxLayout *second_row = new QHBoxLayout;
     QLabel *label_category = new QLabel("Category: ");
     this->edit_category = new QComboBox;
-    list<Category*> list_categories = this->pm->get_categories();
-    for (Category *category : list_categories) {
+    this->category_list = this->pm->get_categories();
+    for (Category *category : category_list) {
         QPixmap pixmap(10, 10);
         pixmap.fill(QColor(category->getColor().c_str()));
         this->edit_category->addItem(QIcon(pixmap), QString(category->getName().c_str()));
@@ -41,7 +41,7 @@ EventDialog::EventDialog(Date *start_date, Date *end_date, QWidget *parent) :
     QLabel *label_start = new QLabel("Start: ");
     this->edit_start = new QDateTimeEdit;
     this->edit_start->setCalendarPopup(true);
-    this->edit_start->setDateTime(QDateTime(QDate(start_date->getYear(), start_date->getMonth(), start_date->getMonthDay())));
+    this->edit_start->setDateTime(QDateTime(QDate(start_date.getYear(), start_date.getMonth(), start_date.getMonthDay())));
     third_row->addWidget(label_start);
     third_row->addWidget(this->edit_start);
     main_layout->addLayout(third_row);
@@ -49,7 +49,7 @@ EventDialog::EventDialog(Date *start_date, Date *end_date, QWidget *parent) :
     QLabel *label_end = new QLabel("End: ");
     this->edit_end = new QDateTimeEdit;
     this->edit_end->setCalendarPopup(true);
-    this->edit_end->setDateTime(QDateTime(QDate(end_date->getYear(), end_date->getMonth(), end_date->getMonthDay())));
+    this->edit_end->setDateTime(QDateTime(QDate(end_date.getYear(), end_date.getMonth(), end_date.getMonthDay())));
     fourth_row->addWidget(label_end);
     fourth_row->addWidget(this->edit_end);
     main_layout->addLayout(fourth_row);
@@ -73,6 +73,7 @@ EventDialog::~EventDialog()
 
 void EventDialog::on_button_cancel_click() {
     this->close();
+    delete this;
 }
 
 void EventDialog::on_button_save_click() {
@@ -84,10 +85,18 @@ void EventDialog::on_button_save_click() {
         msg.exec();
         return;
     }
-    Event newEvent(0, this->edit_name->text().toStdString(), this->edit_description->toPlainText().toStdString(), this->edit_category->currentText().toStdString(), this->edit_start->dateTime().toTime_t(), this->edit_end->dateTime().toTime_t());
-    if (this->pm->add_event(&newEvent))
+    Category *category;
+    for (Category *c : this->category_list) {
+        if (this->edit_category->currentText().toStdString() == c->getName()) {
+            category = c;
+            break;
+        }
+    }
+    Event newEvent(0, this->edit_name->text().toStdString(), this->edit_description->toPlainText().toStdString(), category, this->edit_start->dateTime().toTime_t(), this->edit_end->dateTime().toTime_t());
+    if (this->pm->add_event(&newEvent)) {
         this->close();
-    else {
+        delete this;
+    } else {
         msg.setText("Persistence error");
         msg.exec();
     }

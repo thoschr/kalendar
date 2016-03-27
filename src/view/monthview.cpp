@@ -60,7 +60,7 @@ void MonthView::on_mouse_release(QFrameExtended *frame) {
          * but only if the user selects a valid range.
          */
         if (this->selection_end->compareTo(*this->selection_start) >= 0) {
-            EventDialog *eventDialog = new EventDialog(this->selection_start, this->selection_end);
+            EventDialog *eventDialog = new EventDialog(*this->selection_start, *this->selection_end);
             eventDialog->show();
         }
         this->selection_start = NULL;
@@ -69,12 +69,18 @@ void MonthView::on_mouse_release(QFrameExtended *frame) {
 
 void MonthView::on_back_button_click() {
     /* Gets the current month displayed using an hack. Infact, the cell in the middle will have always a value setted. */
-    display_days(DateUtil::decrease_month(*this->frames[21]->getDate()));
+    Date newDate = DateUtil::decrease_month(*this->frames[21]->getDate());
+    display_days(newDate);
+    /* Reload events */
+    display_events(newDate);
 }
 
 void MonthView::on_next_button_click() {
     /* Gets the current month displayed using an hack. Infact, the cell in the middle will have always a value setted. */
-    display_days(DateUtil::increase_month(*this->frames[21]->getDate()));
+    Date newDate = DateUtil::increase_month(*this->frames[21]->getDate());
+    display_days(newDate);
+    /* Reload events */
+    display_events(newDate);
 }
 
 MonthView::MonthView(QWidget *parent) :
@@ -86,12 +92,14 @@ MonthView::MonthView(QWidget *parent) :
     this->selection_end = NULL;
     this->label_date = new QLabel;
     this->layout = new QVBoxLayout;
-    label_date->setMaximumHeight(20);
-    label_date->setStyleSheet("QLabel { padding-left: 100px; padding-right: 100px; font-size: 20px; } ");
+    this->label_date->setMaximumHeight(40);
+    this->label_date->setStyleSheet("QLabel { padding-left: 100px; padding-right: 100px; font-size: 20px; } ");
     QPushButton *back = new QPushButton("<");
     QPushButton *next = new QPushButton(">");
     back->setMaximumWidth(60);
     next->setMaximumWidth(60);
+    back->setMaximumHeight(40);
+    next->setMaximumHeight(40);
     connect(back, &QPushButton::clicked, this, &MonthView::on_back_button_click);
     connect(next, &QPushButton::clicked, this, &MonthView::on_next_button_click);
     QHBoxLayout *hl = new QHBoxLayout;
@@ -126,12 +134,9 @@ MonthView::MonthView(QWidget *parent) :
             //Map a Time object to each frame
             QFrameExtended *frame = new QFrameExtended;
             QVBoxLayout *vl = new QVBoxLayout;
-            QLabel *day = new QLabel;
             frame->setDate(NULL);
             frame->setObjectName("day");
-            day->setMaximumHeight(25);
-            vl->setAlignment(Qt::AlignTop | Qt::AlignRight);
-            vl->addWidget(day);
+            vl->setAlignment(Qt::AlignTop | Qt::AlignLeft);
             vl->setMargin(0);
             frame->setMinimumWidth(150);
             frame->setMinimumHeight(100);
@@ -147,13 +152,17 @@ MonthView::MonthView(QWidget *parent) :
     //Fill the grid with the days of the default month (i.e. the current month)
     display_days(current_date);
 
+    //Load the events for the current month
+    display_events(current_date);
+
+    grid_layout->setMargin(5);
     this->layout->addLayout(grid_layout);
 
      // Set layout in QWidget
      QWidgetExtended *window = new QWidgetExtended;
      window->setLayout(this->layout);
-     window->setMinimumHeight(700);
-     window->setMinimumWidth(1200);
+     window->setMinimumHeight(600);
+     window->setMinimumWidth(1100);
 
      connect(window, &QWidgetExtended::mousePress, this, &MonthView::on_mouse_press);
      connect(window, &QWidgetExtended::mouseRelease, this, &MonthView::on_mouse_release);
@@ -188,10 +197,12 @@ void MonthView::display_days(Date date) { //TODO clean today cell
             delete this->frames[i]->getDate();
             this->frames[i]->setDate(NULL);
         }
-        QLabel *day = static_cast<QLabel*> (this->frames[i]->children().at(1));
-        //First clean and then overwrite
-        day->setObjectName("");
-        day->setText("");
+        //Clean all the labels inside the frame
+        QListIterator<QObject *> it (this->frames[i]->children());
+        while (it.hasNext()) {
+            delete qobject_cast<QLabel*> (it.next());
+        }
+        QLabel *day = new QLabel;
         //Checks right cells that will contain the days
         if (( i > 6 || //if I'm after the first week or
             (i % 7 >= start_wday-1)) && //if I'm in the first week and I'm in the right days
@@ -202,9 +213,35 @@ void MonthView::display_days(Date date) { //TODO clean today cell
             //Checks current day
             if ((x == current_date.getMonthDay()) && (date.getMonth() == current_date.getMonth()) && (date.getYear() == current_date.getYear()))
                 day->setObjectName("today");
+            this->frames[i]->layout()->addWidget(day);
             x++;
         }
         //Refresh the css rules
         this->frames[i]->setStyleSheet(CELL_STYLE);
     }
+}
+
+void MonthView::display_events(Date date) {
+    PManager pm;
+    list<Event*> event_list = pm.get_events_of_month(date.getMonth(), date.getYear());
+    int start_offset;
+    //Find at which cell the month starts
+    for (start_offset = 0; start_offset < 42; start_offset++) {
+        //Looks where is the first day of the month
+        if (this->frames[start_offset]->getDate() != NULL) break;
+    }
+    //Add events to the gui
+    for (Event *event : event_list) {
+        Date start = DateUtil::date_from_timestamp(event->getStart());
+        Date end = DateUtil::date_from_timestamp(event->getEnd());
+        QLabel *label_event = new QLabel(event->getName().c_str());
+        label_event->setStyleSheet(QString("QLabel { background-color : ") + QString(event->getCategory()->getColor().c_str()) + QString("};"));
+        label_event->setMinimumWidth(this->frames[start_offset+start.getMonthDay()-1]->minimumWidth());
+        label_event->setToolTip(event->getDescription().c_str());
+        this->frames[start_offset+start.getMonthDay()-1]->layout()->addWidget(label_event);
+    }
+}
+
+void MonthView::display_events(Date date, Category category) {
+
 }

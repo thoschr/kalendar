@@ -35,9 +35,10 @@ private:
     QDateTimeEdit *edit_end;
     QPlainTextEdit *edit_description;
     PManager *pm;
+    list<Category *> category_list;
 
 public:
-    explicit EventDialog(Date *start_date, Date *end_date, QWidget *parent = 0);
+    explicit EventDialog(Date start_date, Date end_date, QWidget *parent = 0);
     ~EventDialog();
 
 public slots:

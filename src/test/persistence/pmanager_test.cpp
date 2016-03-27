@@ -1,21 +1,25 @@
 #include "pmanager_test.h"
 
+#include <QDebug>
+
 PManagerTest::PManagerTest()
 {
     unsigned long timestamp = (unsigned long) time(NULL);
     string test("test_string");
     string specialchars("'/--\"#@");
-    this->valid_event = new Event(0, test, test, test, timestamp, timestamp + 100);
-    this->valid_event_2 = new Event(100, test, test, test, timestamp, timestamp + 100000);
-    /* Invalid Events */
-    this->noname_event = new Event(1, string(""), test, test, timestamp, timestamp + 100);
-    this->invalid_time_event = new Event(1, test, test, test, timestamp, timestamp - 100);
-    this->specialchars_event = new Event(1, specialchars, specialchars, specialchars, timestamp, timestamp + 100);
     /* Categories */
     this->valid_default_category = new Category(1, test, test);
     this->valid_category = new Category(0, test, test);
     this->valid_category_2 = new Category(100, test, test);
     this->noname_category = new Category(0, string(""), test);
+    this->specialchars_category = new Category(0, specialchars, specialchars);
+    /* Events */
+    this->valid_event = new Event(0, test, test, this->valid_category, timestamp, timestamp + 100);
+    this->valid_event_2 = new Event(100, test, test, this->valid_category, timestamp, timestamp + 100000);
+    /* Invalid Events */
+    this->noname_event = new Event(1, string(""), test, this->valid_category, timestamp, timestamp + 100);
+    this->invalid_time_event = new Event(1, test, test, this->valid_category, timestamp, timestamp - 100);
+    this->specialchars_event = new Event(1, specialchars, specialchars, this->specialchars_category, timestamp, timestamp + 100);
 }
 
 PManagerTest::~PManagerTest() {
@@ -25,6 +29,7 @@ PManagerTest::~PManagerTest() {
     delete this->invalid_time_event;
     delete this->noname_category;
     delete this->valid_category;
+    delete this->specialchars_category;
     delete this->valid_category_2;
     delete this->valid_default_category;
     delete this->specialchars_event;
@@ -38,6 +43,7 @@ void PManagerTest::test_all() {
     test_add_category();
     test_get_categories();
     test_remove_category();
+    test_get_category();
 }
 
 void PManagerTest::test_remove_all() {
@@ -75,17 +81,17 @@ void PManagerTest::test_get_events_of_month() {
 
 void PManagerTest::test_remove_event() {
     Test::print("test_remove_event ");
-    bool ret = false;
+    bool ret;
     PManager pm;
     pm.add_event(this->valid_event);
     pm.add_event(this->valid_event_2);
-    pm.remove_event(this->valid_event);
+    ret = pm.remove_event(this->valid_event);
     time_t timestamp = time(NULL);
     struct tm *current_time = localtime(&timestamp);
     list<Event*> events = pm.get_events_of_month(current_time->tm_mon + 1, current_time->tm_year + 1900);
     if (events.size() == 1) {
         list<Event*>::iterator it = events.begin();
-        ret = this->valid_event_2->equals(**it); // *it has type Event*
+        ret = ret && this->valid_event_2->equals(**it); // *it has type Event*
         delete *it;
     }
     ASSERT (ret)
@@ -130,4 +136,11 @@ void PManagerTest::test_remove_category() {
     }
     ASSERT (ret)
     pm.remove_all();
+}
+
+void PManagerTest::test_get_category() {
+    Test::print("test_get_category ");
+    PManager pm;
+    pm.add_category(this->valid_category);
+    ASSERT ((pm.get_category(this->valid_category->getId()))->equals(*this->valid_category))
 }

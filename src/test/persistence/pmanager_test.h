@@ -18,6 +18,7 @@ private:
     Category *valid_category_2;
     Category *valid_default_category;
     Category *noname_category;
+    Category *specialchars_category;
 
 public:
     PManagerTest();
@@ -30,6 +31,7 @@ public:
     void test_remove_category();
     void test_get_categories();
     void test_remove_all();
+    void test_get_category();
 };
 
 #endif // PMANAGERTEST_H

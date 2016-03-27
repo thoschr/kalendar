@@ -35,6 +35,7 @@ public:
     bool add_category (Category *c);
     bool remove_category(Category *c);
     list<Category*> get_categories();
+    Category *get_category(unsigned int id);
 };
 
 #endif // PMANAGER_H

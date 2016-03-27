@@ -25,7 +25,7 @@ PManager::PManager()
 
     if (db_no_exists) {
         const char *sql = "CREATE TABLE Categories(id UNSIGNED INTEGER PRIMARY KEY, name TEXT, color TEXT);"
-                          "CREATE TABLE Events(id UNSIGNED INTEGER PRIMARY KEY, name TEXT, description TEXT, category TEXT, start DATETIME, end DATETIME);"
+                          "CREATE TABLE Events(id UNSIGNED INTEGER PRIMARY KEY, name TEXT, description TEXT, category UNSIGNED INTEGER, start DATETIME, end DATETIME);"
                           "INSERT INTO Categories VALUES(1, 'Default', '#1022A0');";
 
         rc = sqlite3_exec(this->db, sql, 0, 0, &err_msg);
@@ -55,7 +55,7 @@ string PManager::filterSpecialChars(string str) {
 
 bool PManager::add_event(Event *e) {
     sqlite3_stmt *stmt;
-    string filteredName, filteredDescription, filteredCategory;
+    string filteredName, filteredDescription;
     if ((e->getName().length() < 3) || (e->getStart() > e->getEnd())) return false;
     int rc = sqlite3_prepare_v2(this->db, "INSERT INTO Events VALUES(?, ?, ?, ?, ?, ?);", -1, &stmt, NULL);
     if (rc != SQLITE_OK ) {
@@ -68,8 +68,7 @@ bool PManager::add_event(Event *e) {
     sqlite3_bind_text(stmt, 2, filteredName.c_str(), filteredName.length(), 0);
     filteredDescription = filterSpecialChars(e->getDescription());
     sqlite3_bind_text(stmt, 3, filteredDescription.c_str(), filteredDescription.length(), 0);
-    filteredCategory = filterSpecialChars(e->getCategory());
-    sqlite3_bind_text(stmt, 4, filteredCategory.c_str(), e->getCategory().length(), 0);
+    sqlite3_bind_int64(stmt, 4, e->getCategory()->getId());
     sqlite3_bind_int64(stmt, 5, e->getStart());
     sqlite3_bind_int64(stmt, 6, e->getEnd());
     //commit
@@ -105,13 +104,17 @@ std::list<Event*> PManager::get_events_of_month(int month, int year) {
     sqlite3_bind_int64(res, 1, start_time);
     sqlite3_bind_int64(res, 2, end_time);
     while (rc = sqlite3_step(res) == SQLITE_ROW) {
-
-        Event *e = new Event( sqlite3_column_int(res, 0),
-                              string((const char*)sqlite3_column_text(res, 1)),
-                              string((const char*)sqlite3_column_text(res, 2)),
-                              string((const char*)sqlite3_column_text(res, 3)),
-                              (unsigned long)sqlite3_column_int64(res, 4),
-                              (unsigned long)sqlite3_column_int64(res, 5));
+        unsigned long id = (unsigned long)sqlite3_column_int(res, 0);
+        string name((const char*)sqlite3_column_text(res, 1));
+        string description((const char*)sqlite3_column_text(res, 2));
+        Category *category = this->get_category((unsigned long)sqlite3_column_int64(res, 3));
+        if (category == NULL) {
+            fprintf(stderr, "Error: Received NULL category\n");
+            continue;
+        }
+        unsigned long start = (unsigned long)sqlite3_column_int64(res, 4);
+        unsigned long end = (unsigned long)sqlite3_column_int64(res, 5);
+        Event *e = new Event(id, name, description, category, start, end);
 
         result.push_front(e);
     }
@@ -187,4 +190,23 @@ bool PManager::remove_category(Category *c) {
         return false;
     }
     return true;
+}
+
+Category* PManager::get_category(unsigned int id) {
+    sqlite3_stmt *res;
+    char sql[1024];
+    snprintf(sql, 1024, "SELECT * FROM Categories WHERE id = %u;", id);
+    int rc = sqlite3_prepare_v2(this->db, sql, -1, &res, 0);
+    if (rc != SQLITE_OK) {
+        fprintf(stderr, "Failed to fetch data: %s\n", sqlite3_errmsg(db));
+        return NULL;
+    }
+    if ((rc = sqlite3_step(res)) == SQLITE_ROW) {
+        Category *category = new Category( sqlite3_column_int(res, 0),
+                                           string((const char*)sqlite3_column_text(res, 1)),
+                                           string((const char*)sqlite3_column_text(res, 2)));
+        sqlite3_finalize(res);
+        return category;
+    } else
+        return NULL;
 }

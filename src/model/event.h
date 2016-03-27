@@ -1,6 +1,8 @@
 #ifndef EVENT_H
 #define EVENT_H
 
+#include "category.h"
+
 using namespace std;
 
 class Event
@@ -9,20 +11,21 @@ private:
     unsigned int id;
     string name;
     string description;
-    string category;
+    Category *category;
     /* Timestamp */
+    //TODO: change to time_t
     unsigned long start;
     unsigned long end;
 
 public:
-    Event(unsigned int id, string name, string description, string category, unsigned long start, unsigned long end) {
+    Event(unsigned int id, string name, string description, Category *category, unsigned long start, unsigned long end) {
         this->name = name;
         this->description = description;
         this->category = category;
         if (id == 0)
             /* The returned value from the hash function could be bigger than an integer, so be careful with normal integers.
              * I use an unsigned integer to have always a positive number (also with the overflow). */
-            this->id = static_cast<unsigned int> (hash<string>()(this->name + this->description + this->category));
+            this->id = static_cast<unsigned int> (hash<string>()(this->name + this->description));
         else
             this->id = id;
         this->start = start;
@@ -30,12 +33,13 @@ public:
     }
 
     ~Event() {
+        //Don't free the category, because also other events could have a pointer to the same category
     }
 
     unsigned int getId() { return id; }
     string getName() { return name; }
     string getDescription() { return description; }
-    string getCategory() { return category; }
+    Category *getCategory() { return category; }
     unsigned long getStart() { return start; }
     unsigned long getEnd() { return end; }
 
