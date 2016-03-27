@@ -4,7 +4,7 @@
 #include <QDebug>
 
 
-EventDialog::EventDialog(Date start_date, Date end_date, QWidget *parent) :
+EventDialog::EventDialog(Date start_date, Date end_date, string name, string description, string categoryName, QWidget *parent) :
     QDialog(parent),
     ui(new Ui::EventDialog)
 {
@@ -18,21 +18,25 @@ EventDialog::EventDialog(Date start_date, Date end_date, QWidget *parent) :
     QVBoxLayout *main_layout = new QVBoxLayout;
     QHBoxLayout *first_row = new QHBoxLayout;
     QLabel *label_name = new QLabel("Name: ");
-    this->edit_name = new QLineEdit;
+    this->edit_name = new QLineEdit(name.c_str());
     first_row->addWidget(label_name);
     first_row->addWidget(this->edit_name);
     main_layout->addLayout(first_row);
     main_layout->addWidget(new QLabel("Description: "));
-    this->edit_description = new QPlainTextEdit;
+    this->edit_description = new QPlainTextEdit(description.c_str());
     main_layout->addWidget(this->edit_description);
     QHBoxLayout *second_row = new QHBoxLayout;
     QLabel *label_category = new QLabel("Category: ");
     this->edit_category = new QComboBox;
     this->category_list = this->pm->get_categories();
+    int index = 0;
     for (Category *category : category_list) {
         QPixmap pixmap(10, 10);
         pixmap.fill(QColor(category->getColor().c_str()));
         this->edit_category->addItem(QIcon(pixmap), QString(category->getName().c_str()));
+        if (category->getName() == categoryName)
+            this->edit_category->setCurrentIndex(index);
+        index++;
     }
     second_row->addWidget(label_category);
     second_row->addWidget(this->edit_category);
@@ -92,6 +96,7 @@ void EventDialog::on_button_save_click() {
             break;
         }
     }
+
     Event newEvent(0, this->edit_name->text().toStdString(), this->edit_description->toPlainText().toStdString(), category, this->edit_start->dateTime().toTime_t(), this->edit_end->dateTime().toTime_t());
     if (this->pm->add_event(&newEvent)) {
         this->close();

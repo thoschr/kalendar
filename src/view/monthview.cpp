@@ -234,14 +234,29 @@ void MonthView::display_events(Date date) {
     for (Event *event : event_list) {
         Date start = DateUtil::date_from_timestamp(event->getStart());
         Date end = DateUtil::date_from_timestamp(event->getEnd());
-        QLabel *label_event = new QLabel(event->getName().c_str());
+        QLabelEvent *label_event = new QLabelEvent;
+        label_event->setText(event->getName().c_str());
+        label_event->setEvent(event);
         label_event->setStyleSheet(QString("QLabel { background-color : ") + QString(event->getCategory()->getColor().c_str()) + QString("};"));
         label_event->setMinimumWidth(this->frames[start_offset+start.getMonthDay()-1]->minimumWidth());
         label_event->setToolTip(event->getDescription().c_str());
         this->frames[start_offset+start.getMonthDay()-1]->layout()->addWidget(label_event);
+        //TODO: display label from start to end date
+        connect(label_event, &QLabelEvent::clicked, this, &MonthView::on_event_click);
     }
 }
 
 void MonthView::display_events(Date date, Category category) {
 
 }
+
+void MonthView::on_event_click(Event *event) {
+    EventDialog *eventDialog = new EventDialog(DateUtil::date_from_timestamp(event->getStart()), DateUtil::date_from_timestamp(event->getEnd()), event->getName(), event->getDescription(), event->getCategory()->getName());
+    eventDialog->show();
+}
+
+//FIXME
+/* BUG:
+ * When the user changes the month, opens the EventDialog window, closes it and then changes the month again, when he'll close
+ * the program, will be the following error: corrupted double-linked list
+ */

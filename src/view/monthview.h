@@ -9,6 +9,7 @@
 #include "model/category.h"
 #include "util/dateutil.h"
 #include "qframe_extended.h"
+#include "qlabel_event.h"
 
 namespace Ui {
     class MonthView;
@@ -38,6 +39,7 @@ public slots:
     void on_mouse_move(QFrameExtended *frame);
     void on_back_button_click();
     void on_next_button_click();
+    void on_event_click(Event *event);
 };
 
 #endif // MONTHVIEW_H

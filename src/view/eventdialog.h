@@ -38,7 +38,7 @@ private:
     list<Category *> category_list;
 
 public:
-    explicit EventDialog(Date start_date, Date end_date, QWidget *parent = 0);
+    explicit EventDialog(Date start_date, Date end_date, string name = "", string description = "", string categoryName = "", QWidget *parent = 0);
     ~EventDialog();
 
 public slots:
