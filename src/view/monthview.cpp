@@ -242,6 +242,8 @@ void MonthView::display_events(Date date) {
         label_event->setToolTip(event->getDescription().c_str());
         this->frames[start_offset+start.getMonthDay()-1]->layout()->addWidget(label_event);
         //TODO: display label from start to end date
+        //TODO: write a function to check if the color (of the category) is light or dark to decide
+        //if is better to use a white or black text
         connect(label_event, &QLabelEvent::clicked, this, &MonthView::on_event_click);
     }
 }

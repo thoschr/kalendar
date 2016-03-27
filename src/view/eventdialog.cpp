@@ -80,7 +80,11 @@ void EventDialog::on_button_cancel_click() {
     delete this;
 }
 
+//TODO: Add a delete button, to remove the event from the database
+
+//TODO: if the event already exists, this function updates it, otherwise will be created
 void EventDialog::on_button_save_click() {
+    /* At the moment the function creates and adds a new Event without check if already exist */
     QMessageBox msg;
     msg.setWindowTitle("Error");
     msg.setIconPixmap(QIcon::fromTheme("error").pixmap(40,40));
