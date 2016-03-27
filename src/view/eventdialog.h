@@ -8,7 +8,12 @@
 #include <QLabel>
 #include <QLineEdit>
 #include <QTextEdit>
+#include <QDateTimeEdit>
+#include <QComboBox>
 #include "model/date.h"
+#include "model/category.h"
+#include "model/event.h"
+#include "persistence/pmanager.h"
 
 namespace Ui {
 class EventDialog;

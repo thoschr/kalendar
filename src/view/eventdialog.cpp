@@ -1,7 +1,8 @@
 #include "eventdialog.h"
 #include "ui_eventdialog.h"
 
-#include <QDateTimeEdit>
+#include <QDebug>
+#include <QPixmap>
 
 EventDialog::EventDialog(Date *start_date, Date *end_date, QWidget *parent) :
     QDialog(parent),
@@ -11,6 +12,8 @@ EventDialog::EventDialog(Date *start_date, Date *end_date, QWidget *parent) :
     this->setFixedHeight(500);
     this->setModal(true);
     this->setWindowTitle("Event Manager");
+
+    PManager pm;
 
     QVBoxLayout *main_layout = new QVBoxLayout;
     QHBoxLayout *first_row = new QHBoxLayout;
@@ -23,7 +26,13 @@ EventDialog::EventDialog(Date *start_date, Date *end_date, QWidget *parent) :
     main_layout->addWidget(new QTextEdit);
     QHBoxLayout *second_row = new QHBoxLayout;
     QLabel *label_category = new QLabel("Category: ");
-    QLineEdit *edit_category = new QLineEdit;
+    QComboBox *edit_category = new QComboBox;
+    list<Category*> list_categories = pm.get_categories();
+    for (Category *category : list_categories) {
+        QPixmap pixmap(10, 10);
+        pixmap.fill(QColor(category->getColor().c_str()));
+        edit_category->addItem(QIcon(pixmap), QString(category->getName().c_str()));
+    }
     second_row->addWidget(label_category);
     second_row->addWidget(edit_category);
     main_layout->addLayout(second_row);

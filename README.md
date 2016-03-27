@@ -11,6 +11,7 @@ TODO:
 * Support iCalendar format [as plugin]
 * Notify system [as plugin]
 * Year view for long-term events
+* Meteo plugin
 
 ### Screenshot
 
