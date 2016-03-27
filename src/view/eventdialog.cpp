@@ -54,7 +54,9 @@ EventDialog::EventDialog(Date *start_date, Date *end_date, QWidget *parent) :
     main_layout->addLayout(fourth_row);
     QHBoxLayout *fifth_row = new QHBoxLayout;
     QPushButton *button_cancel = new QPushButton("Cancel");
+    connect(button_cancel, &QPushButton::clicked, this, &EventDialog::on_button_cancel_click);
     QPushButton *button_save = new QPushButton("Save");
+    connect(button_save, &QPushButton::clicked, this, &EventDialog::on_button_save_click);
     fifth_row->addWidget(button_cancel);
     fifth_row->addWidget(button_save);
     main_layout->addLayout(fifth_row);
@@ -65,4 +67,12 @@ EventDialog::EventDialog(Date *start_date, Date *end_date, QWidget *parent) :
 EventDialog::~EventDialog()
 {
     delete ui;
+}
+
+void EventDialog::on_button_cancel_click() {
+    this->close();
+}
+
+void EventDialog::on_button_save_click() {
+
 }

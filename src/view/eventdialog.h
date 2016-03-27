@@ -23,12 +23,16 @@ class EventDialog : public QDialog
 {
     Q_OBJECT
 
+private:
+    Ui::EventDialog *ui;
+
 public:
     explicit EventDialog(Date *start_date, Date *end_date, QWidget *parent = 0);
     ~EventDialog();
 
-private:
-    Ui::EventDialog *ui;
+public slots:
+    void on_button_cancel_click();
+    void on_button_save_click();
 };
 
 #endif // EVENTDIALOG_H
