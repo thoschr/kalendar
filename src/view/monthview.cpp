@@ -237,7 +237,10 @@ void MonthView::display_events(Date date) {
         QLabelEvent *label_event = new QLabelEvent;
         label_event->setText(event->getName().c_str());
         label_event->setEvent(event);
-        label_event->setStyleSheet(QString("QLabel { background-color : ") + QString(event->getCategory()->getColor().c_str()) + QString("};"));
+        QString textColor("#000000");
+        if (is_color_dark(event->getCategory()->getColor()))
+            textColor = "#FFFFFF";
+        label_event->setStyleSheet(QString("QLabel { background-color : ") + QString(event->getCategory()->getColor().c_str()) + QString("; color: ") + textColor + QString("};"));
         label_event->setMinimumWidth(this->frames[start_offset+start.getMonthDay()-1]->minimumWidth());
         label_event->setToolTip(event->getDescription().c_str());
         this->frames[start_offset+start.getMonthDay()-1]->layout()->addWidget(label_event);
@@ -250,6 +253,16 @@ void MonthView::display_events(Date date) {
 
 void MonthView::display_events(Date date, Category category) {
 
+}
+
+bool MonthView::is_color_dark(string colorName) {
+    QColor color(colorName.c_str());
+    //ITU-R BT.709
+    int l = 0.2126 * color.red() + 0.7152 * color.green() + 0.0722 * color.blue();
+    if (l < 40)
+        return true;
+    else
+        return false;
 }
 
 void MonthView::on_event_click(Event *event) {

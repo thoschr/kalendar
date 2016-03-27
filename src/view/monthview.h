@@ -5,6 +5,7 @@
 #include <QGridLayout>
 #include <QLabel>
 #include <QListIterator>
+#include <QColor>
 #include "model/event.h"
 #include "model/category.h"
 #include "util/dateutil.h"
@@ -29,6 +30,7 @@ private:
     void display_days(Date date);
     void display_events(Date date);
     void display_events(Date date, Category category);
+    bool is_color_dark(string colorName);
 
 public:
     explicit MonthView(QWidget *parent = 0);
