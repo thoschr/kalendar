@@ -90,8 +90,8 @@ MonthView::MonthView(QWidget *parent) :
     Date current_date = DateUtil::get_current_date();
     this->selection_start = NULL;
     this->selection_end = NULL;
-    this->label_date = new QLabel;
     this->layout = new QVBoxLayout;
+    this->label_date = new QLabel;
     this->label_date->setMaximumHeight(40);
     this->label_date->setStyleSheet("QLabel { padding-left: 100px; padding-right: 100px; font-size: 20px; } ");
     QPushButton *back = new QPushButton("<");
@@ -138,9 +138,10 @@ MonthView::MonthView(QWidget *parent) :
             frame->setObjectName("day");
             vl->setAlignment(Qt::AlignTop | Qt::AlignLeft);
             vl->setMargin(0);
+            vl->setSpacing(1);
             vl->addWidget(new QLabel);
             frame->setMinimumWidth(150);
-            frame->setMinimumHeight(100);
+            frame->setMinimumHeight(60);
             frame->setLayout(vl);
             frame->setStyleSheet(CELL_STYLE);
             grid_layout->addWidget(frame, i, j);
@@ -200,6 +201,7 @@ void MonthView::display_days(Date date) {
         remove_events_from_frame(i);
 
         QLabel *day = static_cast<QLabel*> (this->frames[i]->children().at(1));
+        day->setMaximumWidth(40);
         day->setObjectName("");
         day->setText("");
         //Checks right cells that will contain the days
@@ -243,8 +245,10 @@ void MonthView::display_events(Date date) {
         QString textColor("#000000");
         if (is_color_dark(event->getCategory()->getColor()))
             textColor = "#FFFFFF";
-        label_event->setStyleSheet(QString("QLabel { background-color : ") + QString(event->getCategory()->getColor().c_str()) + QString("; color: ") + textColor + QString("};"));
-        label_event->setMinimumWidth(this->frames[start_offset+start.getMonthDay()-1]->minimumWidth());
+        label_event->setStyleSheet(QString("QLabel { font-size: 15px; background-color : ") + QString(event->getCategory()->getColor().c_str()) + QString("; color: ") + textColor + QString("};"));
+        label_event->setFixedHeight(22);
+        label_event->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
+        //label_event->setMinimumWidth(this->frames[start_offset+start.getMonthDay()-1]->minimumWidth());
         label_event->setToolTip(event->getDescription().c_str());
         this->frames[start_offset+start.getMonthDay()-1]->layout()->addWidget(label_event);
         //TODO: display label from start to end date
