@@ -41,6 +41,8 @@ HEADERS  += model/event.h \
 
 QMAKE_LIBS += -lsqlite3
 QMAKE_CXXFLAGS += -std=c++11
+#For DEBUG purpose
 QMAKE_CXXFLAGS += -g
+QMAKE_CXXFLAGS += -O0
 
 FORMS +=

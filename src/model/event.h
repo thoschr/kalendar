@@ -33,7 +33,7 @@ public:
     }
 
     ~Event() {
-        //Don't free the category, because also other events could have a pointer to the same category
+        delete this->category;
     }
 
     unsigned int getId() { return id; }

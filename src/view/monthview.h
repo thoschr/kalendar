@@ -6,6 +6,7 @@
 #include <QLabel>
 #include <QListIterator>
 #include <QColor>
+#include <QtAlgorithms>
 #include "model/event.h"
 #include "model/category.h"
 #include "util/dateutil.h"

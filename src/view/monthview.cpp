@@ -138,6 +138,7 @@ MonthView::MonthView(QWidget *parent) :
             frame->setObjectName("day");
             vl->setAlignment(Qt::AlignTop | Qt::AlignLeft);
             vl->setMargin(0);
+            vl->addWidget(new QLabel);
             frame->setMinimumWidth(150);
             frame->setMinimumHeight(100);
             frame->setLayout(vl);
@@ -180,7 +181,7 @@ MonthView::~MonthView()
     delete this->selection_end;
 }
 
-void MonthView::display_days(Date date) { //TODO clean today cell
+void MonthView::display_days(Date date) {
     //Update the label that contains month and year
     this->label_date->setText(QString(DateUtil::get_literal_month(date.getMonth()).c_str()) + QString("    ") + QString::number(date.getYear()));
     //The current time is needed to highlight the current day
@@ -197,12 +198,18 @@ void MonthView::display_days(Date date) { //TODO clean today cell
             delete this->frames[i]->getDate();
             this->frames[i]->setDate(NULL);
         }
-        //Clean all the labels inside the frame
+        //Delete all the event labels inside the frame
+        QLabelEvent label_event;
         QListIterator<QObject *> it (this->frames[i]->children());
         while (it.hasNext()) {
-            delete qobject_cast<QLabel*> (it.next());
+            QObject *o = qobject_cast<QObject*> (it.next());
+            if (o->metaObject()->className() == label_event.metaObject()->className()){
+                delete o;
+            }
         }
-        QLabel *day = new QLabel;
+        QLabel *day = static_cast<QLabel*> (this->frames[i]->children().at(1));
+        day->setObjectName("");
+        day->setText("");
         //Checks right cells that will contain the days
         if (( i > 6 || //if I'm after the first week or
             (i % 7 >= start_wday-1)) && //if I'm in the first week and I'm in the right days
@@ -245,8 +252,6 @@ void MonthView::display_events(Date date) {
         label_event->setToolTip(event->getDescription().c_str());
         this->frames[start_offset+start.getMonthDay()-1]->layout()->addWidget(label_event);
         //TODO: display label from start to end date
-        //TODO: write a function to check if the color (of the category) is light or dark to decide
-        //if is better to use a white or black text
         connect(label_event, &QLabelEvent::clicked, this, &MonthView::on_event_click);
     }
 }
@@ -257,7 +262,7 @@ void MonthView::display_events(Date date, Category category) {
 
 bool MonthView::is_color_dark(string colorName) {
     QColor color(colorName.c_str());
-    //ITU-R BT.709
+    //Formula to calculate luminance from ITU-R BT.709
     int l = 0.2126 * color.red() + 0.7152 * color.green() + 0.0722 * color.blue();
     if (l < 40)
         return true;

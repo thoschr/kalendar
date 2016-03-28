@@ -73,6 +73,11 @@ EventDialog::~EventDialog()
 {
     delete ui;
     delete this->pm;
+    for (Category *c : this->category_list) {
+        qDebug() << c << endl;
+        delete c;
+        qDebug() << "OK" << endl;
+    }
 }
 
 void EventDialog::on_button_cancel_click() {
@@ -97,6 +102,7 @@ void EventDialog::on_button_save_click() {
     for (Category *c : this->category_list) {
         if (this->edit_category->currentText().toStdString() == c->getName()) {
             category = c;
+            this->category_list.remove(category); //Needed to avoid a double free. The category will be freed by newEvent, we don't free it again in the destructor
             break;
         }
     }
