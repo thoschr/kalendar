@@ -14,12 +14,12 @@ PManagerTest::PManagerTest()
     this->noname_category = new Category(0, string(""), test);
     this->specialchars_category = new Category(0, specialchars, specialchars);
     /* Events */
-    this->valid_event = new Event(0, test, test, this->valid_category, timestamp, timestamp + 100);
-    this->valid_event_2 = new Event(100, test, test, this->valid_category, timestamp, timestamp + 100000);
+    this->valid_event = new Event(0, test, test, new Category(1, test, test), timestamp, timestamp + 100);
+    this->valid_event_2 = new Event(100, test, test, new Category(1, test, test), timestamp, timestamp + 100000);
     /* Invalid Events */
-    this->noname_event = new Event(1, string(""), test, this->valid_category, timestamp, timestamp + 100);
-    this->invalid_time_event = new Event(1, test, test, this->valid_category, timestamp, timestamp - 100);
-    this->specialchars_event = new Event(1, specialchars, specialchars, this->specialchars_category, timestamp, timestamp + 100);
+    this->noname_event = new Event(1, string(""), test, new Category(1, test, test), timestamp, timestamp + 100);
+    this->invalid_time_event = new Event(1, test, test, new Category(1, test, test), timestamp, timestamp - 100);
+    this->specialchars_event = new Event(1, specialchars, specialchars, new Category(1, specialchars, specialchars), timestamp, timestamp + 100);
 }
 
 PManagerTest::~PManagerTest() {
