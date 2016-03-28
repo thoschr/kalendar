@@ -60,7 +60,7 @@ void MonthView::on_mouse_release(QFrameExtended *frame) {
          * but only if the user selects a valid range.
          */
         if (this->selection_end->compareTo(*this->selection_start) >= 0) {
-            EventDialog *eventDialog = new EventDialog(*this->selection_start, *this->selection_end);
+            EventDialog *eventDialog = new EventDialog(this, *this->selection_start, *this->selection_end);
             eventDialog->show();
         }
         this->selection_start = NULL;
@@ -197,14 +197,8 @@ void MonthView::display_days(Date date) {
         this->frames[i]->setDate(NULL);
 
         //Delete all the event labels inside the frame
-        QLabelEvent label_event;
-        QListIterator<QObject *> it (this->frames[i]->children());
-        while (it.hasNext()) {
-            QObject *o = qobject_cast<QObject*> (it.next());
-            if (o->metaObject()->className() == label_event.metaObject()->className()){
-                delete o;
-            }
-        }
+        remove_events_from_frame(i);
+
         QLabel *day = static_cast<QLabel*> (this->frames[i]->children().at(1));
         day->setObjectName("");
         day->setText("");
@@ -230,6 +224,10 @@ void MonthView::display_events(Date date) {
     PManager pm;
     list<Event*> event_list = pm.get_events_of_month(date.getMonth(), date.getYear());
     int start_offset;
+
+    //Remove all displayed events
+    remove_events_from_all_frames();
+
     //Find at which cell the month starts
     for (start_offset = 0; start_offset < 42; start_offset++) {
         //Looks where is the first day of the month
@@ -258,6 +256,23 @@ void MonthView::display_events(Date date, Category category) {
 
 }
 
+void MonthView::remove_events_from_all_frames() {
+    int i;
+    for (i = 0; i < 42; i++) {
+        //Delete all the event labels inside the frame
+        remove_events_from_frame(i);
+    }
+}
+
+void MonthView::remove_events_from_frame(int i) {
+    QLabelEvent label_event;
+    QListIterator<QObject *> it (this->frames[i]->children());
+    while (it.hasNext()) {
+        QObject *o = qobject_cast<QObject*> (it.next());
+        if (o->metaObject()->className() == label_event.metaObject()->className()) delete o;
+    }
+}
+
 bool MonthView::is_color_dark(string colorName) {
     QColor color(colorName.c_str());
     //Formula to calculate luminance from ITU-R BT.709
@@ -269,7 +284,7 @@ bool MonthView::is_color_dark(string colorName) {
 }
 
 void MonthView::on_event_click(Event *event) {
-    EventDialog *eventDialog = new EventDialog;
+    EventDialog *eventDialog = new EventDialog(this);
     eventDialog->setEvent(event);
     eventDialog->show();
 }

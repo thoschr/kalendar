@@ -22,10 +22,11 @@ void EventDialog::setEvent(Event *event) {
     }
 }
 
-EventDialog::EventDialog(Date start_date, Date end_date, QWidget *parent) :
+EventDialog::EventDialog(View *parentView, Date start_date, Date end_date, QWidget *parent) :
     QDialog(parent),
     ui(new Ui::EventDialog)
 {
+    this->parent = parentView;
     this->setFixedWidth(400);
     this->setFixedHeight(500);
     this->setModal(true);
@@ -103,6 +104,7 @@ void EventDialog::on_button_cancel_click() {
 void EventDialog::on_button_delete_click() {
     PManager pm;
     pm.remove_event(this->event);
+    this->parent->display_events(DateUtil::date_from_timestamp(this->event->getStart()));
     this->close();
     delete this;
 }
@@ -131,6 +133,7 @@ void EventDialog::on_button_save_click() {
 
     Event newEvent(0, this->edit_name->text().toStdString(), this->edit_description->toPlainText().toStdString(), category, this->edit_start->dateTime().toTime_t(), this->edit_end->dateTime().toTime_t());
     if (this->pm->add_event(&newEvent)) {
+        this->parent->display_events(DateUtil::date_from_timestamp(newEvent.getStart()));
         this->close();
         delete this;
     } else {

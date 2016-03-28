@@ -15,8 +15,7 @@
 #include <QPixmap>
 #include <QIcon>
 #include "util/dateutil.h"
-#include "model/category.h"
-#include "model/event.h"
+#include "view.h"
 #include "persistence/pmanager.h"
 
 namespace Ui {
@@ -35,12 +34,13 @@ private:
     QDateTimeEdit *edit_end;
     QPlainTextEdit *edit_description;
     QPushButton *button_delete;
+    View *parent;
     PManager *pm;
     Event *event;
     list<Category *> category_list;
 
 public:
-    explicit EventDialog(Date start_date = Date(), Date end_date = Date(), QWidget *parent = 0);
+    explicit EventDialog(View *parentView, Date start_date = Date(), Date end_date = Date(), QWidget *parent = 0);
     ~EventDialog();
     void setEvent(Event *event);
 

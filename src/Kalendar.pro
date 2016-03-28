@@ -37,7 +37,8 @@ HEADERS  += model/event.h \
     test/util/dateutil_test.h \
     view/eventdialog.h \
     view/qwidget_extended.h \
-    view/qlabel_event.h
+    view/qlabel_event.h \
+    view/view.h
 
 QMAKE_LIBS += -lsqlite3
 QMAKE_CXXFLAGS += -std=c++11
