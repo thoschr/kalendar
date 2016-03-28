@@ -14,7 +14,7 @@
 #include <QIconEngine>
 #include <QPixmap>
 #include <QIcon>
-#include "model/date.h"
+#include "util/dateutil.h"
 #include "model/category.h"
 #include "model/event.h"
 #include "persistence/pmanager.h"
@@ -34,16 +34,20 @@ private:
     QDateTimeEdit *edit_start;
     QDateTimeEdit *edit_end;
     QPlainTextEdit *edit_description;
+    QPushButton *button_delete;
     PManager *pm;
+    Event *event;
     list<Category *> category_list;
 
 public:
-    explicit EventDialog(Date start_date, Date end_date, string name = "", string description = "", string categoryName = "", QWidget *parent = 0);
+    explicit EventDialog(Date start_date = Date(), Date end_date = Date(), QWidget *parent = 0);
     ~EventDialog();
+    void setEvent(Event *event);
 
 public slots:
     void on_button_cancel_click();
     void on_button_save_click();
+    void on_button_delete_click();
 };
 
 #endif // EVENTDIALOG_H

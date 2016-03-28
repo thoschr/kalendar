@@ -271,7 +271,8 @@ bool MonthView::is_color_dark(string colorName) {
 }
 
 void MonthView::on_event_click(Event *event) {
-    EventDialog *eventDialog = new EventDialog(DateUtil::date_from_timestamp(event->getStart()), DateUtil::date_from_timestamp(event->getEnd()), event->getName(), event->getDescription(), event->getCategory()->getName());
+    EventDialog *eventDialog = new EventDialog;
+    eventDialog->setEvent(event);
     eventDialog->show();
 }
 
