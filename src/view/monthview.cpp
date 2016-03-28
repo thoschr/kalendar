@@ -175,10 +175,10 @@ MonthView::MonthView(QWidget *parent) :
 
 MonthView::~MonthView()
 {
-    delete ui; //seems this frees also this->frames
-    delete this->layout;
-    delete this->selection_start;
-    delete this->selection_end;
+    delete ui;
+    /* this->selection_start and this->selection_end are pointers to dates wrapped inside some QFrameExtended widgets. When
+     * Qt frees QFrameExtended widgets they will free their dates.
+     */
 }
 
 void MonthView::display_days(Date date) {
@@ -194,10 +194,8 @@ void MonthView::display_days(Date date) {
     x = 1;
     for (i = 0; i < 42; i++) {
         //Set an invalid date
-        if (this->frames[i]->getDate() != NULL) {
-            delete this->frames[i]->getDate();
-            this->frames[i]->setDate(NULL);
-        }
+        this->frames[i]->setDate(NULL);
+
         //Delete all the event labels inside the frame
         QLabelEvent label_event;
         QListIterator<QObject *> it (this->frames[i]->children());

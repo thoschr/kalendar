@@ -137,5 +137,4 @@ void EventDialog::on_button_save_click() {
         msg.setText("Persistence error");
         msg.exec();
     }
-
 }
