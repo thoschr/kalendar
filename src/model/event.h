@@ -1,6 +1,8 @@
 #ifndef EVENT_H
 #define EVENT_H
 
+#include <ctime>
+
 #include "category.h"
 
 using namespace std;
@@ -13,12 +15,11 @@ private:
     string description;
     Category *category;
     /* Timestamp */
-    //TODO: change to time_t
-    unsigned long start;
-    unsigned long end;
+    time_t start;
+    time_t end;
 
 public:
-    Event(unsigned int id, string name, string description, Category *category, unsigned long start, unsigned long end) {
+    Event(unsigned int id, string name, string description, Category *category, time_t start, time_t end) {
         this->name = name;
         this->description = description;
         this->category = category;
@@ -40,8 +41,8 @@ public:
     string getName() { return name; }
     string getDescription() { return description; }
     Category *getCategory() { return category; }
-    unsigned long getStart() { return start; }
-    unsigned long getEnd() { return end; }
+    time_t getStart() { return start; }
+    time_t getEnd() { return end; }
 
     bool equals(Event &e) {
         return (this->id == e.getId()) &&

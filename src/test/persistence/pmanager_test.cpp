@@ -4,7 +4,7 @@
 
 PManagerTest::PManagerTest()
 {
-    unsigned long timestamp = 966038400L; // = 20/12/1999 I think it's better than (unsigned long) time(NULL);
+    time_t timestamp = 966038400L; // = 20/12/1999 I think it's better than time(NULL);
     string test("test_string");
     string specialchars("'/--\"#@");
     /* Categories */
