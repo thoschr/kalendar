@@ -4,7 +4,7 @@
 
 PManagerTest::PManagerTest()
 {
-    unsigned long timestamp = (unsigned long) time(NULL);
+    unsigned long timestamp = 966038400L; // = 20/12/1999 I think it's better than (unsigned long) time(NULL);
     string test("test_string");
     string specialchars("'/--\"#@");
     /* Categories */
@@ -15,7 +15,7 @@ PManagerTest::PManagerTest()
     this->specialchars_category = new Category(0, specialchars, specialchars);
     /* Events */
     this->valid_event = new Event(0, test, test, new Category(1, test, test), timestamp, timestamp + 100);
-    this->valid_event_2 = new Event(100, test, test, new Category(1, test, test), timestamp, timestamp + 100000);
+    this->valid_event_2 = new Event(100, test, test, new Category(1, test, test), timestamp, timestamp + 1000000); //starts from current month, ends the next month
     /* Invalid Events */
     this->noname_event = new Event(1, string(""), test, new Category(1, test, test), timestamp, timestamp + 100);
     this->invalid_time_event = new Event(1, test, test, new Category(1, test, test), timestamp, timestamp - 100);
@@ -44,6 +44,7 @@ void PManagerTest::test_all() {
     test_get_categories();
     test_remove_category();
     test_get_category();
+    test_edit_event();
 }
 
 void PManagerTest::test_remove_all() {
@@ -64,10 +65,10 @@ void PManagerTest::test_add_event() {
 
 void PManagerTest::test_get_events_of_month() {
     Test::print("test_get_events_of_month ");
-    bool ret = false;
+    bool ret = false, ret2 = false;
     PManager pm;
     pm.add_event(this->valid_event);
-    time_t timestamp = time(NULL);
+    time_t timestamp = this->valid_event->getStart();
     struct tm *current_time = localtime(&timestamp);
     list<Event*> events = pm.get_events_of_month(current_time->tm_mon + 1, current_time->tm_year + 1900); // tm_mon is from 0 to 11, we need to have 1 - 12
     if (!(events.empty())) {
@@ -75,7 +76,16 @@ void PManagerTest::test_get_events_of_month() {
         ret = this->valid_event->equals(**it); // *it has type Event*
         delete *it;
     }
-    ASSERT (ret)
+    pm.add_event(this->valid_event_2);
+    timestamp = this->valid_event_2->getEnd();
+    current_time = localtime(&timestamp);
+    events = pm.get_events_of_month(current_time->tm_mon + 1, current_time->tm_year + 1900);
+    if (!(events.empty())) {
+        list<Event*>::iterator it = events.begin();
+        ret2 = this->valid_event_2->equals(**it); // *it has type Event*
+        delete *it;
+    }
+    ASSERT (ret && ret2)
     pm.remove_all();
 }
 
@@ -143,4 +153,12 @@ void PManagerTest::test_get_category() {
     PManager pm;
     pm.add_category(this->valid_category);
     ASSERT ((pm.get_category(this->valid_category->getId()))->equals(*this->valid_category))
+}
+
+void PManagerTest::test_edit_event() {
+    Test::print("test_edit_event ");
+    PManager pm;
+    pm.add_event(this->valid_event);
+    ASSERT (pm.edit_event(this->valid_event, this->valid_event_2) &&
+            (!pm.edit_event(this->valid_event_2, this->noname_event)))
 }

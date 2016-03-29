@@ -32,6 +32,7 @@ public:
     void test_get_categories();
     void test_remove_all();
     void test_get_category();
+    void test_edit_event();
 };
 
 #endif // PMANAGERTEST_H

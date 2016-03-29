@@ -102,18 +102,19 @@ void EventDialog::on_button_cancel_click() {
 }
 
 void EventDialog::on_button_delete_click() {
-    PManager pm;
-    pm.remove_event(this->event);
-    this->parent->display_events(DateUtil::date_from_timestamp(this->event->getStart()));
+    this->pm->remove_event(this->event);
+    refresh(DateUtil::date_from_timestamp(this->event->getStart()));
+}
+
+void EventDialog::refresh(Date date) {
+    this->parent->display_events(date);
     this->close();
     delete this;
 }
 
-//TODO: Add a delete button, to remove the event from the database
-
-//TODO: if the event already exists, this function updates it, otherwise will be created
+//if the event already exists, this function updates it, otherwise will be created
 void EventDialog::on_button_save_click() {
-    /* At the moment the function creates and adds a new Event without check if already exist */
+    /* otherwise I create a new Event */
     QMessageBox msg;
     msg.setWindowTitle("Error");
     msg.setIconPixmap(QIcon::fromTheme("error").pixmap(40,40));
@@ -132,10 +133,12 @@ void EventDialog::on_button_save_click() {
     }
 
     Event newEvent(0, this->edit_name->text().toStdString(), this->edit_description->toPlainText().toStdString(), category, this->edit_start->dateTime().toTime_t(), this->edit_end->dateTime().toTime_t());
-    if (this->pm->add_event(&newEvent)) {
-        this->parent->display_events(DateUtil::date_from_timestamp(newEvent.getStart()));
-        this->close();
-        delete this;
+
+    /* If the users has changed an existent event, I'll call the right function */
+    if ((this->event != NULL) && (this->pm->edit_event(this->event, &newEvent))) {
+        refresh(DateUtil::date_from_timestamp(newEvent.getStart()));
+    } else if ((this->event == NULL) && (this->pm->add_event(&newEvent))) { //else I'll create a new Event
+        refresh(DateUtil::date_from_timestamp(newEvent.getStart()));
     } else {
         msg.setText("Persistence error");
         msg.exec();

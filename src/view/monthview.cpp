@@ -240,6 +240,10 @@ void MonthView::display_events(Date date) {
     for (Event *event : event_list) {
         Date start = DateUtil::date_from_timestamp(event->getStart());
         Date end = DateUtil::date_from_timestamp(event->getEnd());
+        if (((start.getMonth() < date.getMonth()) && (start.getYear() == date.getYear())) || (start.getYear() < date.getYear()))
+            start = DateUtil::get_first_day_of_month(date);
+        if (((end.getMonth() > start.getMonth()) && (end.getYear() == start.getYear())) || (end.getYear() > start.getYear()))
+            end = DateUtil::get_last_day_of_month(start);
         for (int i = start_offset+start.getMonthDay()-1; i < (start_offset+end.getMonthDay()); i++) {
             //Events will be copied and wrapped inside the QLabelEvent widgets
             (static_cast <QVBoxLayout*> (this->frames[i]->layout()))->insertWidget(1, createLabelEvent(event));
@@ -267,7 +271,7 @@ QLabelEvent* MonthView::createLabelEvent(Event *event) {
 }
 
 void MonthView::display_events(Date date, Category category) {
-
+    //TODO: implement me
 }
 
 void MonthView::remove_events_from_all_frames() {

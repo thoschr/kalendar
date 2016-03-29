@@ -83,6 +83,37 @@ bool PManager::add_event(Event *e) {
     return true;
 }
 
+bool PManager::edit_event(Event *before, Event *after) {
+    sqlite3_stmt *stmt;
+    string filteredName, filteredDescription;
+    if ((after->getName().length() < 3) || (after->getStart() > after->getEnd())) return false;
+    int rc = sqlite3_prepare_v2(this->db, "UPDATE Events SET id=?, name=?, description=?, category=?, start=?, end=? WHERE id=?;", -1, &stmt, NULL);
+    if (rc != SQLITE_OK ) {
+        fprintf(stderr, "SQL error in prepare\n");
+        sqlite3_close(this->db);
+        return false;
+    }
+    sqlite3_bind_int64(stmt, 1, after->getId());
+    filteredName = filterSpecialChars(after->getName());
+    sqlite3_bind_text(stmt, 2, filteredName.c_str(), filteredName.length(), 0);
+    filteredDescription = filterSpecialChars(after->getDescription());
+    sqlite3_bind_text(stmt, 3, filteredDescription.c_str(), filteredDescription.length(), 0);
+    sqlite3_bind_int64(stmt, 4, after->getCategory()->getId());
+    sqlite3_bind_int64(stmt, 5, after->getStart());
+    sqlite3_bind_int64(stmt, 6, after->getEnd());
+    sqlite3_bind_int64(stmt, 7, before->getId());
+    //commit
+    rc = sqlite3_step(stmt);
+    if (rc != SQLITE_DONE ) {
+        fprintf(stderr, "SQL error in commit\n");
+        sqlite3_close(this->db);
+        return false;
+    }
+    //free memory
+    sqlite3_finalize(stmt);
+    return true;
+}
+
 std::list<Event*> PManager::get_events_of_month(int month, int year) {
     list<Event*> result;
     std::tm tm;
@@ -92,17 +123,19 @@ std::list<Event*> PManager::get_events_of_month(int month, int year) {
     tm.tm_mday = 1;
     tm.tm_mon = month - 1;    // Assuming month represents Jan with 1
     tm.tm_year = year - 1900; // Assuming year is the AD year number
-    long start_time = static_cast<long> (mktime(&tm));
+    long first_month = static_cast<long> (mktime(&tm)); //first of month
     tm.tm_mon = tm.tm_mon + 1;
-    long end_time = static_cast<long> (mktime(&tm));
+    long last_month = static_cast<long> (mktime(&tm)); //last of month
     sqlite3_stmt *res;
-    int rc = sqlite3_prepare_v2(this->db, "SELECT * FROM Events WHERE start >= ? AND start < ?", -1, &res, NULL);
+    int rc = sqlite3_prepare_v2(this->db, "SELECT * FROM Events WHERE (start >= ? AND start < ?) OR (end >= ? AND end < ?);", -1, &res, NULL);
     if (rc != SQLITE_OK) {
         fprintf(stderr, "Failed to fetch data: %s\n", sqlite3_errmsg(db));
         return result;
     }
-    sqlite3_bind_int64(res, 1, start_time);
-    sqlite3_bind_int64(res, 2, end_time);
+    sqlite3_bind_int64(res, 1, first_month);
+    sqlite3_bind_int64(res, 2, last_month);
+    sqlite3_bind_int64(res, 3, first_month);
+    sqlite3_bind_int64(res, 4, last_month);
     while (rc = sqlite3_step(res) == SQLITE_ROW) {
         unsigned long id = (unsigned long)sqlite3_column_int(res, 0);
         string name((const char*)sqlite3_column_text(res, 1));

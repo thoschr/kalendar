@@ -29,6 +29,7 @@ public:
     PManager();
     ~PManager();
     bool add_event (Event *e);
+    bool edit_event (Event *before, Event *after); //return true also if before doesn't exist
     bool remove_event(Event *e);
     bool remove_all();
     list<Event*> get_events_of_month(int month, int year);
