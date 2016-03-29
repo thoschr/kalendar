@@ -32,6 +32,10 @@ private:
     void remove_events_from_all_frames();
     void remove_events_from_frame(int i);
     QLabelEvent *createLabelEvent(Event *event);
+    void createMenu();
+
+protected:
+    void contextMenuEvent(QContextMenuEvent *event) Q_DECL_OVERRIDE;
 
 public:
     explicit MonthView(QWidget *parent = 0);
@@ -45,6 +49,12 @@ public slots:
     void on_back_button_click();
     void on_next_button_click();
     void on_event_click(Event *event);
+
+private slots:
+    void exportEvents();
+    void importEvents();
+    void addEvent();
+    void editCategories();
 };
 
 #endif // MONTHVIEW_H

@@ -14,6 +14,9 @@
 #include <QLabel>
 #include <QFrame>
 
+/* Gets the current month displayed using an hack. Infact, the cell in the middle will have always a value setted. */
+#define CURRENT_MONTH *this->frames[21]->getDate()
+
 #define CELL_STYLE "QFrame { background-color: #FFFFFF; border: 1px solid #555555; }" \
                    "QLabel { border: none; font-size: 16px; padding: 5px; background-color:rgba(0,0,0,0); }" \
                    "QLabel#today { background-color: #FFFF88; }" \
@@ -68,8 +71,7 @@ void MonthView::on_mouse_release(QFrameExtended *frame) {
 }
 
 void MonthView::on_back_button_click() {
-    /* Gets the current month displayed using an hack. Infact, the cell in the middle will have always a value setted. */
-    Date newDate = DateUtil::decrease_month(*this->frames[21]->getDate());
+    Date newDate = DateUtil::decrease_month(CURRENT_MONTH);
     display_days(newDate);
     /* Reload events */
     display_events(newDate);
@@ -77,7 +79,7 @@ void MonthView::on_back_button_click() {
 
 void MonthView::on_next_button_click() {
     /* Gets the current month displayed using an hack. Infact, the cell in the middle will have always a value setted. */
-    Date newDate = DateUtil::increase_month(*this->frames[21]->getDate());
+    Date newDate = DateUtil::increase_month(CURRENT_MONTH);
     display_days(newDate);
     /* Reload events */
     display_events(newDate);
@@ -107,7 +109,7 @@ MonthView::MonthView(QWidget *parent) :
     hl->addWidget(back);
     hl->addWidget(label_date);
     hl->addWidget(next);
-    //TODO map the keyboard arrows to the handler on_back_.. and on_next_..
+    //TODO map the keyboard arrows to the handler on_back_.. and on_next_.. (use setShortcut)
     this->layout->addLayout(hl);
 
     //Create 7x7 grid
@@ -171,6 +173,8 @@ MonthView::MonthView(QWidget *parent) :
      connect(window, &QWidgetExtended::mouseRelease, this, &MonthView::on_mouse_release);
      connect(window, &QWidgetExtended::mouseMove, this, &MonthView::on_mouse_move);
 
+     createMenu();
+
      // Set QWidget as the central layout of the main window
      setCentralWidget(window);
 }
@@ -181,6 +185,55 @@ MonthView::~MonthView()
     /* this->selection_start and this->selection_end are pointers to dates wrapped inside some QFrameExtended widgets. When
      * Qt frees QFrameExtended widgets they will free their dates.
      */
+}
+
+void MonthView::createMenu() {
+    QAction *importAct = new QAction(tr("&Import events"), this);
+    importAct->setStatusTip(tr("Import events with iCalendar format"));
+    connect(importAct, &QAction::triggered, this, &MonthView::importEvents);
+    QAction *exportAct = new QAction(tr("E&xport events"), this);
+    exportAct->setStatusTip(tr("Export events with iCalendar format"));
+    connect(exportAct, &QAction::triggered, this, &MonthView::exportEvents);
+    QAction *addEventAct = new QAction(tr("&Add new event"), this);
+    addEventAct->setStatusTip(tr("Show a dialog to add a new event"));
+    connect(addEventAct, &QAction::triggered, this, &MonthView::addEvent);
+    QAction *editCategoriesAct = new QAction(tr("Edit &Categories"), this);
+    editCategoriesAct->setStatusTip(tr("Show a dialog to edit the categories"));
+    connect(editCategoriesAct, &QAction::triggered, this, &MonthView::editCategories);
+    QMenu *fileMenu;
+    fileMenu = menuBar()->addMenu(tr("&File"));
+    fileMenu->addAction(importAct);
+    fileMenu->addAction(exportAct);
+    QMenu *editMenu;
+    editMenu = menuBar()->addMenu(tr("&Edit"));
+    editMenu->addAction(addEventAct);
+    editMenu->addAction(editCategoriesAct);
+    QMenu *viewsMenu;
+    viewsMenu = menuBar()->addMenu(tr("&Views"));
+    //TODO: Add the other future views (each view will be displayed in a different window)
+}
+
+void MonthView::contextMenuEvent(QContextMenuEvent *event)
+{
+    QMenu menu(this);
+    menu.exec(event->globalPos());
+}
+
+void MonthView::importEvents() {
+    //TODO: import events (iCalendar format)
+}
+
+void MonthView::exportEvents() {
+    //TODO: export events (iCalendar format)
+}
+
+void MonthView::addEvent() {
+    EventDialog *eventDialog = new EventDialog(this, CURRENT_MONTH, CURRENT_MONTH);
+    eventDialog->show();
+}
+
+void MonthView::editCategories() {
+
 }
 
 void MonthView::display_days(Date date) {
