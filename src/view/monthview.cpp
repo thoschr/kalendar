@@ -144,6 +144,7 @@ MonthView::MonthView(QWidget *parent) :
             frame->setMinimumHeight(60);
             frame->setLayout(vl);
             frame->setStyleSheet(CELL_STYLE);
+            frame->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
             grid_layout->addWidget(frame, i, j);
             this->frames[7*(i-1)+j] = frame;
         }
@@ -239,21 +240,30 @@ void MonthView::display_events(Date date) {
     for (Event *event : event_list) {
         Date start = DateUtil::date_from_timestamp(event->getStart());
         Date end = DateUtil::date_from_timestamp(event->getEnd());
-        QLabelEvent *label_event = new QLabelEvent;
-        label_event->setText(event->getName().c_str());
-        label_event->setEvent(event);
-        QString textColor("#000000");
-        if (is_color_dark(event->getCategory()->getColor()))
-            textColor = "#FFFFFF";
-        label_event->setStyleSheet(QString("QLabel { font-size: 15px; background-color : ") + QString(event->getCategory()->getColor().c_str()) + QString("; color: ") + textColor + QString("};"));
-        label_event->setFixedHeight(22);
-        label_event->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
-        //label_event->setMinimumWidth(this->frames[start_offset+start.getMonthDay()-1]->minimumWidth());
-        label_event->setToolTip(event->getDescription().c_str());
-        this->frames[start_offset+start.getMonthDay()-1]->layout()->addWidget(label_event);
-        //TODO: display label from start to end date
-        connect(label_event, &QLabelEvent::clicked, this, &MonthView::on_event_click);
+        for (int i = start_offset+start.getMonthDay()-1; i < (start_offset+end.getMonthDay()); i++) {
+            //Events will be copied and wrapped inside the QLabelEvent widgets
+            (static_cast <QVBoxLayout*> (this->frames[i]->layout()))->insertWidget(1, createLabelEvent(event));
+        }
+        delete event;
     }
+}
+
+QLabelEvent* MonthView::createLabelEvent(Event *event) {
+    //Make a copy
+    Category *newCategory = new Category(event->getCategory()->getId(), event->getCategory()->getName(), event->getCategory()->getColor());
+    Event *newEvent = new Event(event->getId(), event->getName(), event->getDescription(), newCategory, event->getStart(), event->getEnd());
+    QLabelEvent *label_event = new QLabelEvent;
+    label_event->setText(newEvent->getName().c_str());
+    label_event->setEvent(newEvent);
+    QString textColor("#000000");
+    if (is_color_dark(newEvent->getCategory()->getColor()))
+        textColor = "#FFFFFF";
+    label_event->setStyleSheet(QString("QLabel { font-size: 15px; background-color : ") + QString(newEvent->getCategory()->getColor().c_str()) + QString("; color: ") + textColor + QString("};"));
+    label_event->setFixedHeight(22);
+    label_event->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
+    label_event->setToolTip(newEvent->getDescription().c_str());
+    connect(label_event, &QLabelEvent::clicked, this, &MonthView::on_event_click);
+    return label_event;
 }
 
 void MonthView::display_events(Date date, Category category) {

@@ -31,6 +31,7 @@ private:
     bool is_color_dark(string colorName);
     void remove_events_from_all_frames();
     void remove_events_from_frame(int i);
+    QLabelEvent *createLabelEvent(Event *event);
 
 public:
     explicit MonthView(QWidget *parent = 0);
