@@ -22,5 +22,14 @@ TODO:
 ### Motivation
 I need to schedule my time in a more efficient way. I don't like online calendar like google calendar for the privacy issues. I looked for some good calendar application, but seems there are just a couple of such calendars. This is a shame, because linux exists from so many years and the users need to have a good calendar application. The two main calendar applications are: gnome-desktop and korganizer. Their problems are a lot of dependencies and complicated compilation. So I decided to develop a simple but powerful calendar with painless compilation, without dependencies and desktop environment independent.
 
+### Compilation
+
+You need to have `qmake`. In Fedora you can find it inside the `qt-devel` package.
+
+You need to install also `sqlite3` developer package. In Fedora the package is called `sqlite-devel`.
+
+After you've installed these packages, you can run `qmake` (or `qmake-qt5` in Fedora) inside the src folder and then the `make` command.
+You should get the Kalendar executable inside the same folder.
+
 ### License
 GPLv3
