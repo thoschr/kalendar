@@ -102,6 +102,8 @@ MonthView::MonthView(QWidget *parent) :
     next->setMaximumWidth(60);
     back->setMaximumHeight(40);
     next->setMaximumHeight(40);
+    back->setShortcut(QKeySequence(Qt::Key_Left));
+    next->setShortcut(QKeySequence(Qt::Key_Right));
     connect(back, &QPushButton::clicked, this, &MonthView::on_back_button_click);
     connect(next, &QPushButton::clicked, this, &MonthView::on_next_button_click);
     QHBoxLayout *hl = new QHBoxLayout;
@@ -109,7 +111,6 @@ MonthView::MonthView(QWidget *parent) :
     hl->addWidget(back);
     hl->addWidget(label_date);
     hl->addWidget(next);
-    //TODO map the keyboard arrows to the handler on_back_.. and on_next_.. (use setShortcut)
     this->layout->addLayout(hl);
 
     //Create 7x7 grid
