@@ -144,8 +144,8 @@ std::list<Event*> PManager::get_events_of_month(int month, int year) {
             fprintf(stderr, "Error: Received NULL category\n");
             continue;
         }
-        unsigned long start = (unsigned long)sqlite3_column_int64(res, 4);
-        unsigned long end = (unsigned long)sqlite3_column_int64(res, 5);
+        time_t start = (unsigned long)sqlite3_column_int64(res, 4);
+        time_t end = (unsigned long)sqlite3_column_int64(res, 5);
         Event *e = new Event(id, name, description, category, start, end);
 
         result.push_front(e);
@@ -252,4 +252,33 @@ bool PManager::remove_past_events(time_t timestamp) {
         return false;
     }
     return true;
+}
+
+list<Event*> PManager::get_all_events() {
+    list<Event*> result;
+    sqlite3_stmt *res;
+    char sql[1024];
+    snprintf(sql, 1024, "SELECT * FROM Events;");
+    int rc = sqlite3_prepare_v2(this->db, sql, -1, &res, 0);
+    if (rc != SQLITE_OK) {
+        fprintf(stderr, "Failed to fetch data: %s\n", sqlite3_errmsg(db));
+        return result;
+    }
+    while (rc = sqlite3_step(res) == SQLITE_ROW) {
+        unsigned long id = (unsigned long)sqlite3_column_int(res, 0);
+        string name((const char*)sqlite3_column_text(res, 1));
+        string description((const char*)sqlite3_column_text(res, 2));
+        Category *category = this->get_category((unsigned long)sqlite3_column_int64(res, 3));
+        if (category == NULL) {
+            fprintf(stderr, "Error: Received NULL category\n");
+            continue;
+        }
+        time_t start = (unsigned long)sqlite3_column_int64(res, 4);
+        time_t end = (unsigned long)sqlite3_column_int64(res, 5);
+        Event *e = new Event(id, name, description, category, start, end);
+
+        result.push_front(e);
+    }
+    sqlite3_finalize(res);
+    return result;
 }

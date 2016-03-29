@@ -47,6 +47,7 @@ void PManagerTest::test_all() {
     test_remove_category();
     test_get_category();
     test_edit_event();
+    test_get_all_events();
     test_remove_past_events();
 }
 
@@ -181,20 +182,38 @@ void PManagerTest::test_edit_event() {
     pm.remove_all();
 }
 
+void PManagerTest::test_get_all_events() {
+    Test::print("test_get_all_events ");
+    bool ret = false, ret2 = false;
+    PManager pm;
+    pm.add_event(this->valid_event);
+    pm.add_event(this->valid_event_2);
+    list<Event*> events = pm.get_all_events();
+    if (!(events.empty())) {
+        list<Event*>::iterator it = events.begin();
+        ret = (this->valid_event->equals(**it) || this->valid_event_2->equals(**it)); // *it has type Event*
+        delete *it;
+        it++;
+        ret2 = (this->valid_event->equals(**it) || this->valid_event_2->equals(**it));
+        delete *it;
+    }
+    ASSERT (ret && ret2)
+    pm.remove_all();
+}
+
 void PManagerTest::test_remove_past_events() {
     Test::print("test_remove_past_events ");
-    /*bool ret;
+    bool ret;
     PManager pm;
     pm.add_event(this->valid_event);
     pm.add_event(this->valid_event_2);
     ret = pm.remove_past_events(this->valid_event_2->getEnd()-1);
-    list<Category*> categories = pm.get_category();
-    if (categories.size() == 1) {
-        list<Category*>::iterator it = categories.begin();
-        ret = ret && this->valid_event_2->equals(**it); // *it has type Category*
+    list<Event*> events = pm.get_all_events();
+    if (events.size() == 1) {
+        list<Event*>::iterator it = events.begin();
+        ret = ret && this->valid_event_2->equals(**it); // *it has type Event*
         delete *it;
     } else ret = false;
     ASSERT (ret)
     pm.remove_all();
-    */
 }

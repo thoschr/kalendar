@@ -38,6 +38,7 @@ public:
     list<Category*> get_categories();
     Category *get_category(unsigned int id);
     bool remove_past_events(time_t timestamp);
+    list<Event*> get_all_events();
 };
 
 #endif // PMANAGER_H

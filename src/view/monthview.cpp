@@ -142,6 +142,11 @@ MonthView::MonthView(QWidget *parent) :
     grid_layout->setHorizontalSpacing(0);
     grid_layout->setVerticalSpacing(0);
 
+    //Remove events too old
+    PManager pm;
+    Date target = DateUtil::decrease_month(current_date);
+    pm.remove_past_events(QDateTime(QDate(target.getYear(), target.getMonth() , target.getMonthDay())).toTime_t());
+
     //Fill the grid with the days of the default month (i.e. the current month)
     display_days(current_date);
 

@@ -34,6 +34,7 @@ public:
     void test_remove_all();
     void test_get_category();
     void test_edit_event();
+    void test_get_all_events();
     void test_remove_past_events();
 };
 
