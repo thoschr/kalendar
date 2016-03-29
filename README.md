@@ -31,5 +31,7 @@ You need to install also `sqlite3` developer package. In Fedora the package is c
 After you've installed these packages, you can run `qmake` (or `qmake-qt5` in Fedora) inside the src folder and then the `make` command.
 You should get the Kalendar executable inside the same folder.
 
+Note: Kalendar will create the following folder: ~/kalendar, so remember to delete it if you decide to delete Kalendar.
+
 ### License
 GPLv3
