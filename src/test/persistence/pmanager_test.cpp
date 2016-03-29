@@ -47,6 +47,7 @@ void PManagerTest::test_all() {
     test_remove_category();
     test_get_category();
     test_edit_event();
+    test_remove_past_events();
 }
 
 void PManagerTest::test_remove_all() {
@@ -99,14 +100,14 @@ void PManagerTest::test_remove_event() {
     pm.add_event(this->valid_event);
     pm.add_event(this->valid_event_2);
     ret = pm.remove_event(this->valid_event);
-    time_t timestamp = time(NULL);
+    time_t timestamp = this->valid_event->getStart();
     struct tm *current_time = localtime(&timestamp);
     list<Event*> events = pm.get_events_of_month(current_time->tm_mon + 1, current_time->tm_year + 1900);
     if (events.size() == 1) {
         list<Event*>::iterator it = events.begin();
         ret = ret && this->valid_event_2->equals(**it); // *it has type Event*
         delete *it;
-    }
+    } else ret = false;
     ASSERT (ret)
     pm.remove_all();
 }
@@ -135,28 +136,30 @@ void PManagerTest::test_get_categories() {
 
 void PManagerTest::test_remove_category() {
     Test::print("test_remove_category ");
-    bool ret = false;
+    bool ret;
     PManager pm;
     pm.add_category(this->valid_category);
     pm.add_category(this->valid_category_2);
-    pm.remove_category(this->valid_category);
-    pm.remove_category(this->valid_default_category); //Delete the default category
+    ret = pm.remove_category(this->valid_category);
+    ret = ret && pm.remove_category(this->valid_default_category); //Delete the default category
     list<Category*> categories = pm.get_categories();
     if (categories.size() == 1) {
         list<Category*>::iterator it = categories.begin();
-        ret = this->valid_category_2->equals(**it); // *it has type Category*
+        ret = ret && this->valid_category_2->equals(**it); // *it has type Category*
         delete *it;
-    }
+    } else ret = false;
     ret = ret && pm.remove_category(this->valid_category_2);
     ret = ret && (pm.get_categories().size() == 0);
     pm.add_category(this->valid_default_category);
     pm.add_event(this->valid_event);
     ret = ret && (!pm.remove_category(this->valid_default_category)); //try to delete the default category, but it's referenced by valid_event, so the function should fails
-    if (pm.get_categories().size() == 1) {
+    categories = pm.get_categories();
+    qDebug() << categories.size() << endl;
+    if (categories.size() == 1) {
         list<Category*>::iterator it = categories.begin();
         ret = ret && this->valid_default_category->equals(**it); // *it has type Category*
         delete *it;
-    }
+    } else ret = false;
     ASSERT (ret)
     pm.remove_all();
 }
@@ -166,6 +169,7 @@ void PManagerTest::test_get_category() {
     PManager pm;
     pm.add_category(this->valid_category);
     ASSERT ((pm.get_category(this->valid_category->getId()))->equals(*this->valid_category))
+    pm.remove_all();
 }
 
 void PManagerTest::test_edit_event() {
@@ -174,4 +178,23 @@ void PManagerTest::test_edit_event() {
     pm.add_event(this->valid_event);
     ASSERT (pm.edit_event(this->valid_event, this->valid_event_2) &&
             (!pm.edit_event(this->valid_event_2, this->noname_event)))
+    pm.remove_all();
+}
+
+void PManagerTest::test_remove_past_events() {
+    Test::print("test_remove_past_events ");
+    /*bool ret;
+    PManager pm;
+    pm.add_event(this->valid_event);
+    pm.add_event(this->valid_event_2);
+    ret = pm.remove_past_events(this->valid_event_2->getEnd()-1);
+    list<Category*> categories = pm.get_category();
+    if (categories.size() == 1) {
+        list<Category*>::iterator it = categories.begin();
+        ret = ret && this->valid_event_2->equals(**it); // *it has type Category*
+        delete *it;
+    } else ret = false;
+    ASSERT (ret)
+    pm.remove_all();
+    */
 }

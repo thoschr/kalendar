@@ -28,14 +28,14 @@ PManager::PManager()
                           "CREATE TABLE Events(id UNSIGNED INTEGER PRIMARY KEY, name TEXT, "
                           "description TEXT, category UNSIGNED INTEGER, start DATETIME, end DATETIME,"
                           "FOREIGN KEY(category) REFERENCES Categories(id) ON DELETE RESTRICT);"
-                          "INSERT INTO Categories VALUES(1, 'Default', '#1022A0');";
+                          "INSERT INTO Categories VALUES(1, 'Default', '#1022A0');"
+                          "PRAGMA foreign_keys = ON;";
 
         rc = sqlite3_exec(this->db, sql, 0, 0, &err_msg);
 
         if (rc != SQLITE_OK ) {
             fprintf(stderr, "SQL error: %s\n", err_msg);
             sqlite3_free(err_msg);
-            sqlite3_close(this->db);
         }
     }
 }
@@ -77,7 +77,6 @@ bool PManager::add_event(Event *e) {
     rc = sqlite3_step(stmt);
     if (rc != SQLITE_DONE ) {
         fprintf(stderr, "SQL error in commit\n");
-        sqlite3_close(this->db);
         return false;
     }
     //free memory
@@ -92,7 +91,6 @@ bool PManager::edit_event(Event *before, Event *after) {
     int rc = sqlite3_prepare_v2(this->db, "UPDATE Events SET id=?, name=?, description=?, category=?, start=?, end=? WHERE id=?;", -1, &stmt, NULL);
     if (rc != SQLITE_OK ) {
         fprintf(stderr, "SQL error in prepare\n");
-        sqlite3_close(this->db);
         return false;
     }
     sqlite3_bind_int64(stmt, 1, after->getId());
@@ -108,7 +106,6 @@ bool PManager::edit_event(Event *before, Event *after) {
     rc = sqlite3_step(stmt);
     if (rc != SQLITE_DONE ) {
         fprintf(stderr, "SQL error in commit\n");
-        sqlite3_close(this->db);
         return false;
     }
     //free memory
@@ -170,7 +167,6 @@ bool PManager::remove_event(Event *e) {
     if (rc != SQLITE_OK ) {
         fprintf(stderr, "SQL error: %s\n", err_msg);
         sqlite3_free(err_msg);
-        sqlite3_close(this->db);
         return false;
     }
     return true;
@@ -185,7 +181,6 @@ bool PManager::add_category(Category *c) {
     if (rc != SQLITE_OK ) {
         fprintf(stderr, "SQL error: %s\n", err_msg);
         sqlite3_free(err_msg);
-        sqlite3_close(this->db);
         return false;
     }
     return true;
@@ -221,7 +216,7 @@ bool PManager::remove_category(Category *c) {
     if (rc != SQLITE_OK ) {
         fprintf(stderr, "SQL error: %s\n", err_msg);
         sqlite3_free(err_msg);
-        sqlite3_close(this->db);
+        //Don't close the db
         return false;
     }
     return true;
@@ -244,4 +239,17 @@ Category* PManager::get_category(unsigned int id) {
         return category;
     } else
         return NULL;
+}
+
+bool PManager::remove_past_events(time_t timestamp) {
+    char *err_msg = 0;
+    char sql[1024];
+    snprintf(sql, 1024, "DELETE FROM Events WHERE end <= %ld;", static_cast <long> (timestamp));
+    int rc = sqlite3_exec(this->db, sql, 0, 0, &err_msg);
+    if (rc != SQLITE_OK ) {
+        fprintf(stderr, "SQL error: %s\n", err_msg);
+        sqlite3_free(err_msg);
+        return false;
+    }
+    return true;
 }

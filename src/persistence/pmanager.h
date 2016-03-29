@@ -37,7 +37,7 @@ public:
     bool remove_category(Category *c);
     list<Category*> get_categories();
     Category *get_category(unsigned int id);
-    bool delete_past_events(time_t timestamp);
+    bool remove_past_events(time_t timestamp);
 };
 
 #endif // PMANAGER_H
