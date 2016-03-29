@@ -1,18 +1,5 @@
 #include "monthview.h"
-#include "ui_monthview.h"
-
-#include "../util/dateutil.h"
-#include "eventdialog.h"
-#include "qframe_extended.h"
-#include "qwidget_extended.h"
-
 #include <QDebug>
-
-#include <QPushButton>
-#include <QHBoxLayout>
-#include <QVBoxLayout>
-#include <QLabel>
-#include <QFrame>
 
 /* Gets the current month displayed using an hack. Infact, the cell in the middle will have always a value setted. */
 #define CURRENT_MONTH *this->frames[21]->getDate()
@@ -234,7 +221,8 @@ void MonthView::addEvent() {
 }
 
 void MonthView::editCategories() {
-
+    CategoryDialog *categoryDialog = new CategoryDialog;
+    categoryDialog->show();
 }
 
 void MonthView::display_days(Date date) {
@@ -316,8 +304,9 @@ QLabelEvent* MonthView::createLabelEvent(Event *event) {
     QString textColor("#000000");
     if (is_color_dark(newEvent->getCategory()->getColor()))
         textColor = "#FFFFFF";
-    label_event->setStyleSheet(QString("QLabel { font-size: 15px; background-color : ") + QString(newEvent->getCategory()->getColor().c_str()) + QString("; color: ") + textColor + QString("};"));
-    label_event->setFixedHeight(22);
+    label_event->setStyleSheet(QString("QLabel { font-size: 14px; background-color : ") + QString(newEvent->getCategory()->getColor().c_str()) + QString("; color: ") + textColor + QString("};"));
+    label_event->setFixedHeight(26);
+    label_event->setMargin(0);
     label_event->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
     label_event->setToolTip(newEvent->getDescription().c_str());
     connect(label_event, &QLabelEvent::clicked, this, &MonthView::on_event_click);

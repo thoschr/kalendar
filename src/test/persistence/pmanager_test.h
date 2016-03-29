@@ -14,6 +14,7 @@ private:
     Event *noname_event;
     Event *specialchars_event;
     Event *invalid_time_event;
+    Event *event_with_invalid_category;
     Category *valid_category;
     Category *valid_category_2;
     Category *valid_default_category;

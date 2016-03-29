@@ -21,7 +21,8 @@ SOURCES += main.cpp\
     test/util/dateutil_test.cpp \
     view/eventdialog.cpp \
     view/qwidget_extended.cpp \
-    view/qlabel_event.cpp
+    view/qlabel_event.cpp \
+    view/categorydialog.cpp
 
 HEADERS  += model/event.h \
     persistence/pmanager.h \
@@ -38,7 +39,8 @@ HEADERS  += model/event.h \
     view/eventdialog.h \
     view/qwidget_extended.h \
     view/qlabel_event.h \
-    view/view.h
+    view/view.h \
+    view/categorydialog.h
 
 QMAKE_LIBS += -lsqlite3
 QMAKE_CXXFLAGS += -std=c++11

@@ -25,7 +25,9 @@ PManager::PManager()
 
     if (db_no_exists) {
         const char *sql = "CREATE TABLE Categories(id UNSIGNED INTEGER PRIMARY KEY, name TEXT, color TEXT);"
-                          "CREATE TABLE Events(id UNSIGNED INTEGER PRIMARY KEY, name TEXT, description TEXT, category UNSIGNED INTEGER, start DATETIME, end DATETIME);"
+                          "CREATE TABLE Events(id UNSIGNED INTEGER PRIMARY KEY, name TEXT, "
+                          "description TEXT, category UNSIGNED INTEGER, start DATETIME, end DATETIME,"
+                          "FOREIGN KEY(category) REFERENCES Categories(id) ON DELETE RESTRICT);"
                           "INSERT INTO Categories VALUES(1, 'Default', '#1022A0');";
 
         rc = sqlite3_exec(this->db, sql, 0, 0, &err_msg);
@@ -177,7 +179,7 @@ bool PManager::remove_event(Event *e) {
 bool PManager::add_category(Category *c) {
     char *err_msg = 0;
     char sql[1024];
-    if (c->getName().length() < 6) return false;
+    if (c->getName().length() < 3) return false;
     snprintf(sql, 1024, "INSERT INTO Categories VALUES(%u, '%s', '%s');", c->getId(), filterSpecialChars(c->getName()).c_str(), filterSpecialChars(c->getColor()).c_str());
     int rc = sqlite3_exec(this->db, sql, 0, 0, &err_msg);
     if (rc != SQLITE_OK ) {
@@ -214,7 +216,7 @@ list<Category*> PManager::get_categories() {
 bool PManager::remove_category(Category *c) {
     char *err_msg = 0;
     char sql[1024];
-    snprintf(sql, 1024, "DELETE FROM Categories WHERE id = %u;", c->getId());
+    snprintf(sql, 1024, "PRAGMA foreign_keys = ON; DELETE FROM Categories WHERE id = %u;", c->getId());
     int rc = sqlite3_exec(this->db, sql, 0, 0, &err_msg);
     if (rc != SQLITE_OK ) {
         fprintf(stderr, "SQL error: %s\n", err_msg);

@@ -6,10 +6,17 @@
 #include <QLabel>
 #include <QListIterator>
 #include <QColor>
-#include <QtAlgorithms>
+#include <QPushButton>
+#include <QHBoxLayout>
+#include <QVBoxLayout>
+#include <QFrame>
+#include "ui_monthview.h"
+#include "eventdialog.h"
+#include "qframe_extended.h"
+#include "qwidget_extended.h"
+#include "categorydialog.h"
 #include "view.h"
 #include "util/dateutil.h"
-#include "qframe_extended.h"
 #include "qlabel_event.h"
 
 namespace Ui {

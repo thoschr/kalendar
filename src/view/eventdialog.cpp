@@ -115,12 +115,8 @@ void EventDialog::refresh(Date date) {
 //if the event already exists, this function updates it, otherwise will be created
 void EventDialog::on_button_save_click() {
     /* otherwise I create a new Event */
-    QMessageBox msg;
-    msg.setWindowTitle("Error");
-    msg.setIconPixmap(QIcon::fromTheme("error").pixmap(40,40));
     if (this->edit_name->text().length() < 3) {
-        msg.setText("The name must have a length greater than 2.");
-        msg.exec();
+        QMessageBox::critical(this, "Error", "The name must have a length greater than 2", QMessageBox::Ok);
         return;
     }
     Category *category;
@@ -140,7 +136,6 @@ void EventDialog::on_button_save_click() {
     } else if ((this->event == NULL) && (this->pm->add_event(&newEvent))) { //else I'll create a new Event
         refresh(DateUtil::date_from_timestamp(newEvent.getStart()));
     } else {
-        msg.setText("Persistence error");
-        msg.exec();
+        QMessageBox::critical(this, "Error", "Persistence error", QMessageBox::Ok);
     }
 }
