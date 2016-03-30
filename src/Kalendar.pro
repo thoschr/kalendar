@@ -22,7 +22,9 @@ SOURCES += main.cpp\
     view/eventdialog.cpp \
     view/qwidget_extended.cpp \
     view/qlabel_event.cpp \
-    view/categorydialog.cpp
+    view/categorydialog.cpp \
+    view/qpushbutton_extended.cpp \
+    view/daydialog.cpp
 
 HEADERS  += model/event.h \
     persistence/pmanager.h \
@@ -40,10 +42,14 @@ HEADERS  += model/event.h \
     view/qwidget_extended.h \
     view/qlabel_event.h \
     view/view.h \
-    view/categorydialog.h
+    view/categorydialog.h \
+    view/qpushbutton_extended.h \
+    view/daydialog.h
 
 QMAKE_LIBS += -lsqlite3
 QMAKE_CXXFLAGS += -std=c++11
 #For DEBUG purpose
 QMAKE_CXXFLAGS += -g
 QMAKE_CXXFLAGS += -O0
+
+FORMS +=

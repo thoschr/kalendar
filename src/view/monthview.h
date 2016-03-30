@@ -18,6 +18,8 @@
 #include "view.h"
 #include "util/dateutil.h"
 #include "qlabel_event.h"
+#include "qpushbutton_extended.h"
+#include "daydialog.h"
 
 namespace Ui {
     class MonthView;
@@ -40,6 +42,7 @@ private:
     void remove_events_from_frame(int i);
     QLabelEvent *createLabelEvent(Event *event);
     void createMenu();
+    void on_button_extended_click(int index);
 
 protected:
     void contextMenuEvent(QContextMenuEvent *event) Q_DECL_OVERRIDE;

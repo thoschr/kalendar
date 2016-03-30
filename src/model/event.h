@@ -19,6 +19,15 @@ private:
     time_t end;
 
 public:
+    Event(Event &event) {
+        this->name = event.getName();
+        this->description = event.getDescription();
+        this->category = new Category(*event.getCategory());
+        this->id = event.getId();
+        this->start = event.getStart();
+        this->end = event.getEnd();
+    }
+
     Event(unsigned int id, string name, string description, Category *category, time_t start, time_t end) {
         this->name = name;
         this->description = description;

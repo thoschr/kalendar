@@ -1,7 +1,8 @@
 #include "monthview.h"
 #include <QDebug>
 
-/* Gets the current month displayed using an hack. Infact, the cell in the middle will have always a value setted. */
+/* Gets the current month displayed using an hack. Infact, the cell in the middle will have always a value setted.
+ * This should be used when you don't care about the day */
 #define CURRENT_MONTH *this->frames[21]->getDate()
 
 #define CELL_STYLE "QFrame { background-color: #FFFFFF; border: 1px solid #555555; }" \
@@ -293,16 +294,41 @@ void MonthView::display_events(Date date) {
             end = DateUtil::get_last_day_of_month(start);
         for (int i = start_offset+start.getMonthDay()-1; i < (start_offset+end.getMonthDay()); i++) {
             QLabelEvent *label_event = createLabelEvent(event);
-            /*if (this->frames[i]->children().size() == 5) {
-                QPushButton *button_show_all = new QPushButton("Show All");
+            if (this->frames[i]->children().size() == 5) {
+                QPushButtonExtended *button_show_all = new QPushButtonExtended("Show All");
+                button_show_all->setIndex(i);
+                connect(button_show_all, &QPushButtonExtended::on_click, this, &MonthView::on_button_extended_click);
                 this->frames[i]->layout()->addWidget(button_show_all);
                 label_event->setHidden(true);
-            } else if (this->frames[i]->children().size() > 5) label_event->setHidden(true);*/
+            } else if (this->frames[i]->children().size() > 5) label_event->setHidden(true);
             //Events will be copied and wrapped inside the QLabelEvent widgets
             (static_cast <QVBoxLayout*> (this->frames[i]->layout()))->insertWidget(1, label_event);
         }
         delete event;
     }
+}
+
+void MonthView::on_button_extended_click(int index) {
+    //Make a copy
+    QFrameExtended *frame = new QFrameExtended;
+    QVBoxLayout *vl = new QVBoxLayout;
+    frame->setDate(NULL);
+    frame->setObjectName("day");
+    vl->setAlignment(Qt::AlignTop | Qt::AlignLeft);
+    vl->setMargin(0);
+    vl->setSpacing(1);
+    vl->addWidget(new QLabel);
+    frame->setMinimumWidth(150);
+    frame->setMinimumHeight(60);
+    frame->setLayout(vl);
+    frame->setStyleSheet(CELL_STYLE);
+    frame->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+    for (QLabelEvent *label_event : this->frames[index]->findChildren<QLabelEvent*>()) {
+        Event *event = new Event(*label_event->getEvent());
+        frame->layout()->addWidget(createLabelEvent(event));
+    }
+    DayDialog *day_dialog = new DayDialog(this, frame);
+    day_dialog->show();
 }
 
 QLabelEvent* MonthView::createLabelEvent(Event *event) {
@@ -338,10 +364,12 @@ void MonthView::remove_events_from_all_frames() {
 
 void MonthView::remove_events_from_frame(int i) {
     QLabelEvent label_event;
+    QPushButtonExtended button("");
     QListIterator<QObject *> it (this->frames[i]->children());
     while (it.hasNext()) {
         QObject *o = qobject_cast<QObject*> (it.next());
         if (o->metaObject()->className() == label_event.metaObject()->className()) delete o;
+        else if (o->metaObject()->className() == button.metaObject()->className()) delete o;
     }
 }
 

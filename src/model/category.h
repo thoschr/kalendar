@@ -11,6 +11,12 @@ private:
     string color;
 
 public:
+    Category (Category &category) {
+        this->name = category.getName();
+        this->color = category.getColor();
+        this->id = category.getId();
+    }
+
     Category(unsigned int id, string name, string color) {
         this->name = name;
         this->color = color;
