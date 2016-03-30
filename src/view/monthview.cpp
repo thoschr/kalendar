@@ -144,7 +144,7 @@ MonthView::MonthView(QWidget *parent) :
 
     //Remove events too old
     PManager pm;
-    Date target = DateUtil::decrease_month(current_date);
+    Date target = DateUtil::decrease_month(DateUtil::get_first_day_of_month(current_date));
     pm.remove_past_events(QDateTime(QDate(target.getYear(), target.getMonth() , target.getMonthDay())).toTime_t());
 
     //Fill the grid with the days of the default month (i.e. the current month)
@@ -292,8 +292,14 @@ void MonthView::display_events(Date date) {
         if (((end.getMonth() > start.getMonth()) && (end.getYear() == start.getYear())) || (end.getYear() > start.getYear()))
             end = DateUtil::get_last_day_of_month(start);
         for (int i = start_offset+start.getMonthDay()-1; i < (start_offset+end.getMonthDay()); i++) {
+            QLabelEvent *label_event = createLabelEvent(event);
+            /*if (this->frames[i]->children().size() == 5) {
+                QPushButton *button_show_all = new QPushButton("Show All");
+                this->frames[i]->layout()->addWidget(button_show_all);
+                label_event->setHidden(true);
+            } else if (this->frames[i]->children().size() > 5) label_event->setHidden(true);*/
             //Events will be copied and wrapped inside the QLabelEvent widgets
-            (static_cast <QVBoxLayout*> (this->frames[i]->layout()))->insertWidget(1, createLabelEvent(event));
+            (static_cast <QVBoxLayout*> (this->frames[i]->layout()))->insertWidget(1, label_event);
         }
         delete event;
     }

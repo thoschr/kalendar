@@ -47,5 +47,3 @@ QMAKE_CXXFLAGS += -std=c++11
 #For DEBUG purpose
 QMAKE_CXXFLAGS += -g
 QMAKE_CXXFLAGS += -O0
-
-FORMS +=
