@@ -370,7 +370,7 @@ bool MonthView::is_color_dark(string colorName) {
     QColor color(colorName.c_str());
     //Formula to calculate luminance from ITU-R BT.709
     int l = 0.2126 * color.red() + 0.7152 * color.green() + 0.0722 * color.blue();
-    if (l < 40)
+    if (l < 50)
         return true;
     else
         return false;

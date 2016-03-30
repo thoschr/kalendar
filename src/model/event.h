@@ -35,7 +35,7 @@ public:
         if (id == 0)
             /* The returned value from the hash function could be bigger than an integer, so be careful with normal integers.
              * I use an unsigned integer to have always a positive number (also with the overflow). */
-            this->id = static_cast<unsigned int> (hash<string>()(this->name + this->description));
+            this->id = static_cast<unsigned int> (hash<string>()(this->name + this->description)) + this->category->getId();
         else
             this->id = id;
         this->start = start;
