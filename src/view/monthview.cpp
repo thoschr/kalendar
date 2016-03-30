@@ -274,12 +274,14 @@ void MonthView::display_events(Date date) {
     }
     //Add events to the gui
     for (Event *event : event_list) {
+        qDebug() << "Event: " << event->getStart() << endl;
         Date start = DateUtil::date_from_timestamp(event->getStart());
         Date end = DateUtil::date_from_timestamp(event->getEnd());
         if (((start.getMonth() < date.getMonth()) && (start.getYear() == date.getYear())) || (start.getYear() < date.getYear()))
             start = DateUtil::get_first_day_of_month(date);
         if (((end.getMonth() > start.getMonth()) && (end.getYear() == start.getYear())) || (end.getYear() > start.getYear()))
             end = DateUtil::get_last_day_of_month(start);
+
         for (int i = start_offset+start.getMonthDay()-1; i < (start_offset+end.getMonthDay()); i++) {
             QLabelEvent *label_event = createLabelEvent(event);
             if (this->frames[i]->children().size() == 5) {

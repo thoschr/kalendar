@@ -119,24 +119,52 @@ bool PManager::edit_event(Event *before, Event *after) {
     return true;
 }
 
+bool IsDST(int day, int month, int dow)
+{
+    //January, february, and december are out.
+    if (month < 3 || month > 11) { return false; }
+    //April to October are in
+    if (month > 3 && month < 11) { return true; }
+    int previousSunday = day - dow;
+    //In march, we are DST if our previous sunday was on or after the 8th.
+    if (month == 3) { return previousSunday >= 8; }
+    //In november we must be before the first sunday to be dst.
+    //That means the previous sunday must be before the 1st.
+    return previousSunday <= 0;
+}
+
+
 std::list<Event*> PManager::get_events_of_month(int month, int year) {
     list<Event*> result;
-    std::tm tm;
+
+    std::tm tm; //*tm = localtime(&timestamp);
     tm.tm_sec = 0;
     tm.tm_min = 0;
     tm.tm_hour = 0;
     tm.tm_mday = 1;
     tm.tm_mon = month - 1;    // Assuming month represents Jan with 1
     tm.tm_year = year - 1900; // Assuming year is the AD year number
+    tm.tm_isdst = 0;//IsDST(tm.tm_mday, tm.tm_mon, tm.tm_wday);
+    //printf("First: %d %d %d\n",tm.tm_mday, tm.tm_mon, tm.tm_wday );
     long first_month = static_cast<long> (mktime(&tm)); //first of month
     tm.tm_mon = tm.tm_mon + 1;
+    //time_t r = mktime(&tm);
+    //std::tm *t = localtime(&r);
+    //printf("Last: %d %d %d\n",t->tm_mday, t->tm_mon, t->tm_wday );
+    //tm.tm_isdst = IsDST(t->tm_mday, t->tm_mon, 2);
     long last_month = static_cast<long> (mktime(&tm)); //last of month
+    if ((first_month == -1) || (last_month == -1)) {
+        fprintf(stderr, "Failed to calculate timestamp\n");
+        return result;
+    }
     sqlite3_stmt *res;
     int rc = sqlite3_prepare_v2(this->db, "SELECT * FROM Events WHERE (start >= ? AND start < ?) OR (end >= ? AND end < ?);", -1, &res, NULL);
     if (rc != SQLITE_OK) {
         fprintf(stderr, "Failed to fetch data: %s\n", sqlite3_errmsg(db));
         return result;
     }
+    printf("FirstMonth: %ld\n", first_month);
+    printf("LastMonth: %ld\n", last_month);
     sqlite3_bind_int64(res, 1, first_month);
     sqlite3_bind_int64(res, 2, last_month);
     sqlite3_bind_int64(res, 3, first_month);
