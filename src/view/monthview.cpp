@@ -123,19 +123,7 @@ MonthView::MonthView(QWidget *parent) :
     for (i = 1; i < 7; i++) { //rows
         for (j = 0; j < 7; j++) { //columns
             //Map a Time object to each frame
-            QFrameExtended *frame = new QFrameExtended;
-            QVBoxLayout *vl = new QVBoxLayout;
-            frame->setDate(NULL);
-            frame->setObjectName("day");
-            vl->setAlignment(Qt::AlignTop | Qt::AlignLeft);
-            vl->setMargin(0);
-            vl->setSpacing(1);
-            vl->addWidget(new QLabel);
-            frame->setMinimumWidth(150);
-            frame->setMinimumHeight(60);
-            frame->setLayout(vl);
-            frame->setStyleSheet(CELL_STYLE);
-            frame->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+            QFrameExtended *frame = createQFrameExtended(NULL);
             grid_layout->addWidget(frame, i, j);
             this->frames[7*(i-1)+j] = frame;
         }
@@ -308,11 +296,10 @@ void MonthView::display_events(Date date) {
     }
 }
 
-void MonthView::on_button_extended_click(int index) {
-    //Make a copy
+QFrameExtended* MonthView::createQFrameExtended(Date *date) {
     QFrameExtended *frame = new QFrameExtended;
     QVBoxLayout *vl = new QVBoxLayout;
-    frame->setDate(NULL);
+    frame->setDate(date);
     frame->setObjectName("day");
     vl->setAlignment(Qt::AlignTop | Qt::AlignLeft);
     vl->setMargin(0);
@@ -323,6 +310,12 @@ void MonthView::on_button_extended_click(int index) {
     frame->setLayout(vl);
     frame->setStyleSheet(CELL_STYLE);
     frame->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+    return frame;
+}
+
+void MonthView::on_button_extended_click(int index) {
+    //Make a copy
+    QFrameExtended *frame = createQFrameExtended(NULL);
     for (QLabelEvent *label_event : this->frames[index]->findChildren<QLabelEvent*>()) {
         Event *event = new Event(*label_event->getEvent());
         frame->layout()->addWidget(createLabelEvent(event));

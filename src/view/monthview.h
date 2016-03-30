@@ -41,6 +41,7 @@ private:
     void remove_events_from_all_frames();
     void remove_events_from_frame(int i);
     QLabelEvent *createLabelEvent(Event *event);
+    QFrameExtended *createQFrameExtended(Date *date);
     void createMenu();
     void on_button_extended_click(int index);
 
