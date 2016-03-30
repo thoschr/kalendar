@@ -35,7 +35,7 @@ public:
         if (id == 0)
             /* The returned value from the hash function could be bigger than an integer, so be careful with normal integers.
              * I use an unsigned integer to have always a positive number (also with the overflow). */
-            this->id = static_cast<unsigned int> (hash<string>()(this->name + this->description)) + this->category->getId();
+            this->id = static_cast<unsigned int> (hash<string>()(this->name + this->description)) + (this->category ? this->category->getId() : 0);
         else
             this->id = id;
         this->start = start;
@@ -43,7 +43,7 @@ public:
     }
 
     ~Event() {
-        delete this->category;
+        if (this->category != NULL) delete this->category;
     }
 
     unsigned int getId() { return id; }

@@ -56,12 +56,14 @@ string PManager::filterSpecialChars(string str) {
 }
 
 bool PManager::add_event(Event *e) {
+    char *err_msg = 0;
     sqlite3_stmt *stmt;
     string filteredName, filteredDescription;
-    if ((e->getName().length() < 3) || (e->getStart() > e->getEnd())) return false;
+    if ((e->getName().length() < 3) || (e->getStart() > e->getEnd()) || (e->getCategory() == NULL)) return false;
     int rc = sqlite3_prepare_v2(this->db, "INSERT INTO Events VALUES(?, ?, ?, ?, ?, ?);", -1, &stmt, NULL);
     if (rc != SQLITE_OK ) {
-        fprintf(stderr, "SQL error in prepare\n");
+        fprintf(stderr, "SQL error in prepare: %s\n", sqlite3_errmsg(this->db));
+        sqlite3_free(err_msg);
         sqlite3_close(this->db);
         return false;
     }
@@ -76,7 +78,8 @@ bool PManager::add_event(Event *e) {
     //commit
     rc = sqlite3_step(stmt);
     if (rc != SQLITE_DONE ) {
-        fprintf(stderr, "SQL error in commit\n");
+        fprintf(stderr, "SQL error in commit: %s\n", sqlite3_errmsg(this->db));
+        sqlite3_free(err_msg);
         return false;
     }
     //free memory
@@ -85,12 +88,14 @@ bool PManager::add_event(Event *e) {
 }
 
 bool PManager::edit_event(Event *before, Event *after) {
+    char *err_msg = 0;
     sqlite3_stmt *stmt;
     string filteredName, filteredDescription;
     if ((after->getName().length() < 3) || (after->getStart() > after->getEnd())) return false;
     int rc = sqlite3_prepare_v2(this->db, "UPDATE Events SET id=?, name=?, description=?, category=?, start=?, end=? WHERE id=?;", -1, &stmt, NULL);
     if (rc != SQLITE_OK ) {
-        fprintf(stderr, "SQL error in prepare\n");
+        fprintf(stderr, "SQL error in prepare: %s\n", sqlite3_errmsg(this->db));
+        sqlite3_free(err_msg);
         return false;
     }
     sqlite3_bind_int64(stmt, 1, after->getId());
@@ -105,7 +110,8 @@ bool PManager::edit_event(Event *before, Event *after) {
     //commit
     rc = sqlite3_step(stmt);
     if (rc != SQLITE_DONE ) {
-        fprintf(stderr, "SQL error in commit\n");
+        fprintf(stderr, "SQL error in commit: %s\n", sqlite3_errmsg(this->db));
+        sqlite3_free(err_msg);
         return false;
     }
     //free memory

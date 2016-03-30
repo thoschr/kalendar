@@ -122,8 +122,7 @@ void EventDialog::on_button_save_click() {
     Category *category;
     for (Category *c : this->category_list) {
         if (this->edit_category->currentText().toStdString() == c->getName()) {
-            category = c;
-            this->category_list.remove(category); //Needed to avoid a double free. The category will be freed by newEvent, we don't free it again in the destructor
+            category = new Category(*c);
             break;
         }
     }

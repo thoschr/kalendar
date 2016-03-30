@@ -17,6 +17,7 @@ PManagerTest::PManagerTest()
     this->valid_event = new Event(0, test, test, new Category(1, test, test), timestamp, timestamp + 100);
     this->valid_event_2 = new Event(100, test, test, new Category(1, test, test), timestamp, timestamp + 1000000); //starts from current month, ends the next month
     /* Invalid Events */
+    this->event_with_null_category = new Event(0, test, test, NULL, timestamp, timestamp);
     this->event_with_invalid_category = new Event(0, test, test, new Category(99, test, test), timestamp, timestamp);
     this->noname_event = new Event(1, string(""), test, new Category(1, test, test), timestamp, timestamp + 100);
     this->invalid_time_event = new Event(1, test, test, new Category(1, test, test), timestamp, timestamp - 100);
@@ -35,6 +36,7 @@ PManagerTest::~PManagerTest() {
     delete this->valid_default_category;
     delete this->specialchars_event;
     delete this->event_with_invalid_category;
+    delete this->event_with_null_category;
 }
 
 void PManagerTest::test_all() {
@@ -63,6 +65,7 @@ void PManagerTest::test_add_event() {
     ASSERT ((!(pm.add_event(this->noname_event))) &&
            (!(pm.add_event(this->invalid_time_event))) &&
            (!(pm.add_event(this->event_with_invalid_category))) &&
+           (!(pm.add_event(this->event_with_null_category))) &&
            (pm.add_event(this->specialchars_event)) &&
            (pm.add_event(this->valid_event)))
     pm.remove_all();
