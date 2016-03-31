@@ -12,9 +12,9 @@ private:
 
 public:
     explicit QLabelEvent(QWidget *parent = 0);
-    ~QLabelEvent() { delete this->event; }
-    void setEvent(Event *event) { this->event = event; }
-    Event* getEvent() { return event; }
+    ~QLabelEvent();
+    void setEvent(Event *event);
+    Event* getEvent();
 protected:
     virtual void mouseReleaseEvent(QMouseEvent *);
 

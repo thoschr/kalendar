@@ -20,6 +20,7 @@ PManager::PManager()
     if (rc != SQLITE_OK) {
 
         fprintf(stderr, "Cannot open database: %s\n", sqlite3_errmsg(this->db));
+        sqlite3_free(err_msg);
         sqlite3_close(this->db);
     }
 
@@ -36,6 +37,7 @@ PManager::PManager()
         if (rc != SQLITE_OK ) {
             fprintf(stderr, "SQL error: %s\n", err_msg);
             sqlite3_free(err_msg);
+            sqlite3_close(this->db);
         }
     }
 }

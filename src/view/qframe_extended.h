@@ -15,6 +15,7 @@ private:
 
 public:
     explicit QFrameExtended(QWidget *parent = 0) : QFrame(parent), date(NULL) { }
+    ~QFrameExtended() { delete this->date; }
     Date* getDate() { return date; }
     void setDate(Date *d) {
         if (this->date != NULL) delete this->date;
