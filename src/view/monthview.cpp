@@ -9,7 +9,8 @@
                    "QLabel { border: none; font-size: 16px; padding: 5px; background-color:rgba(0,0,0,0); }" \
                    "QLabel#today { background-color: #FFFF88; }" \
                    "QFrame#selected { background-color: #EEEEFF; }" \
-                   "QLabel#header { background-color: #EEEEEE; padding: auto; font-weight: bold; }"
+                   "QLabel#header { font-weight: bold; }" \
+                   "QFrame#header { background-color: #EEEEEE; }"
 
 void MonthView::on_mouse_move(QFrameExtended *frame) {
     if ((frame->getDate() != NULL) && //Checks if the frame is valid
@@ -107,14 +108,15 @@ MonthView::MonthView(QWidget *parent) :
     //First row contains the names of the days of the week
     for (j = 0; j < 7; j++) {
         QFrame *frame = new QFrame;
-        QVBoxLayout *vl = new QVBoxLayout;
-        frame->setMinimumWidth(150);
-        frame->setMinimumHeight(100);
+        QHBoxLayout *hl = new QHBoxLayout;
+        hl->setAlignment(Qt::AlignCenter);
+        frame->setFixedHeight(50);
         QLabel *wday_name = new QLabel(DateUtil::numeric2literal_day_of_week(j+1).c_str());
         wday_name->setObjectName("header");
-        vl->addWidget(wday_name);
-        vl->setMargin(0);
-        frame->setLayout(vl);
+        frame->setObjectName("header");
+        hl->addWidget(wday_name);
+        hl->setMargin(0);
+        frame->setLayout(hl);
         frame->setStyleSheet(CELL_STYLE);
         grid_layout->addWidget(frame, 0, j);
     }
