@@ -115,13 +115,16 @@ void EventDialog::refresh(Date date) {
     delete this;
 }
 
-//if the event already exists, this function updates it, otherwise will be created
 void EventDialog::on_button_save_click() {
-    /* otherwise I create a new Event */
     if (this->edit_name->text().length() < 3) {
         QMessageBox::critical(this, "Error", "The name must have a length greater than 2", QMessageBox::Ok);
         return;
     }
+    if (this->edit_start->dateTime() > this->edit_end->dateTime()) {
+        QMessageBox::critical(this, "Error", "Invalid range of time selected", QMessageBox::Ok);
+        return;
+    }
+
     Category *category = NULL;
     for (Category *c : this->category_list) {
         if (this->edit_category->currentText().toStdString() == c->getName()) {

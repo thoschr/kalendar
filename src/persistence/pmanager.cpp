@@ -61,7 +61,7 @@ bool PManager::add_event(Event *e) {
     char *err_msg = 0;
     sqlite3_stmt *stmt;
     string filteredName, filteredDescription;
-    if ((e->getName().length() < 3) || (e->getStart() > e->getEnd()) || (e->getCategory() == NULL)) return false;
+    if ((e->getName().length() < 3) || (difftime(e->getStart(), e->getEnd()) > 0) || (e->getCategory() == NULL)) return false;
     int rc = sqlite3_prepare_v2(this->db, "INSERT INTO Events VALUES(?, ?, ?, ?, ?, ?);", -1, &stmt, NULL);
     if (rc != SQLITE_OK ) {
         fprintf(stderr, "SQL error in prepare: %s\n", sqlite3_errmsg(this->db));
