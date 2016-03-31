@@ -316,7 +316,17 @@ QFrameExtended* MonthView::createQFrameExtended(Date *date) {
 
 void MonthView::on_button_extended_click(int index) {
     //Make a copy
-    QFrameExtended *frame = createQFrameExtended(NULL);
+    Date *date = new Date(this->frames[index]->getDate()->getMonthDay(), this->frames[index]->getDate()->getWeekDay(), this->frames[index]->getDate()->getMonth(), this->frames[index]->getDate()->getYear());
+    QFrameExtended *frame = createQFrameExtended(date);
+    QString text = QString(DateUtil::numeric2literal_day_of_week(frame->getDate()->getWeekDay()).c_str()) +
+                   QString("    ") +
+                   QString::number(frame->getDate()->getMonthDay()) + QString(" ") +
+                   QString(DateUtil::get_literal_month(frame->getDate()->getMonth()).c_str()) + QString(" ") +
+                   QString::number(frame->getDate()->getYear());
+    QLabel *label_day = static_cast<QLabel*> (frame->children().at(1));
+    label_day->setText(text);
+    label_day->setStyleSheet("QLabel { background-color: #ffffb3; border-bottom: 1px solid #000000; margin-bottom: 2px; }");
+    (static_cast <QVBoxLayout*> (frame->layout()))->insertWidget(1, label_day);
     for (QLabelEvent *label_event : this->frames[index]->findChildren<QLabelEvent*>()) {
         Event *event = new Event(*label_event->getEvent());
         frame->layout()->addWidget(createLabelEvent(event));

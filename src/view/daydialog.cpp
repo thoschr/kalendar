@@ -12,10 +12,10 @@ DayDialog::DayDialog(View *parentView, QFrameExtended *frame, QWidget *parent) :
 
     this->setFixedWidth(300);
     this->setFixedHeight(400);
-    this->setModal(true);
     this->setWindowTitle("Day Dialog");
 
     QVBoxLayout *main_layout = new QVBoxLayout;
+
     main_layout->addWidget(frame);
     setLayout(main_layout);
 }

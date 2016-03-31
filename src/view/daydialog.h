@@ -4,6 +4,8 @@
 #include <QDialog>
 #include <QVBoxLayout>
 #include <QKeyEvent>
+#include <QLabel>
+#include <QVBoxLayout>
 #include "view.h"
 #include "qframe_extended.h"
 

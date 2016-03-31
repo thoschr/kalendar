@@ -15,6 +15,7 @@ private:
     int year;
 public:
     Date() {}
+
     Date(int mday, int wday, int month, int year) {
         this->mday = mday;
         this->wday = wday;
