@@ -62,6 +62,8 @@ EventDialog::EventDialog(View *parentView, Date start_date, Date end_date, QWidg
     this->edit_start = new QDateTimeEdit;
     this->edit_start->setCalendarPopup(true);
     this->edit_start->setDateTime(QDateTime(QDate(start_date.getYear(), start_date.getMonth(), start_date.getMonthDay())));
+    //I set a specific hour because the default is the midnight, but this could lead more easily problems caused by daylight saving time
+    this->edit_start->setTime(QTime(8,0,0));
     third_row->addWidget(label_start);
     third_row->addWidget(this->edit_start);
     main_layout->addLayout(third_row);
@@ -70,6 +72,7 @@ EventDialog::EventDialog(View *parentView, Date start_date, Date end_date, QWidg
     this->edit_end = new QDateTimeEdit;
     this->edit_end->setCalendarPopup(true);
     this->edit_end->setDateTime(QDateTime(QDate(end_date.getYear(), end_date.getMonth(), end_date.getMonthDay())));
+    this->edit_end->setTime(QTime(9,0,0));
     fourth_row->addWidget(label_end);
     fourth_row->addWidget(this->edit_end);
     main_layout->addLayout(fourth_row);
@@ -119,7 +122,7 @@ void EventDialog::on_button_save_click() {
         QMessageBox::critical(this, "Error", "The name must have a length greater than 2", QMessageBox::Ok);
         return;
     }
-    Category *category;
+    Category *category = NULL;
     for (Category *c : this->category_list) {
         if (this->edit_category->currentText().toStdString() == c->getName()) {
             category = new Category(*c);

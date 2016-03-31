@@ -137,21 +137,32 @@ bool IsDST(int day, int month, int dow)
 std::list<Event*> PManager::get_events_of_month(int month, int year) {
     list<Event*> result;
 
-    std::tm tm; //*tm = localtime(&timestamp);
+    /* A large number of countries use daylight saving time (DST) (called also summer time).
+     * We need to manage DST. Most of the countries start to use DST between 1 March and 1 April,
+     * but the dates where the DST ends are different. For example in Europe DST ends before 1 November, instead in U.S.A.
+     * DST ends after the 1 November. We must calculate for the current user if DST ends before or after 1 November (geolocation dependent).
+     * The following lines of code use localtime function that takes into account the location of the user. */
+    time_t threshold = 26262000; // = 1 November 1970
+    std::tm *t = localtime(&threshold);
+    /* From documentation:
+     * The Daylight Saving Time flag (tm_isdst) is greater than zero if Daylight Saving Time is in effect,
+     * zero if Daylight Saving Time is not in effect,
+     * and less than zero if the information is not available.
+     */
+    int s = 0;
+    if (t->tm_isdst > 0) s = 1; //if tm_isdst is negative, s will have the default value
+
+    std::tm tm;
     tm.tm_sec = 0;
     tm.tm_min = 0;
     tm.tm_hour = 0;
     tm.tm_mday = 1;
     tm.tm_mon = month - 1;    // Assuming month represents Jan with 1
     tm.tm_year = year - 1900; // Assuming year is the AD year number
-    tm.tm_isdst = 0;//IsDST(tm.tm_mday, tm.tm_mon, tm.tm_wday);
-    //printf("First: %d %d %d\n",tm.tm_mday, tm.tm_mon, tm.tm_wday );
+    tm.tm_isdst = ((tm.tm_mon > 2) && (tm.tm_mon < 10+s)); // 10 is November
     long first_month = static_cast<long> (mktime(&tm)); //first of month
-    tm.tm_mon = tm.tm_mon + 1;
-    //time_t r = mktime(&tm);
-    //std::tm *t = localtime(&r);
-    //printf("Last: %d %d %d\n",t->tm_mday, t->tm_mon, t->tm_wday );
-    //tm.tm_isdst = IsDST(t->tm_mday, t->tm_mon, 2);
+    tm.tm_mon = tm.tm_mon + 1; //This could be 12, but isn't a problem
+    tm.tm_isdst = ((tm.tm_mon > 2) && (tm.tm_mon < 10+s));
     long last_month = static_cast<long> (mktime(&tm)); //last of month
     if ((first_month == -1) || (last_month == -1)) {
         fprintf(stderr, "Failed to calculate timestamp\n");
@@ -163,8 +174,6 @@ std::list<Event*> PManager::get_events_of_month(int month, int year) {
         fprintf(stderr, "Failed to fetch data: %s\n", sqlite3_errmsg(db));
         return result;
     }
-    printf("FirstMonth: %ld\n", first_month);
-    printf("LastMonth: %ld\n", last_month);
     sqlite3_bind_int64(res, 1, first_month);
     sqlite3_bind_int64(res, 2, last_month);
     sqlite3_bind_int64(res, 3, first_month);

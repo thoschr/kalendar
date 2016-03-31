@@ -274,7 +274,6 @@ void MonthView::display_events(Date date) {
     }
     //Add events to the gui
     for (Event *event : event_list) {
-        qDebug() << "Event: " << event->getStart() << endl;
         Date start = DateUtil::date_from_timestamp(event->getStart());
         Date end = DateUtil::date_from_timestamp(event->getEnd());
         if (((start.getMonth() < date.getMonth()) && (start.getYear() == date.getYear())) || (start.getYear() < date.getYear()))
