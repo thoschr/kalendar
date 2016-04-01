@@ -1,6 +1,7 @@
 #include "categorydialog.h"
 
 #include <QDebug>
+#include <functional>
 
 CategoryDialog::CategoryDialog(QWidget *parent) :
     QDialog(parent),
@@ -8,19 +9,20 @@ CategoryDialog::CategoryDialog(QWidget *parent) :
 {
     this->setFixedWidth(300);
     this->setFixedHeight(400);
-    this->setModal(true);
     this->setWindowTitle("Category Manager");
+    this->custom_dialog = NULL;
     this->pm = new PManager;
     this->selected_color = QColor(DEFAULT_COLOR);
     QVBoxLayout *layout = new QVBoxLayout;
     this->list_widget = new QListWidget;
+    connect(this->list_widget, &QListWidget::itemClicked, this, &CategoryDialog::on_item_click);
     load_categories();
     QPushButton *button_delete = new QPushButton("Delete");
     QPushButton *button_add = new QPushButton("Add new category");
     QPushButton *button_cancel = new QPushButton("Cancel");
     QHBoxLayout *hl = new QHBoxLayout;
     this->button_color = new QPushButton;
-    QPixmap pixmap(20, 20);
+    QPixmap pixmap(ICON_SIZE, ICON_SIZE);
     pixmap.fill(QColor(DEFAULT_COLOR));
     button_color->setIcon(QIcon(pixmap));
     this->edit_name = new QLineEdit;
@@ -50,10 +52,32 @@ void CategoryDialog::load_categories() {
     this->category_list = this->pm->get_categories();
     this->list_widget->clear();
     for (Category *category : this->category_list) {
-        QPixmap pixmap(10, 10);
+        QPixmap pixmap(ICON_SIZE, ICON_SIZE);
         pixmap.fill(QColor(category->getColor().c_str()));
         this->list_widget->addItem(new QListWidgetItem(QIcon(pixmap), QString(category->getName().c_str())));
     }
+}
+
+void CategoryDialog::on_item_click(QListWidgetItem *item) {
+    QVBoxLayout *vl = new QVBoxLayout;
+    QHBoxLayout *hl = new QHBoxLayout;
+    QHBoxLayout *hl2 = new QHBoxLayout;
+    QPushButton *button_color = new QPushButton;
+    button_color->setIcon(item->icon());
+    QLineEdit *edit_name = new QLineEdit(item->text());
+    hl->addWidget(edit_name);
+    hl->addWidget(button_color);
+    QPushButton *button_save = new QPushButton("Save");
+    QPushButton *button_delete = new QPushButton("Delete");
+    connect(button_delete, &QPushButton::clicked, this, &CategoryDialog::on_button_delete_click);
+    connect(button_save, &QPushButton::clicked, this, &CategoryDialog::on_button_save_click);
+    hl2->addWidget(button_save);
+    hl2->addWidget(button_delete);
+    vl->addLayout(hl);
+    vl->addLayout(hl2);
+    this->custom_dialog = new CustomDialog(vl);
+    this->custom_dialog->setModal(true);
+    this->custom_dialog->show();
 }
 
 void CategoryDialog::on_button_cancel_click() {
@@ -61,15 +85,11 @@ void CategoryDialog::on_button_cancel_click() {
     delete this;
 }
 
+void CategoryDialog::on_button_save_click() {
+    //TODO: Implement this
+}
+
 void CategoryDialog::on_button_delete_click() {
-    if (this->list_widget->count() <= 1) {
-        QMessageBox::critical(this, "Error", "You can't have 0 categories, add another category and then try again", QMessageBox::Ok);
-        return;
-    }
-    else if (this->list_widget->selectedItems().size() == 0) {
-        QMessageBox::critical(this, "Error", "Select a category to delete from the list", QMessageBox::Ok);
-        return;
-    }
     QString selected_category = this->list_widget->selectedItems().at(0)->text();
     QMessageBox::StandardButton reply;
     reply = QMessageBox::question(this, "Confirm", QString("Do you want to delete ") + selected_category + QString("?"), QMessageBox::Yes|QMessageBox::No);
@@ -83,6 +103,9 @@ void CategoryDialog::on_button_delete_click() {
                 break;
             }
         }
+        this->custom_dialog->close();
+        delete this->custom_dialog;
+        this->custom_dialog = NULL;
     }
 }
 
@@ -101,7 +124,7 @@ void CategoryDialog::on_button_add_click() {
 
 void CategoryDialog::on_button_color_click() {
     this->selected_color = QColorDialog::getColor(QColor(DEFAULT_COLOR));
-    QPixmap pixmap(20, 20);
+    QPixmap pixmap(ICON_SIZE, ICON_SIZE);
     pixmap.fill(QColor(this->selected_color));
     button_color->setIcon(QIcon(pixmap));
 }

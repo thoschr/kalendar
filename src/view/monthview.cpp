@@ -333,8 +333,13 @@ void MonthView::on_button_extended_click(int index) {
         Event *event = new Event(*label_event->getEvent());
         frame->layout()->addWidget(createLabelEvent(event));
     }
-    DayDialog *day_dialog = new DayDialog(this, frame);
-    day_dialog->show();
+    QVBoxLayout *main_layout = new QVBoxLayout;
+    main_layout->addWidget(frame);
+    CustomDialog *custom_dialog = new CustomDialog(main_layout);
+    custom_dialog->setFixedWidth(300);
+    custom_dialog->setMinimumHeight(400);
+    custom_dialog->setWindowTitle("Day Dialog");
+    custom_dialog->show();
 }
 
 QLabelEvent* MonthView::createLabelEvent(Event *event) {

@@ -6,8 +6,8 @@
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
 ********************************************************************************/
 
-#ifndef UI_DAYDIALOG_H
-#define UI_DAYDIALOG_H
+#ifndef UI_CUSTOMDIALOG_H
+#define UI_CUSTOMDIALOG_H
 
 #include <QtCore/QVariant>
 #include <QtWidgets/QAction>
@@ -18,32 +18,27 @@
 
 QT_BEGIN_NAMESPACE
 
-class Ui_DayDialog
+class Ui_CustomDialog
 {
 public:
 
-    void setupUi(QDialog *DayDialog)
+    void setupUi(QDialog *CustomDialog)
     {
-        if (DayDialog->objectName().isEmpty())
-            DayDialog->setObjectName(QStringLiteral("DayDialog"));
-        DayDialog->resize(400, 300);
+        if (CustomDialog->objectName().isEmpty())
+            CustomDialog->setObjectName(QStringLiteral("CustomDialog"));
+        CustomDialog->resize(400, 300);
 
-        retranslateUi(DayDialog);
+        CustomDialog->setWindowTitle(QApplication::translate("CustomDialog", "Dialog", 0));
 
-        QMetaObject::connectSlotsByName(DayDialog);
+        QMetaObject::connectSlotsByName(CustomDialog);
     } // setupUi
-
-    void retranslateUi(QDialog *DayDialog)
-    {
-        DayDialog->setWindowTitle(QApplication::translate("DayDialog", "Dialog", 0));
-    } // retranslateUi
 
 };
 
 namespace Ui {
-    class DayDialog: public Ui_DayDialog {};
+    class CustomDialog: public Ui_CustomDialog {};
 } // namespace Ui
 
 QT_END_NAMESPACE
 
-#endif // UI_DAYDIALOG_H
+#endif

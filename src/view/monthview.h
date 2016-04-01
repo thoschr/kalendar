@@ -19,7 +19,7 @@
 #include "util/dateutil.h"
 #include "qlabel_event.h"
 #include "qpushbutton_extended.h"
-#include "daydialog.h"
+#include "customdialog.h"
 
 namespace Ui {
     class MonthView;
