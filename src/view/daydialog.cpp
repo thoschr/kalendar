@@ -11,7 +11,8 @@ DayDialog::DayDialog(View *parentView, QFrameExtended *frame, QWidget *parent) :
     this->frame = frame;
 
     this->setFixedWidth(300);
-    this->setFixedHeight(400);
+    this->setMinimumHeight(400);
+    this->setWindowFlags(Qt::WindowCloseButtonHint | Qt::WindowMinimizeButtonHint);
     this->setWindowTitle("Day Dialog");
 
     QVBoxLayout *main_layout = new QVBoxLayout;
