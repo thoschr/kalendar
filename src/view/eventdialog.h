@@ -37,7 +37,7 @@ private:
     View *parent;
     PManager *pm;
     Event *event;
-    list<Category *> category_list;
+    vector<Category *> category_list;
     void refresh(Date date);
 
 public:

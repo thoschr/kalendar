@@ -37,6 +37,7 @@ public:
     void test_edit_event();
     void test_get_all_events();
     void test_remove_past_events();
+    void test_edit_category();
 };
 
 #endif // PMANAGERTEST_H

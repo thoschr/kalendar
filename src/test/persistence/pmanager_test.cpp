@@ -51,6 +51,7 @@ void PManagerTest::test_all() {
     test_edit_event();
     test_get_all_events();
     test_remove_past_events();
+    test_edit_category();
 }
 
 void PManagerTest::test_remove_all() {
@@ -128,9 +129,9 @@ void PManagerTest::test_get_categories() {
     bool ret = false;
     PManager pm;
     pm.add_category(this->valid_category);
-    list<Category*> categories = pm.get_categories();
+    vector<Category*> categories = pm.get_categories();
     if (!(categories.empty())) {
-        list<Category*>::iterator it = categories.begin();
+        vector<Category*>::iterator it = categories.begin();
         ret = this->valid_category->equals(**it); // *it has type Category*
         delete *it;
     }
@@ -146,9 +147,9 @@ void PManagerTest::test_remove_category() {
     pm.add_category(this->valid_category_2);
     ret = pm.remove_category(this->valid_category);
     ret = ret && pm.remove_category(this->valid_default_category); //Delete the default category
-    list<Category*> categories = pm.get_categories();
+    vector<Category*> categories = pm.get_categories();
     if (categories.size() == 1) {
-        list<Category*>::iterator it = categories.begin();
+        vector<Category*>::iterator it = categories.begin();
         ret = ret && this->valid_category_2->equals(**it); // *it has type Category*
         delete *it;
     } else ret = false;
@@ -158,9 +159,8 @@ void PManagerTest::test_remove_category() {
     pm.add_event(this->valid_event);
     ret = ret && (!pm.remove_category(this->valid_default_category)); //try to delete the default category, but it's referenced by valid_event, so the function should fails
     categories = pm.get_categories();
-    qDebug() << categories.size() << endl;
     if (categories.size() == 1) {
-        list<Category*>::iterator it = categories.begin();
+        vector<Category*>::iterator it = categories.begin();
         ret = ret && this->valid_default_category->equals(**it); // *it has type Category*
         delete *it;
     } else ret = false;
@@ -218,5 +218,14 @@ void PManagerTest::test_remove_past_events() {
         delete *it;
     } else ret = false;
     ASSERT (ret)
+    pm.remove_all();
+}
+
+void PManagerTest::test_edit_category() {
+    Test::print("test_edit_category ");
+    PManager pm;
+    pm.add_category(this->valid_category);
+    ASSERT (!pm.edit_category(this->valid_category, this->noname_category) &&
+            (pm.edit_category(this->valid_category, this->valid_category_2)))
     pm.remove_all();
 }

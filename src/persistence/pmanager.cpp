@@ -89,26 +89,26 @@ bool PManager::add_event(Event *e) {
     return true;
 }
 
-bool PManager::edit_event(Event *before, Event *after) {
+bool PManager::edit_event(Event *old_event, Event *new_event) {
     char *err_msg = 0;
     sqlite3_stmt *stmt;
     string filteredName, filteredDescription;
-    if ((after->getName().length() < 3) || (after->getStart() > after->getEnd())) return false;
+    if ((new_event->getName().length() < 3) || (difftime(new_event->getStart(), new_event->getEnd()) > 0) || (new_event->getCategory() == NULL)) return false;
     int rc = sqlite3_prepare_v2(this->db, "UPDATE Events SET id=?, name=?, description=?, category=?, start=?, end=? WHERE id=?;", -1, &stmt, NULL);
     if (rc != SQLITE_OK ) {
         fprintf(stderr, "SQL error in prepare: %s\n", sqlite3_errmsg(this->db));
         sqlite3_free(err_msg);
         return false;
     }
-    sqlite3_bind_int64(stmt, 1, after->getId());
-    filteredName = filterSpecialChars(after->getName());
+    sqlite3_bind_int64(stmt, 1, new_event->getId());
+    filteredName = filterSpecialChars(new_event->getName());
     sqlite3_bind_text(stmt, 2, filteredName.c_str(), filteredName.length(), 0);
-    filteredDescription = filterSpecialChars(after->getDescription());
+    filteredDescription = filterSpecialChars(new_event->getDescription());
     sqlite3_bind_text(stmt, 3, filteredDescription.c_str(), filteredDescription.length(), 0);
-    sqlite3_bind_int64(stmt, 4, after->getCategory()->getId());
-    sqlite3_bind_int64(stmt, 5, after->getStart());
-    sqlite3_bind_int64(stmt, 6, after->getEnd());
-    sqlite3_bind_int64(stmt, 7, before->getId());
+    sqlite3_bind_int64(stmt, 4, new_event->getCategory()->getId());
+    sqlite3_bind_int64(stmt, 5, new_event->getStart());
+    sqlite3_bind_int64(stmt, 6, new_event->getEnd());
+    sqlite3_bind_int64(stmt, 7, old_event->getId());
     //commit
     rc = sqlite3_step(stmt);
     if (rc != SQLITE_DONE ) {
@@ -121,20 +121,19 @@ bool PManager::edit_event(Event *before, Event *after) {
     return true;
 }
 
-bool IsDST(int day, int month, int dow)
-{
-    //January, february, and december are out.
-    if (month < 3 || month > 11) { return false; }
-    //April to October are in
-    if (month > 3 && month < 11) { return true; }
-    int previousSunday = day - dow;
-    //In march, we are DST if our previous sunday was on or after the 8th.
-    if (month == 3) { return previousSunday >= 8; }
-    //In november we must be before the first sunday to be dst.
-    //That means the previous sunday must be before the 1st.
-    return previousSunday <= 0;
+bool PManager::edit_category(Category *old_category, Category *new_category) {
+    char *err_msg = 0;
+    char sql[1024];
+    if (new_category->getName().length() < 3) return false;
+    snprintf(sql, 1024, "UPDATE Categories SET name='%s', color='%s' WHERE id=%u;", filterSpecialChars(new_category->getName()).c_str(), filterSpecialChars(new_category->getColor()).c_str(), old_category->getId());
+    int rc = sqlite3_exec(this->db, sql, 0, 0, &err_msg);
+    if (rc != SQLITE_OK ) {
+        fprintf(stderr, "SQL error: %s\n", err_msg);
+        sqlite3_free(err_msg);
+        return false;
+    }
+    return true;
 }
-
 
 std::list<Event*> PManager::get_events_of_month(int month, int year) {
     list<Event*> result;
@@ -231,8 +230,8 @@ bool PManager::add_category(Category *c) {
     return true;
 }
 
-list<Category*> PManager::get_categories() {
-    list<Category*> result;
+vector<Category*> PManager::get_categories() {
+    vector<Category*> result;
     sqlite3_stmt *res;
     char sql[1024];
     snprintf(sql, 1024, "SELECT * FROM Categories;");
@@ -247,7 +246,7 @@ list<Category*> PManager::get_categories() {
                               string((const char*)sqlite3_column_text(res, 1)),
                               string((const char*)sqlite3_column_text(res, 2)));
 
-        result.push_front(c);
+        result.push_back(c);
     }
     sqlite3_finalize(res);
     return result;

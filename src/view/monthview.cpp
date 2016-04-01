@@ -217,8 +217,8 @@ void MonthView::addEvent() {
 }
 
 void MonthView::editCategories() {
-    CategoryDialog *categoryDialog = new CategoryDialog;
-    categoryDialog->show();
+    CategoryDialog *category_dialog = new CategoryDialog;
+    category_dialog->show();
 }
 
 void MonthView::display_days(Date date) {
@@ -399,9 +399,3 @@ void MonthView::on_event_click(Event *event) {
     eventDialog->setEvent(event);
     eventDialog->show();
 }
-
-//FIXME
-/* BUG:
- * When the user changes the month, opens the EventDialog window, closes it and then changes the month again, when he'll close
- * the program, will be the following error: corrupted double-linked list
- */
