@@ -3,10 +3,11 @@
 #include <QDebug>
 #include <functional>
 
-CategoryDialog::CategoryDialog(QWidget *parent) :
+CategoryDialog::CategoryDialog(View *parentView, QWidget *parent) :
     QDialog(parent),
     ui(new Ui::CategoryDialog)
 {
+    this->parent = parentView;
     this->setFixedWidth(300);
     this->setFixedHeight(400);
     this->setWindowTitle("Category Manager");
@@ -68,4 +69,7 @@ QListWidget* CategoryDialog::getListWidget() {
 
 PManager* CategoryDialog::getPManager() {
     return this->pm;
+}
+View* CategoryDialog::getParentView() {
+    return this->parent;
 }

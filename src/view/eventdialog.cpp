@@ -106,11 +106,11 @@ void EventDialog::on_button_cancel_click() {
 
 void EventDialog::on_button_delete_click() {
     this->pm->remove_event(this->event);
-    refresh(DateUtil::date_from_timestamp(this->event->getStart()));
+    refresh();
 }
 
-void EventDialog::refresh(Date date) {
-    this->parent->display_events(date);
+void EventDialog::refresh() {
+    this->parent->refresh_events();
     this->close();
     delete this;
 }
@@ -137,9 +137,9 @@ void EventDialog::on_button_save_click() {
 
     /* If the users has changed an existent event, I'll call the right function */
     if ((this->event != NULL) && (this->pm->edit_event(this->event, &newEvent))) {
-        refresh(DateUtil::date_from_timestamp(newEvent.getStart()));
+        refresh();
     } else if ((this->event == NULL) && (this->pm->add_event(&newEvent))) { //else I'll create a new Event
-        refresh(DateUtil::date_from_timestamp(newEvent.getStart()));
+        refresh();
     } else {
         QMessageBox::critical(this, "Error", "Persistence error", QMessageBox::Ok);
     }

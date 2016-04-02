@@ -59,8 +59,8 @@ void CategoryEditDialog::on_button_save_click() {
     }else //Change the selected category
     if (this->parentDialog->getPManager()->edit_category(this->parentDialog->getCategoryList()[this->parentDialog->getListWidget()->currentIndex().row()], &category)) {
         this->parentDialog->load_categories();
+        this->parentDialog->getParentView()->refresh_events();
         this->close();
-        QMessageBox::warning(this, "Attention", "Restart the application to see the change applied in the views", QMessageBox::Ok);
         delete this;
     } else {
         QMessageBox::critical(this, "Error", "Persistence error. Try with a different name or color.");

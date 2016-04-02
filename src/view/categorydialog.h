@@ -10,6 +10,7 @@
 #include "ui_categorydialog.h"
 #include "persistence/pmanager.h"
 #include "categoryeditdialog.h"
+#include "view.h"
 
 #define DEFAULT_COLOR "#1022A0"
 #define ICON_SIZE 10
@@ -27,13 +28,15 @@ private:
     QListWidget *list_widget;
     vector<Category*> category_list;
     PManager *pm;
+    View *parent;
 
 public:
-    explicit CategoryDialog(QWidget *parent = 0);
+    explicit CategoryDialog(View *parentView, QWidget *parent = 0);
     ~CategoryDialog();
     QListWidget *getListWidget();
     vector<Category*> getCategoryList();
     PManager* getPManager();
+    View* getParentView();
     void load_categories();
 
 public slots:

@@ -9,6 +9,7 @@ class View
 {
 public:
     //pure virtual functions
+    virtual void refresh_events() = 0;
     virtual void display_events(Date date) = 0;
     virtual void display_events(Date date, Category category) = 0;
 };

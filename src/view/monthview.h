@@ -50,8 +50,9 @@ protected:
 
 public:
     explicit MonthView(QWidget *parent = 0);
-    virtual void display_events(Date date);
-    virtual void display_events(Date date, Category category);
+    void refresh_events();
+    void display_events(Date date);
+    void display_events(Date date, Category category);
     ~MonthView();
 public slots:
     void on_mouse_press(QFrameExtended *frame);

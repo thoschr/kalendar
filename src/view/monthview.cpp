@@ -217,7 +217,7 @@ void MonthView::addEvent() {
 }
 
 void MonthView::editCategories() {
-    CategoryDialog *category_dialog = new CategoryDialog;
+    CategoryDialog *category_dialog = new CategoryDialog(this);
     category_dialog->show();
 }
 
@@ -259,6 +259,10 @@ void MonthView::display_days(Date date) {
         //Refresh the css rules
         this->frames[i]->setStyleSheet(CELL_STYLE);
     }
+}
+
+void MonthView::refresh_events() {
+    display_events(CURRENT_MONTH);
 }
 
 void MonthView::display_events(Date date) {

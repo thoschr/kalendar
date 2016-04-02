@@ -38,7 +38,7 @@ private:
     PManager *pm;
     Event *event;
     vector<Category *> category_list;
-    void refresh(Date date);
+    void refresh();
 
 public:
     explicit EventDialog(View *parentView, Date start_date = Date(), Date end_date = Date(), QWidget *parent = 0);
