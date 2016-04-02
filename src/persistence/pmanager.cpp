@@ -302,7 +302,7 @@ list<Event*> PManager::get_all_events() {
     list<Event*> result;
     sqlite3_stmt *res;
     char sql[1024];
-    snprintf(sql, 1024, "SELECT * FROM Events;");
+    snprintf(sql, 1024, "SELECT * FROM Events ORDER BY start DESC;");
     int rc = sqlite3_prepare_v2(this->db, sql, -1, &res, 0);
     if (rc != SQLITE_OK) {
         fprintf(stderr, "Failed to fetch data: %s\n", sqlite3_errmsg(db));

@@ -67,7 +67,6 @@ void MonthView::on_back_button_click() {
 }
 
 void MonthView::on_next_button_click() {
-    /* Gets the current month displayed using an hack. Infact, the cell in the middle will have always a value setted. */
     Date newDate = DateUtil::increase_month(CURRENT_MONTH);
     display_days(newDate);
     /* Reload events */
@@ -79,6 +78,7 @@ MonthView::MonthView(QWidget *parent) :
     ui(new Ui::MonthView)
 {
     Date current_date = DateUtil::get_current_date();
+    this->pm = new PManager;
     this->selection_start = NULL;
     this->selection_end = NULL;
     this->layout = new QVBoxLayout;
@@ -134,9 +134,8 @@ MonthView::MonthView(QWidget *parent) :
     grid_layout->setVerticalSpacing(0);
 
     //Remove events too old
-    PManager pm;
     Date target = DateUtil::decrease_month(DateUtil::get_first_day_of_month(current_date));
-    pm.remove_past_events(QDateTime(QDate(target.getYear(), target.getMonth() , target.getMonthDay())).toTime_t());
+    this->pm->remove_past_events(QDateTime(QDate(target.getYear(), target.getMonth() , target.getMonthDay())).toTime_t());
 
     //Fill the grid with the days of the default month (i.e. the current month)
     display_days(current_date);
@@ -174,16 +173,19 @@ MonthView::~MonthView()
 void MonthView::createMenu() {
     QAction *importAct = new QAction(tr("&Import events"), this);
     importAct->setStatusTip(tr("Import events with iCalendar format"));
-    connect(importAct, &QAction::triggered, this, &MonthView::importEvents);
+    connect(importAct, &QAction::triggered, this, &MonthView::import_events);
     QAction *exportAct = new QAction(tr("E&xport events"), this);
     exportAct->setStatusTip(tr("Export events with iCalendar format"));
-    connect(exportAct, &QAction::triggered, this, &MonthView::exportEvents);
+    connect(exportAct, &QAction::triggered, this, &MonthView::export_events);
     QAction *addEventAct = new QAction(tr("&Add new event"), this);
     addEventAct->setStatusTip(tr("Show a dialog to add a new event"));
-    connect(addEventAct, &QAction::triggered, this, &MonthView::addEvent);
+    connect(addEventAct, &QAction::triggered, this, &MonthView::add_event);
     QAction *editCategoriesAct = new QAction(tr("Edit &Categories"), this);
     editCategoriesAct->setStatusTip(tr("Show a dialog to edit the categories"));
-    connect(editCategoriesAct, &QAction::triggered, this, &MonthView::editCategories);
+    connect(editCategoriesAct, &QAction::triggered, this, &MonthView::edit_categories);
+    QAction *showAgendaAct = new QAction(tr("Show &Agenda"), this);
+    showAgendaAct->setStatusTip(tr("Show a dialog with all the events"));
+    connect(showAgendaAct, &QAction::triggered, this, &MonthView::show_agenda);
     QMenu *fileMenu;
     fileMenu = menuBar()->addMenu(tr("&File"));
     fileMenu->addAction(importAct);
@@ -194,6 +196,7 @@ void MonthView::createMenu() {
     editMenu->addAction(editCategoriesAct);
     QMenu *viewsMenu;
     viewsMenu = menuBar()->addMenu(tr("&Views"));
+    viewsMenu->addAction(showAgendaAct);
     //TODO: Add the other future views (each view will be displayed in a different window)
 }
 
@@ -203,22 +206,54 @@ void MonthView::contextMenuEvent(QContextMenuEvent *event)
     menu.exec(event->globalPos());
 }
 
-void MonthView::importEvents() {
+void MonthView::import_events() {
     //TODO: import events (iCalendar format)
 }
 
-void MonthView::exportEvents() {
+void MonthView::export_events() {
     //TODO: export events (iCalendar format)
 }
 
-void MonthView::addEvent() {
+void MonthView::add_event() {
     EventDialog *eventDialog = new EventDialog(this, CURRENT_MONTH, CURRENT_MONTH);
     eventDialog->show();
 }
 
-void MonthView::editCategories() {
+void MonthView::edit_categories() {
     CategoryDialog *category_dialog = new CategoryDialog(this);
     category_dialog->show();
+}
+
+void MonthView::show_agenda() {
+    list<Event*> events_list = this->pm->get_all_events();
+    QFrameExtended *frame = createQFrameExtended(NULL);
+    QLabel *header = static_cast<QLabel*> (frame->children().at(1));
+    header->setText(QString::number(events_list.size()) + QString(" Events"));
+    header->setStyleSheet("QLabel { background-color: #ffffb3; border-bottom: 1px solid #000000; margin-bottom: 2px; }");
+    header->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
+    for (Event *event : events_list) {
+        QHBoxLayout *hl = new QHBoxLayout;
+        Date start = DateUtil::date_from_timestamp(event->getStart());
+        Date end = DateUtil::date_from_timestamp(event->getEnd());
+        QString text = QString::number(start.getMonthDay()) + QString("/") + QString::number(start.getMonth()) + QString("/") + QString::number(start.getYear()) +
+                       QString(" - ") + QString::number(end.getMonthDay()) + QString("/") + QString::number(end.getMonth()) + QString("/") + QString::number(end.getYear());
+        QLabel *label_time = new QLabel(text);
+        label_time->setFixedWidth(200);
+        hl->addWidget(label_time);
+        hl->addWidget(createLabelEvent(event));
+        (static_cast <QVBoxLayout*> (frame->layout()))->addLayout(hl);
+    }
+    QVBoxLayout *main_layout = new QVBoxLayout;
+    QScrollArea *scroll_area = new QScrollArea;
+    scroll_area->setMaximumHeight(600);
+    scroll_area->setWidget(frame);
+    scroll_area->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+    frame->setFixedWidth(scroll_area->width());
+    main_layout->addWidget(scroll_area);
+    CustomDialog *custom_dialog = new CustomDialog(main_layout);
+    custom_dialog->setFixedWidth(500);
+    custom_dialog->setWindowTitle("Agenda");
+    custom_dialog->show();
 }
 
 void MonthView::display_days(Date date) {
@@ -266,8 +301,7 @@ void MonthView::refresh_events() {
 }
 
 void MonthView::display_events(Date date) {
-    PManager pm;
-    list<Event*> event_list = pm.get_events_of_month(date.getMonth(), date.getYear());
+    list<Event*> event_list = this->pm->get_events_of_month(date.getMonth(), date.getYear());
     int start_offset;
 
     //Remove all displayed events
@@ -332,7 +366,6 @@ void MonthView::on_button_extended_click(int index) {
     QLabel *label_day = static_cast<QLabel*> (frame->children().at(1));
     label_day->setText(text);
     label_day->setStyleSheet("QLabel { background-color: #ffffb3; border-bottom: 1px solid #000000; margin-bottom: 2px; }");
-    (static_cast <QVBoxLayout*> (frame->layout()))->insertWidget(1, label_day);
     for (QLabelEvent *label_event : this->frames[index]->findChildren<QLabelEvent*>()) {
         Event *event = new Event(*label_event->getEvent());
         frame->layout()->addWidget(createLabelEvent(event));
@@ -341,7 +374,6 @@ void MonthView::on_button_extended_click(int index) {
     main_layout->addWidget(frame);
     CustomDialog *custom_dialog = new CustomDialog(main_layout);
     custom_dialog->setFixedWidth(300);
-    custom_dialog->setMinimumHeight(400);
     custom_dialog->setWindowTitle("Day Dialog");
     custom_dialog->show();
 }
@@ -359,8 +391,8 @@ QLabelEvent* MonthView::createLabelEvent(Event *event) {
     label_event->setStyleSheet(QString("QLabel { font-size: 14px; background-color : ") + QString(newEvent->getCategory()->getColor().c_str()) + QString("; color: ") + textColor + QString("};"));
     label_event->setFixedHeight(26);
     label_event->setMargin(0);
-    label_event->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
     label_event->setToolTip(newEvent->getDescription().c_str());
+    label_event->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
     connect(label_event, &QLabelEvent::clicked, this, &MonthView::on_event_click);
     return label_event;
 }

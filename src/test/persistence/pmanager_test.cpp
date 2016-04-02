@@ -15,7 +15,7 @@ PManagerTest::PManagerTest()
     this->specialchars_category = new Category(0, specialchars, specialchars);
     /* Events */
     this->valid_event = new Event(0, test, test, new Category(1, test, test), timestamp, timestamp + 100);
-    this->valid_event_2 = new Event(100, test, test, new Category(1, test, test), timestamp, timestamp + 1000000); //starts from current month, ends the next month
+    this->valid_event_2 = new Event(100, test, test, new Category(1, test, test), timestamp - 500, timestamp + 1000000); //starts from current month, ends the next month
     /* Invalid Events */
     this->event_with_null_category = new Event(0, test, test, NULL, timestamp, timestamp);
     this->event_with_invalid_category = new Event(0, test, test, new Category(99, test, test), timestamp, timestamp);
@@ -132,7 +132,10 @@ void PManagerTest::test_get_categories() {
     vector<Category*> categories = pm.get_categories();
     if (!(categories.empty())) {
         vector<Category*>::iterator it = categories.begin();
-        ret = this->valid_category->equals(**it); // *it has type Category*
+        ret = (this->valid_category->equals(**it) || this->valid_default_category->equals(**it)); // *it has type Category*
+        delete *it;
+        it++;
+        ret = ret && (this->valid_category->equals(**it) || this->valid_default_category->equals(**it)); // *it has type Category*
         delete *it;
     }
     ASSERT (ret)
@@ -194,10 +197,10 @@ void PManagerTest::test_get_all_events() {
     list<Event*> events = pm.get_all_events();
     if (!(events.empty())) {
         list<Event*>::iterator it = events.begin();
-        ret = (this->valid_event->equals(**it) || this->valid_event_2->equals(**it)); // *it has type Event*
+        ret = this->valid_event_2->equals(**it); // *it has type Event*
         delete *it;
         it++;
-        ret2 = (this->valid_event->equals(**it) || this->valid_event_2->equals(**it));
+        ret2 = this->valid_event->equals(**it);
         delete *it;
     }
     ASSERT (ret && ret2)

@@ -10,6 +10,7 @@
 #include <QHBoxLayout>
 #include <QVBoxLayout>
 #include <QFrame>
+#include <QScrollArea>
 #include "ui_monthview.h"
 #include "eventdialog.h"
 #include "qframe_extended.h"
@@ -35,6 +36,7 @@ private:
     Date *selection_start;
     Date *selection_end;
     Ui::MonthView *ui;
+    PManager *pm;
     QFrameExtended *frames[42]; //I have a 7x7 grid, but without consider the first row I've a total of 6x7 cells
     void display_days(Date date);
     bool is_color_dark(string colorName);
@@ -63,10 +65,11 @@ public slots:
     void on_event_click(Event *event);
 
 private slots:
-    void exportEvents();
-    void importEvents();
-    void addEvent();
-    void editCategories();
+    void export_events();
+    void import_events();
+    void add_event();
+    void edit_categories();
+    void show_agenda();
 };
 
 #endif // MONTHVIEW_H
