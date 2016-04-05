@@ -14,10 +14,8 @@ void EventDialog::setEvent(Event *event) {
                 this->edit_category->setCurrentIndex(index);
             index++;
         }
-        Date start_date = DateUtil::date_from_timestamp(event->getStart());
-        Date end_date = DateUtil::date_from_timestamp(event->getEnd());
-        this->edit_start->setDateTime(QDateTime(QDate(start_date.getYear(), start_date.getMonth(), start_date.getMonthDay())));
-        this->edit_end->setDateTime(QDateTime(QDate(end_date.getYear(), end_date.getMonth(), end_date.getMonthDay())));
+        this->edit_start->setDateTime(QDateTime::fromTime_t(event->getStart()));
+        this->edit_end->setDateTime(QDateTime::fromTime_t(event->getEnd()));
         this->button_delete->setEnabled(true);
     }
 }
