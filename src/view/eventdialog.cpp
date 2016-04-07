@@ -139,6 +139,6 @@ void EventDialog::on_button_save_click() {
     } else if ((this->event == NULL) && (this->pm->add_event(&newEvent))) { //else I'll create a new Event
         refresh();
     } else {
-        QMessageBox::critical(this, "Error", "Persistence error", QMessageBox::Ok);
+        QMessageBox::critical(this, "Error", "Persistence error. Try with a different name.", QMessageBox::Ok);
     }
 }

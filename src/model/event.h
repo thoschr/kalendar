@@ -32,14 +32,14 @@ public:
         this->name = name;
         this->description = description;
         this->category = category;
+        this->start = start;
+        this->end = end;
         if (id == 0)
             /* The returned value from the hash function could be bigger than an integer, so be careful with normal integers.
              * I use an unsigned integer to have always a positive number (also with the overflow). */
-            this->id = static_cast<unsigned int> (hash<string>()(this->name + this->description)) + (this->category ? this->category->getId() : 0);
+            this->id = static_cast<unsigned int> (hash<string>()(this->name + this->description)) + (this->category ? this->category->getId() : 0) + static_cast<unsigned int> ((this->start / 1000) + (this->end - this->start));
         else
             this->id = id;
-        this->start = start;
-        this->end = end;
     }
 
     ~Event() {
@@ -60,7 +60,7 @@ public:
     }
 
     long hashcode() {
-        return this->id + static_cast<long> ((this->start / 1000) + (this->end - this->start));
+        return this->id;
     }
 };
 
