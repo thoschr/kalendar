@@ -207,11 +207,16 @@ void MonthView::contextMenuEvent(QContextMenuEvent *event)
 }
 
 void MonthView::import_events() {
-    //TODO: import events (iCalendar format)
+    QString path = QFileDialog::getOpenFileName(this, "Import events and categories", QDir::homePath(), "Kalendar Files (*.kal)");
+    int result = this->pm->import_db(path.toStdString());
+    refresh_events();
+    QMessageBox::information(this, "Success", "Imported " + QString::number(result) + " events/categories", QMessageBox::Ok);
 }
 
 void MonthView::export_events() {
-    //TODO: export events (iCalendar format)
+    QString path = QFileDialog::getSaveFileName(this, "Export events and categories", QDir::homePath(), "Kalendar Files (*.kal)");
+    int result = this->pm->export_db(path.toStdString());
+    QMessageBox::information(this, "Success", "Exported " + QString::number(result) + " events/categories", QMessageBox::Ok);
 }
 
 void MonthView::add_event() {

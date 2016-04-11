@@ -326,3 +326,48 @@ list<Event*> PManager::get_all_events() {
     sqlite3_finalize(res);
     return result;
 }
+
+int PManager::export_db(string path) {
+    if (path.length() < 5) return 0;
+    if (path.substr(path.length()-4, 4) != ".kal") path += ".kal";
+    int counter = 0;
+    ofstream file;
+    file.open(path);
+    char sql[1024];
+    vector<Category*> categories_list = get_categories();
+    for (Category *category : categories_list) {
+        snprintf(sql, 1024, "INSERT INTO Categories VALUES(%u, '%s', '%s');", category->getId(), category->getName().c_str(), category->getColor().c_str());
+        file << sql << endl;
+        delete category;
+        counter++;
+    }
+    list<Event*> events_list = get_all_events();
+    for (Event *event : events_list) {
+        snprintf(sql, 1024, "INSERT INTO Events VALUES(%u, '%s', '%s', %u, %ld, %ld);", event->getId(), event->getName().c_str(), event->getDescription().c_str(), event->getCategory()->getId(), event->getStart(), event->getEnd());
+        file << sql << endl;
+        delete event;
+        counter++;
+    }
+    file.close();
+    return counter;
+}
+
+int PManager::import_db(string path) {
+    if ((path.length() < 5) && (path.substr(path.length()-4, 4) != ".kal")) return 0;
+    ifstream file;
+    string line;
+    int rc;
+    int counter = 0;
+    char *err_msg = 0;
+    file.open(path);
+    while ( getline (file,line) ) {
+        rc = sqlite3_exec(this->db, line.c_str(), 0, 0, &err_msg);
+        if (rc != SQLITE_OK ) {
+            fprintf(stderr, "SQL error: %s\n", err_msg);
+            sqlite3_free(err_msg);
+        }
+        counter++;
+    }
+    file.close();
+    return counter;
+}

@@ -42,6 +42,10 @@ public:
     Category *get_category(unsigned int id);
     bool remove_past_events(time_t timestamp);
     list<Event*> get_all_events();
+    int export_db(string path);
+    int export_db_iCal_format(string path);
+    int import_db(string path);
+    int import_db_iCal_format(string path);
 };
 
 #endif // PMANAGER_H

@@ -10,6 +10,8 @@
 #include <QHBoxLayout>
 #include <QVBoxLayout>
 #include <QFrame>
+#include <QDir>
+#include <QFileDialog>
 #include <QScrollArea>
 #include "ui_monthview.h"
 #include "eventdialog.h"
