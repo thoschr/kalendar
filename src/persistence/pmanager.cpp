@@ -352,6 +352,9 @@ int PManager::export_db(string path) {
     return counter;
 }
 
+/* it's easy import a crafted file with malicious queries (e.g. "DELETE ... ")
+ * we assume the user knows the source and the content of the file.
+ */
 int PManager::import_db(string path) {
     if ((path.length() < 5) && (path.substr(path.length()-4, 4) != ".kal")) return 0;
     ifstream file;
@@ -360,13 +363,12 @@ int PManager::import_db(string path) {
     int counter = 0;
     char *err_msg = 0;
     file.open(path);
-    while ( getline (file,line) ) {
+    while ( getline (file,line) && (line.substr(0, 6) == "INSERT") ) {
         rc = sqlite3_exec(this->db, line.c_str(), 0, 0, &err_msg);
         if (rc != SQLITE_OK ) {
             fprintf(stderr, "SQL error: %s\n", err_msg);
             sqlite3_free(err_msg);
-        }
-        counter++;
+        } else counter++;
     }
     file.close();
     return counter;

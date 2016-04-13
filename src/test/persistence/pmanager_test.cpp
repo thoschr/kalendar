@@ -8,7 +8,7 @@ PManagerTest::PManagerTest()
     string test("test_string");
     string specialchars("'/--\"#@");
     /* Categories */
-    this->valid_default_category = new Category(1, test, test);
+    this->valid_default_category = new Category(1, string("Default"), string("#1022A0"));
     this->valid_category = new Category(0, test, test);
     this->valid_category_2 = new Category(100, test, test);
     this->noname_category = new Category(0, string(""), test);
@@ -52,6 +52,8 @@ void PManagerTest::test_all() {
     test_get_all_events();
     test_remove_past_events();
     test_edit_category();
+    test_import_db();
+    test_export_db();
 }
 
 void PManagerTest::test_remove_all() {
@@ -231,4 +233,54 @@ void PManagerTest::test_edit_category() {
     ASSERT (!pm.edit_category(this->valid_category, this->noname_category) &&
             (pm.edit_category(this->valid_category, this->valid_category_2)))
     pm.remove_all();
+}
+
+void PManagerTest::test_import_db() {
+    Test::print("test_import_db ");
+    bool ret;
+    PManager pm;
+    ofstream file;
+    file.open("testdb.kal");
+    file << "INSERT INTO Categories VALUES(" << this->valid_category->getId() << ",'" << this->valid_category->getName() << "','" << this->valid_category->getColor() << "');" << endl;
+    file << "INSERT INTO Events VALUES(" << this->valid_event->getId() << ",'" << this->valid_event->getName() << "','" << this->valid_event->getDescription() << "'," << this->valid_event->getCategory()->getId() << "," << this->valid_event->getStart() << "," << this->valid_event->getEnd() << ");" << endl;
+    file.close();
+    ret = pm.import_db("notexist");
+    ret = !ret && pm.import_db("testdb.kal");
+    Category *category = pm.get_category(this->valid_category->getId());
+    ret = ret && category->equals(*this->valid_category);
+    delete category;
+    list<Event*> events = pm.get_all_events();
+    if (events.size() == 1) {
+        list<Event*>::iterator it = events.begin();
+        ret = ret && this->valid_event->equals(**it); // *it has type Event*
+        delete *it;
+    } else ret = false;
+    ASSERT (ret)
+    pm.remove_all();
+    remove("testdb.kal");
+}
+
+void PManagerTest::test_export_db() {
+    Test::print("test_export_db ");
+    bool ret;
+    PManager pm;
+    ifstream file;
+    string line;
+    char insert_event[1024];
+    char insert_category[1024];
+    snprintf(insert_event, 1024, "INSERT INTO Events VALUES(%u, '%s', '%s', %u, %ld, %ld);", this->valid_event->getId(), this->valid_event->getName().c_str(), this->valid_event->getDescription().c_str(), this->valid_event->getCategory()->getId(), this->valid_event->getStart(), this->valid_event->getEnd());
+    snprintf(insert_category, 1024, "INSERT INTO Categories VALUES(%u, '%s', '%s');", this->valid_default_category->getId(), this->valid_default_category->getName().c_str(), this->valid_default_category->getColor().c_str());
+    pm.add_event(this->valid_event);
+    ret = pm.export_db("testdb");
+    file.open("testdb.kal");
+    getline (file,line);
+    ret = ret && ((line == insert_category) || (line == insert_event));
+    getline (file,line);
+    ret = ret && ((line == insert_event) || (line == insert_category));
+    getline (file,line);
+    ret = ret && (line == "");
+    ASSERT (ret)
+    file.close();
+    pm.remove_all();
+    remove("testdb.kal");
 }
