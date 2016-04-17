@@ -14,14 +14,14 @@ PManagerTest::PManagerTest()
     this->noname_category = new Category(0, string(""), test);
     this->specialchars_category = new Category(0, specialchars, specialchars);
     /* Events */
-    this->valid_event = new Event(0, test, test, new Category(1, test, test), timestamp, timestamp + 100);
-    this->valid_event_2 = new Event(100, test, test, new Category(1, test, test), timestamp - 500, timestamp + 1000000); //starts from current month, ends the next month
+    this->valid_event = new Event(0, test, test, test, new Category(1, test, test), timestamp, timestamp + 100);
+    this->valid_event_2 = new Event(100, test, test, test, new Category(1, test, test), timestamp - 500, timestamp + 1000000); //starts from current month, ends the next month
     /* Invalid Events */
-    this->event_with_null_category = new Event(0, test, test, NULL, timestamp, timestamp);
-    this->event_with_invalid_category = new Event(0, test, test, new Category(99, test, test), timestamp, timestamp);
-    this->noname_event = new Event(1, string(""), test, new Category(1, test, test), timestamp, timestamp + 100);
-    this->invalid_time_event = new Event(1, test, test, new Category(1, test, test), timestamp, timestamp - 100);
-    this->specialchars_event = new Event(1, specialchars, specialchars, new Category(1, specialchars, specialchars), timestamp, timestamp + 100);
+    this->event_with_null_category = new Event(0, test, test, test, NULL, timestamp, timestamp);
+    this->event_with_invalid_category = new Event(0, test, test, test, new Category(99, test, test), timestamp, timestamp);
+    this->noname_event = new Event(1, string(""), test, test, new Category(1, test, test), timestamp, timestamp + 100);
+    this->invalid_time_event = new Event(1, test, test, test,  new Category(1, test, test), timestamp, timestamp - 100);
+    this->specialchars_event = new Event(1, specialchars, specialchars, specialchars, new Category(1, specialchars, specialchars), timestamp, timestamp + 100);
 }
 
 PManagerTest::~PManagerTest() {
@@ -242,7 +242,7 @@ void PManagerTest::test_import_db() {
     ofstream file;
     file.open("testdb.kal");
     file << "INSERT INTO Categories VALUES(" << this->valid_category->getId() << ",'" << this->valid_category->getName() << "','" << this->valid_category->getColor() << "');" << endl;
-    file << "INSERT INTO Events VALUES(" << this->valid_event->getId() << ",'" << this->valid_event->getName() << "','" << this->valid_event->getDescription() << "'," << this->valid_event->getCategory()->getId() << "," << this->valid_event->getStart() << "," << this->valid_event->getEnd() << ");" << endl;
+    file << "INSERT INTO Events VALUES(" << this->valid_event->getId() << ",'" << this->valid_event->getName() << "','" << this->valid_event->getDescription() << "','" << this->valid_event->getPlace() << "'," << this->valid_event->getCategory()->getId() << "," << this->valid_event->getStart() << "," << this->valid_event->getEnd() << ");" << endl;
     file.close();
     ret = pm.import_db("notexist");
     ret = !ret && pm.import_db("testdb.kal");
@@ -268,7 +268,7 @@ void PManagerTest::test_export_db() {
     string line;
     char insert_event[1024];
     char insert_category[1024];
-    snprintf(insert_event, 1024, "INSERT INTO Events VALUES(%u, '%s', '%s', %u, %ld, %ld);", this->valid_event->getId(), this->valid_event->getName().c_str(), this->valid_event->getDescription().c_str(), this->valid_event->getCategory()->getId(), this->valid_event->getStart(), this->valid_event->getEnd());
+    snprintf(insert_event, 1024, "INSERT INTO Events VALUES(%u, '%s', '%s', '%s', %u, %ld, %ld);", this->valid_event->getId(), this->valid_event->getName().c_str(), this->valid_event->getDescription().c_str(), this->valid_event->getPlace().c_str(), this->valid_event->getCategory()->getId(), this->valid_event->getStart(), this->valid_event->getEnd());
     snprintf(insert_category, 1024, "INSERT INTO Categories VALUES(%u, '%s', '%s');", this->valid_default_category->getId(), this->valid_default_category->getName().c_str(), this->valid_default_category->getColor().c_str());
     pm.add_event(this->valid_event);
     ret = pm.export_db("testdb");

@@ -26,8 +26,8 @@ PManager::PManager()
 
     if (db_no_exists) {
         const char *sql = "CREATE TABLE Categories(id UNSIGNED INTEGER PRIMARY KEY, name TEXT, color TEXT);"
-                          "CREATE TABLE Events(id UNSIGNED INTEGER PRIMARY KEY, name TEXT, "
-                          "description TEXT, category UNSIGNED INTEGER, start DATETIME, end DATETIME,"
+                          "CREATE TABLE Events(id UNSIGNED INTEGER PRIMARY KEY, name TEXT, description TEXT,"
+                          "place TEXT, category UNSIGNED INTEGER, start DATETIME, end DATETIME,"
                           "FOREIGN KEY(category) REFERENCES Categories(id) ON DELETE RESTRICT);"
                           "INSERT INTO Categories VALUES(1, 'Default', '#1022A0');"
                           "PRAGMA foreign_keys = ON;";
@@ -60,9 +60,9 @@ string PManager::filterSpecialChars(string str) {
 bool PManager::add_event(Event *e) {
     char *err_msg = 0;
     sqlite3_stmt *stmt;
-    string filteredName, filteredDescription;
+    string filteredName, filteredDescription, filteredPlace;
     if ((e->getName().length() < 3) || (difftime(e->getStart(), e->getEnd()) > 0) || (e->getCategory() == NULL)) return false;
-    int rc = sqlite3_prepare_v2(this->db, "INSERT INTO Events VALUES(?, ?, ?, ?, ?, ?);", -1, &stmt, NULL);
+    int rc = sqlite3_prepare_v2(this->db, "INSERT INTO Events VALUES(?, ?, ?, ?, ?, ?, ?);", -1, &stmt, NULL);
     if (rc != SQLITE_OK ) {
         fprintf(stderr, "SQL error in prepare: %s\n", sqlite3_errmsg(this->db));
         sqlite3_free(err_msg);
@@ -74,9 +74,11 @@ bool PManager::add_event(Event *e) {
     sqlite3_bind_text(stmt, 2, filteredName.c_str(), filteredName.length(), 0);
     filteredDescription = filterSpecialChars(e->getDescription());
     sqlite3_bind_text(stmt, 3, filteredDescription.c_str(), filteredDescription.length(), 0);
-    sqlite3_bind_int64(stmt, 4, e->getCategory()->getId());
-    sqlite3_bind_int64(stmt, 5, e->getStart());
-    sqlite3_bind_int64(stmt, 6, e->getEnd());
+    filteredPlace = filterSpecialChars(e->getPlace());
+    sqlite3_bind_text(stmt, 4, filteredPlace.c_str(), filteredPlace.length(), 0);
+    sqlite3_bind_int64(stmt, 5, e->getCategory()->getId());
+    sqlite3_bind_int64(stmt, 6, e->getStart());
+    sqlite3_bind_int64(stmt, 7, e->getEnd());
     //commit
     rc = sqlite3_step(stmt);
     if (rc != SQLITE_DONE ) {
@@ -92,9 +94,9 @@ bool PManager::add_event(Event *e) {
 bool PManager::edit_event(Event *old_event, Event *new_event) {
     char *err_msg = 0;
     sqlite3_stmt *stmt;
-    string filteredName, filteredDescription;
+    string filteredName, filteredDescription, filteredPlace;
     if ((new_event->getName().length() < 3) || (difftime(new_event->getStart(), new_event->getEnd()) > 0) || (new_event->getCategory() == NULL)) return false;
-    int rc = sqlite3_prepare_v2(this->db, "UPDATE Events SET id=?, name=?, description=?, category=?, start=?, end=? WHERE id=?;", -1, &stmt, NULL);
+    int rc = sqlite3_prepare_v2(this->db, "UPDATE Events SET id=?, name=?, description=?, place=?, category=?, start=?, end=? WHERE id=?;", -1, &stmt, NULL);
     if (rc != SQLITE_OK ) {
         fprintf(stderr, "SQL error in prepare: %s\n", sqlite3_errmsg(this->db));
         sqlite3_free(err_msg);
@@ -105,10 +107,12 @@ bool PManager::edit_event(Event *old_event, Event *new_event) {
     sqlite3_bind_text(stmt, 2, filteredName.c_str(), filteredName.length(), 0);
     filteredDescription = filterSpecialChars(new_event->getDescription());
     sqlite3_bind_text(stmt, 3, filteredDescription.c_str(), filteredDescription.length(), 0);
-    sqlite3_bind_int64(stmt, 4, new_event->getCategory()->getId());
-    sqlite3_bind_int64(stmt, 5, new_event->getStart());
-    sqlite3_bind_int64(stmt, 6, new_event->getEnd());
-    sqlite3_bind_int64(stmt, 7, old_event->getId());
+    filteredPlace = filterSpecialChars(new_event->getPlace());
+    sqlite3_bind_text(stmt, 4, filteredPlace.c_str(), filteredPlace.length(), 0);
+    sqlite3_bind_int64(stmt, 5, new_event->getCategory()->getId());
+    sqlite3_bind_int64(stmt, 6, new_event->getStart());
+    sqlite3_bind_int64(stmt, 7, new_event->getEnd());
+    sqlite3_bind_int64(stmt, 8, old_event->getId());
     //commit
     rc = sqlite3_step(stmt);
     if (rc != SQLITE_DONE ) {
@@ -183,14 +187,15 @@ std::list<Event*> PManager::get_events_of_month(int month, int year) {
         unsigned long id = (unsigned long)sqlite3_column_int(res, 0);
         string name((const char*)sqlite3_column_text(res, 1));
         string description((const char*)sqlite3_column_text(res, 2));
-        Category *category = this->get_category((unsigned long)sqlite3_column_int64(res, 3));
+        string place((const char*)sqlite3_column_text(res, 3));
+        Category *category = this->get_category((unsigned long)sqlite3_column_int64(res, 4));
         if (category == NULL) {
             fprintf(stderr, "Error: Received NULL category\n");
             continue;
         }
-        time_t start = (unsigned long)sqlite3_column_int64(res, 4);
-        time_t end = (unsigned long)sqlite3_column_int64(res, 5);
-        Event *e = new Event(id, name, description, category, start, end);
+        time_t start = (unsigned long)sqlite3_column_int64(res, 5);
+        time_t end = (unsigned long)sqlite3_column_int64(res, 6);
+        Event *e = new Event(id, name, description, place, category, start, end);
 
         result.push_front(e);
     }
@@ -312,14 +317,15 @@ list<Event*> PManager::get_all_events() {
         unsigned long id = (unsigned long)sqlite3_column_int(res, 0);
         string name((const char*)sqlite3_column_text(res, 1));
         string description((const char*)sqlite3_column_text(res, 2));
-        Category *category = this->get_category((unsigned long)sqlite3_column_int64(res, 3));
+        string place((const char*)sqlite3_column_text(res, 3));
+        Category *category = this->get_category((unsigned long)sqlite3_column_int64(res, 4));
         if (category == NULL) {
             fprintf(stderr, "Error: Received NULL category\n");
             continue;
         }
-        time_t start = (unsigned long)sqlite3_column_int64(res, 4);
-        time_t end = (unsigned long)sqlite3_column_int64(res, 5);
-        Event *e = new Event(id, name, description, category, start, end);
+        time_t start = (unsigned long)sqlite3_column_int64(res, 5);
+        time_t end = (unsigned long)sqlite3_column_int64(res, 6);
+        Event *e = new Event(id, name, description, place, category, start, end);
 
         result.push_front(e);
     }
@@ -343,7 +349,7 @@ int PManager::export_db(string path) {
     }
     list<Event*> events_list = get_all_events();
     for (Event *event : events_list) {
-        snprintf(sql, 1024, "INSERT INTO Events VALUES(%u, '%s', '%s', %u, %ld, %ld);", event->getId(), event->getName().c_str(), event->getDescription().c_str(), event->getCategory()->getId(), event->getStart(), event->getEnd());
+        snprintf(sql, 1024, "INSERT INTO Events VALUES(%u, '%s', '%s', '%s', %u, %ld, %ld);", event->getId(), event->getName().c_str(), event->getDescription().c_str(), event->getPlace().c_str(), event->getCategory()->getId(), event->getStart(), event->getEnd());
         file << sql << endl;
         delete event;
         counter++;

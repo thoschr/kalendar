@@ -8,6 +8,7 @@ void EventDialog::setEvent(Event *event) {
     if (event != NULL) {
         this->edit_name->setText(event->getName().c_str());
         this->edit_description->setPlainText(event->getDescription().c_str());
+        this->edit_place->setText(event->getPlace().c_str());
         int index = 0;
         for (Category *category : category_list) {
             if (category->getName() == event->getCategory()->getName())
@@ -40,10 +41,16 @@ EventDialog::EventDialog(View *parentView, Date start_date, Date end_date, QWidg
     first_row->addWidget(label_name);
     first_row->addWidget(this->edit_name);
     main_layout->addLayout(first_row);
+    QHBoxLayout *second_row = new QHBoxLayout;
+    QLabel *label_place = new QLabel("Place: ");
+    this->edit_place = new QLineEdit;
+    second_row->addWidget(label_place);
+    second_row->addWidget(this->edit_place);
+    main_layout->addLayout(second_row);
     main_layout->addWidget(new QLabel("Description: "));
     this->edit_description = new QPlainTextEdit;
     main_layout->addWidget(this->edit_description);
-    QHBoxLayout *second_row = new QHBoxLayout;
+    QHBoxLayout *third_row = new QHBoxLayout;
     QLabel *label_category = new QLabel("Category: ");
     this->edit_category = new QComboBox;
     this->category_list = this->pm->get_categories();
@@ -52,29 +59,29 @@ EventDialog::EventDialog(View *parentView, Date start_date, Date end_date, QWidg
         pixmap.fill(QColor(category->getColor().c_str()));
         this->edit_category->addItem(QIcon(pixmap), QString(category->getName().c_str()));
     }
-    second_row->addWidget(label_category);
-    second_row->addWidget(this->edit_category);
-    main_layout->addLayout(second_row);
-    QHBoxLayout *third_row = new QHBoxLayout;
+    third_row->addWidget(label_category);
+    third_row->addWidget(this->edit_category);
+    main_layout->addLayout(third_row);
+    QHBoxLayout *fourth_row = new QHBoxLayout;
     QLabel *label_start = new QLabel("Start: ");
     this->edit_start = new QDateTimeEdit;
     this->edit_start->setCalendarPopup(true);
     this->edit_start->setDateTime(QDateTime(QDate(start_date.getYear(), start_date.getMonth(), start_date.getMonthDay())));
     //I set a specific hour because the default is the midnight, but this could lead more easily problems caused by daylight saving time
     this->edit_start->setTime(QTime(8,0,0));
-    third_row->addWidget(label_start);
-    third_row->addWidget(this->edit_start);
-    main_layout->addLayout(third_row);
-    QHBoxLayout *fourth_row = new QHBoxLayout;
+    fourth_row->addWidget(label_start);
+    fourth_row->addWidget(this->edit_start);
+    main_layout->addLayout(fourth_row);
+    QHBoxLayout *fifth_row = new QHBoxLayout;
     QLabel *label_end = new QLabel("End: ");
     this->edit_end = new QDateTimeEdit;
     this->edit_end->setCalendarPopup(true);
     this->edit_end->setDateTime(QDateTime(QDate(end_date.getYear(), end_date.getMonth(), end_date.getMonthDay())));
     this->edit_end->setTime(QTime(9,0,0));
-    fourth_row->addWidget(label_end);
-    fourth_row->addWidget(this->edit_end);
-    main_layout->addLayout(fourth_row);
-    QHBoxLayout *fifth_row = new QHBoxLayout;
+    fifth_row->addWidget(label_end);
+    fifth_row->addWidget(this->edit_end);
+    main_layout->addLayout(fifth_row);
+    QHBoxLayout *last_row = new QHBoxLayout;
     QPushButton *button_cancel = new QPushButton("Cancel");
     connect(button_cancel, &QPushButton::clicked, this, &EventDialog::on_button_cancel_click);
     button_delete = new QPushButton("Delete");
@@ -82,10 +89,10 @@ EventDialog::EventDialog(View *parentView, Date start_date, Date end_date, QWidg
     connect(button_delete, &QPushButton::clicked, this, &EventDialog::on_button_delete_click);
     QPushButton *button_save = new QPushButton("Save");
     connect(button_save, &QPushButton::clicked, this, &EventDialog::on_button_save_click);
-    fifth_row->addWidget(button_cancel);
-    fifth_row->addWidget(button_delete);
-    fifth_row->addWidget(button_save);
-    main_layout->addLayout(fifth_row);
+    last_row->addWidget(button_cancel);
+    last_row->addWidget(button_delete);
+    last_row->addWidget(button_save);
+    main_layout->addLayout(last_row);
 
     this->setLayout(main_layout);
 }
@@ -131,7 +138,7 @@ void EventDialog::on_button_save_click() {
         }
     }
 
-    Event newEvent(0, this->edit_name->text().toStdString(), this->edit_description->toPlainText().toStdString(), category, this->edit_start->dateTime().toTime_t(), this->edit_end->dateTime().toTime_t());
+    Event newEvent(0, this->edit_name->text().toStdString(), this->edit_description->toPlainText().toStdString(), this->edit_place->text().toStdString(), category, this->edit_start->dateTime().toTime_t(), this->edit_end->dateTime().toTime_t());
 
     /* If the users has changed an existent event, I'll call the right function */
     if ((this->event != NULL) && (this->pm->edit_event(this->event, &newEvent))) {

@@ -29,6 +29,7 @@ class EventDialog : public QDialog
 private:
     Ui::EventDialog *ui;
     QLineEdit *edit_name;
+    QLineEdit *edit_place;
     QComboBox *edit_category;
     QDateTimeEdit *edit_start;
     QDateTimeEdit *edit_end;

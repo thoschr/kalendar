@@ -385,8 +385,7 @@ void MonthView::on_button_extended_click(int index) {
 
 QLabelEvent* MonthView::createLabelEvent(Event *event) {
     //Make a copy
-    Category *newCategory = new Category(event->getCategory()->getId(), event->getCategory()->getName(), event->getCategory()->getColor());
-    Event *newEvent = new Event(event->getId(), event->getName(), event->getDescription(), newCategory, event->getStart(), event->getEnd());
+    Event *newEvent = new Event(*event);
     QLabelEvent *label_event = new QLabelEvent;
     label_event->setText(newEvent->getName().c_str());
     label_event->setEvent(newEvent);
@@ -396,7 +395,7 @@ QLabelEvent* MonthView::createLabelEvent(Event *event) {
     label_event->setStyleSheet(QString("QLabel { font-size: 14px; background-color : ") + QString(newEvent->getCategory()->getColor().c_str()) + QString("; color: ") + textColor + QString("};"));
     label_event->setFixedHeight(26);
     label_event->setMargin(0);
-    label_event->setToolTip(newEvent->getDescription().c_str());
+    label_event->setToolTip(QString("<b>Place: </b>") + newEvent->getPlace().c_str() + QString("\n<b>Description:</b>\n") + newEvent->getDescription().c_str());
     label_event->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
     connect(label_event, &QLabelEvent::clicked, this, &MonthView::on_event_click);
     return label_event;
