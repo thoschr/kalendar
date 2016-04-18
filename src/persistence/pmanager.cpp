@@ -333,6 +333,8 @@ list<Event*> PManager::get_all_events() {
     return result;
 }
 
+
+//TODO: Fix multiline description
 int PManager::export_db(string path) {
     if (path.length() < 5) return 0;
     if (path.substr(path.length()-4, 4) != ".kal") path += ".kal";
