@@ -395,7 +395,12 @@ QLabelEvent* MonthView::createLabelEvent(Event *event) {
     label_event->setStyleSheet(QString("QLabel { font-size: 14px; background-color : ") + QString(newEvent->getCategory()->getColor().c_str()) + QString("; color: ") + textColor + QString("};"));
     label_event->setFixedHeight(26);
     label_event->setMargin(0);
-    label_event->setToolTip(QString("<b>Place: </b>") + newEvent->getPlace().c_str() + QString("\n<b>Description:</b>\n") + newEvent->getDescription().c_str());
+    QString tooltip_text;
+    if (newEvent->getPlace() != "")
+        tooltip_text = QString("<b>Place: </b>") + newEvent->getPlace().c_str();
+    if (newEvent->getDescription() != "")
+        tooltip_text = tooltip_text + QString("\n<b>Description:</b>\n") + newEvent->getDescription().c_str();
+    label_event->setToolTip(tooltip_text);
     label_event->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
     connect(label_event, &QLabelEvent::clicked, this, &MonthView::on_event_click);
     return label_event;
