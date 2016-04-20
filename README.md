@@ -1,6 +1,6 @@
 # Kalendar
 
-Kalendar is a Gregorian calendar application written in C++ with the QT library for the gui. This project **is not related** with KDE, but this desktop environment is the main target of this project. I'm try to keep Kalendar as simple as possible and I want to avoid annoying dependencies (so you can easly install it everywhere).
+Kalendar is a Gregorian calendar application written in C++ with the QT library for the gui. This project **is not related** with KDE, but this desktop environment is the main target of this project. I'm trying to keep Kalendar as simple as possible and I want to avoid annoying dependencies (so you can easly install it everywhere).
 
 **The project is currently under development** and requires a lot of work to be ready for the first release. Stay tuned.
 
@@ -13,14 +13,14 @@ TODO:
 * Year view for long-term events
 * Meteo plugin
 
-### Screenshot
+### Screenshots
 
 ![screenshot](https://raw.githubusercontent.com/echo-devim/kalendar/master/screenshot.png)
 ![screenshot2](https://raw.githubusercontent.com/echo-devim/kalendar/master/screenshot2.png)
 ![screenshot3](https://raw.githubusercontent.com/echo-devim/kalendar/master/screenshot3.png)
 
-### Motivation
-I need to schedule my time in a more efficient way. I don't like online calendar like google calendar for the privacy issues. I looked for some good calendar application, but seems there are just a couple of such calendars. This is a shame, because linux exists from so many years and the users need to have a good calendar application. The two main calendar applications are: gnome-desktop and korganizer. Their problems are a lot of dependencies and complicated compilation. So I decided to develop a simple but powerful calendar with painless compilation, without dependencies and desktop environment independent.
+### Motivations
+I need to schedule my time in a more efficient way. I don't like online calendars like google calendar for the privacy issues. I looked for some good calendar application, but seems there are just a couple of such calendars. This is a shame, because linux exists from so many years and the users need to have a good calendar application. The two main calendar applications are: gnome-desktop and korganizer. Their problems are a lot of dependencies and complicated compilation. So I decided to develop a simple but powerful calendar with painless compilation, without dependencies and desktop environment (almost) independent.
 
 ### Compilation
 
