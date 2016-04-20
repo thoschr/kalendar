@@ -333,8 +333,6 @@ list<Event*> PManager::get_all_events() {
     return result;
 }
 
-
-//TODO: Fix multiline description
 int PManager::export_db(string path) {
     if (path.length() < 5) return 0;
     if (path.substr(path.length()-4, 4) != ".kal") path += ".kal";
@@ -351,7 +349,13 @@ int PManager::export_db(string path) {
     }
     list<Event*> events_list = get_all_events();
     for (Event *event : events_list) {
-        snprintf(sql, 1024, "INSERT INTO Events VALUES(%u, '%s', '%s', '%s', %u, %ld, %ld);", event->getId(), event->getName().c_str(), event->getDescription().c_str(), event->getPlace().c_str(), event->getCategory()->getId(), event->getStart(), event->getEnd());
+        string description_single_line = event->getDescription();
+        size_t start_pos = 0;
+        while((start_pos = description_single_line.find("\n", start_pos)) != std::string::npos) {
+            description_single_line.replace(start_pos, 1, "\\n");
+            start_pos += 2;
+        }
+        snprintf(sql, 1024, "INSERT INTO Events VALUES(%u, '%s', '%s', '%s', %u, %ld, %ld);", event->getId(), event->getName().c_str(), description_single_line.c_str(), event->getPlace().c_str(), event->getCategory()->getId(), event->getStart(), event->getEnd());
         file << sql << endl;
         delete event;
         counter++;
@@ -372,6 +376,12 @@ int PManager::import_db(string path) {
     char *err_msg = 0;
     file.open(path);
     while ( getline (file,line) && (line.substr(0, 6) == "INSERT") ) {
+        //Transform line into a multiline (replacing \n)
+        size_t start_pos = 0;
+        while((start_pos = line.find("\\n", start_pos)) != std::string::npos) {
+            line.replace(start_pos, 2, "\n");
+            start_pos += 1;
+        }
         rc = sqlite3_exec(this->db, line.c_str(), 0, 0, &err_msg);
         if (rc != SQLITE_OK ) {
             fprintf(stderr, "SQL error: %s\n", err_msg);
