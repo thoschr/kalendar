@@ -2,7 +2,7 @@
 
 Kalendar is a Gregorian calendar application written in C++ with the QT library for the gui. This project **is not related** with KDE, but this desktop environment is the main target of this project. I'm trying to keep Kalendar as simple as possible and I want to avoid annoying dependencies (so you can easly install it everywhere).
 
-**The project is currently under development** and requires a lot of work to be ready for the first release. Stay tuned.
+**The project is currently suspended** and still requires a lot of work to be ready for the first release.
 
 The project was inspired by gnome-calendar, but I'm writing it from scratch.
 
