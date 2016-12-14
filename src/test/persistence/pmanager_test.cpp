@@ -244,7 +244,8 @@ void PManagerTest::test_load_db() {
     file << "INSERT INTO Categories VALUES(" << this->valid_category->getId() << ",'" << this->valid_category->getName() << "','" << this->valid_category->getColor() << "');" << endl;
     file << "INSERT INTO Events VALUES(" << this->valid_event->getId() << ",'" << this->valid_event->getName() << "','" << this->valid_event->getDescription() << "','" << this->valid_event->getPlace() << "'," << this->valid_event->getCategory()->getId() << "," << this->valid_event->getStart() << "," << this->valid_event->getEnd() << ");" << endl;
     file.close();
-    ret = pm.load_db("notexist");
+    ret = pm.load_db("");
+    ret = !ret && pm.load_db("notexist");
     ret = !ret && pm.load_db("testdb.kal");
     Category *category = pm.get_category(this->valid_category->getId());
     ret = ret && category->equals(*this->valid_category);

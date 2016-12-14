@@ -368,7 +368,7 @@ int PManager::save_db(string path) {
  * we assume the user knows the source and the content of the file.
  */
 int PManager::load_db(string path) {
-    if ((path.length() < 5) && (path.substr(path.length()-4, 4) != ".kal")) return 0;
+    if ((path.length() < 5) || (path.substr(path.length()-4, 4) != ".kal")) return 0;
     ifstream file;
     string line;
     int rc;
