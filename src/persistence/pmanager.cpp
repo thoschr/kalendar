@@ -333,7 +333,7 @@ list<Event*> PManager::get_all_events() {
     return result;
 }
 
-int PManager::export_db(string path) {
+int PManager::save_db(string path) {
     if (path.length() < 5) return 0;
     if (path.substr(path.length()-4, 4) != ".kal") path += ".kal";
     int counter = 0;
@@ -364,10 +364,10 @@ int PManager::export_db(string path) {
     return counter;
 }
 
-/* it's easy import a crafted file with malicious queries (e.g. "DELETE ... ")
+/* it's easy load a crafted file with malicious queries (e.g. "DELETE ... ")
  * we assume the user knows the source and the content of the file.
  */
-int PManager::import_db(string path) {
+int PManager::load_db(string path) {
     if ((path.length() < 5) && (path.substr(path.length()-4, 4) != ".kal")) return 0;
     ifstream file;
     string line;

@@ -67,8 +67,9 @@ public slots:
     void on_event_click(Event *event);
 
 private slots:
-    void export_events();
-    void import_events();
+    void save_events();
+    void load_events();
+    //void import_events();
     void add_event();
     void edit_categories();
     void show_agenda();

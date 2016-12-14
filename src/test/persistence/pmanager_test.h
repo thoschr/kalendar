@@ -38,8 +38,8 @@ public:
     void test_get_all_events();
     void test_remove_past_events();
     void test_edit_category();
-    void test_import_db();
-    void test_export_db();
+    void test_load_db();
+    void test_save_db();
     void test_import_db_iCal_format();
     void test_export_db_iCal_format();
 };

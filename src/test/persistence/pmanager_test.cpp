@@ -52,8 +52,8 @@ void PManagerTest::test_all() {
     test_get_all_events();
     test_remove_past_events();
     test_edit_category();
-    test_import_db();
-    test_export_db();
+    test_load_db();
+    test_save_db();
 }
 
 void PManagerTest::test_remove_all() {
@@ -235,8 +235,8 @@ void PManagerTest::test_edit_category() {
     pm.remove_all();
 }
 
-void PManagerTest::test_import_db() {
-    Test::print("test_import_db ");
+void PManagerTest::test_load_db() {
+    Test::print("test_load_db ");
     bool ret;
     PManager pm;
     ofstream file;
@@ -244,8 +244,8 @@ void PManagerTest::test_import_db() {
     file << "INSERT INTO Categories VALUES(" << this->valid_category->getId() << ",'" << this->valid_category->getName() << "','" << this->valid_category->getColor() << "');" << endl;
     file << "INSERT INTO Events VALUES(" << this->valid_event->getId() << ",'" << this->valid_event->getName() << "','" << this->valid_event->getDescription() << "','" << this->valid_event->getPlace() << "'," << this->valid_event->getCategory()->getId() << "," << this->valid_event->getStart() << "," << this->valid_event->getEnd() << ");" << endl;
     file.close();
-    ret = pm.import_db("notexist");
-    ret = !ret && pm.import_db("testdb.kal");
+    ret = pm.load_db("notexist");
+    ret = !ret && pm.load_db("testdb.kal");
     Category *category = pm.get_category(this->valid_category->getId());
     ret = ret && category->equals(*this->valid_category);
     delete category;
@@ -260,8 +260,8 @@ void PManagerTest::test_import_db() {
     remove("testdb.kal");
 }
 
-void PManagerTest::test_export_db() {
-    Test::print("test_export_db ");
+void PManagerTest::test_save_db() {
+    Test::print("test_save_db ");
     bool ret;
     PManager pm;
     ifstream file;
@@ -271,7 +271,7 @@ void PManagerTest::test_export_db() {
     snprintf(insert_event, 1024, "INSERT INTO Events VALUES(%u, '%s', '%s', '%s', %u, %ld, %ld);", this->valid_event->getId(), this->valid_event->getName().c_str(), this->valid_event->getDescription().c_str(), this->valid_event->getPlace().c_str(), this->valid_event->getCategory()->getId(), this->valid_event->getStart(), this->valid_event->getEnd());
     snprintf(insert_category, 1024, "INSERT INTO Categories VALUES(%u, '%s', '%s');", this->valid_default_category->getId(), this->valid_default_category->getName().c_str(), this->valid_default_category->getColor().c_str());
     pm.add_event(this->valid_event);
-    ret = pm.export_db("testdb");
+    ret = pm.save_db("testdb");
     file.open("testdb.kal");
     getline (file,line);
     ret = ret && ((line == insert_category) || (line == insert_event));
