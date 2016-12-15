@@ -54,6 +54,7 @@ void PManagerTest::test_all() {
     test_edit_category();
     test_load_db();
     test_save_db();
+    test_import_db_iCal_format();
 }
 
 void PManagerTest::test_remove_all() {
@@ -284,4 +285,25 @@ void PManagerTest::test_save_db() {
     file.close();
     pm.remove_all();
     remove("testdb.kal");
+}
+
+void PManagerTest::test_import_db_iCal_format() {
+    Test::print("test_import_db_iCal_format ");
+    PManager pm;
+    ofstream file;
+    bool ret;
+    ret = pm.import_db_iCal_format("");
+    ret = !ret && !pm.import_db_iCal_format("notexists");
+    file.open("temp.ics");
+    file << "BEGIN:VEVENT" << endl << "UID:0" << endl << "DTSTART;VALUE=DATE:20170117" << endl << "DTEND;VALUE=DATE:20170118" << endl << "SUMMARY:test" << endl << "END:VEVENT" << endl;
+    file.close();
+    ret = ret && pm.import_db_iCal_format("temp.ics");
+    list<Event*> events = pm.get_all_events();
+    if (events.size() == 1) {
+       list<Event*>::iterator it = events.begin();
+       ret = ret && ((**it).getName().compare("test") == 0); // *it has type Event*
+       delete *it;
+    } else ret = false;
+    ASSERT (ret)
+    remove("test");
 }

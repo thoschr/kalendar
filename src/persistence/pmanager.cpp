@@ -391,3 +391,58 @@ int PManager::load_db(string path) {
     file.close();
     return counter;
 }
+
+int PManager::import_db_iCal_format(string path) {
+    if ((path.length() < 5) || (path.substr(path.length()-4, 4) != ".ics")) return 0;
+    ifstream file;
+    string line;
+    string pattern;
+    string summary;
+    int counter = 0;
+    Event *e;
+    struct tm start;
+    start.tm_sec = start.tm_min = start.tm_hour = start.tm_wday = start.tm_yday = start.tm_year = start.tm_mday = start.tm_mon = 0;
+    struct tm end;
+    end.tm_sec = end.tm_min = end.tm_hour = end.tm_wday = end.tm_yday = end.tm_year = end.tm_mday = end.tm_mon = 0;
+    /* Look at the explanation in get_events_of_month */
+    time_t threshold = 26262000; // = 1 November 1970
+    std::tm *t = localtime(&threshold);
+    int s = 0;
+    if (t->tm_isdst > 0) s = 1;
+
+    file.open(path);
+    while ( getline (file,line) ) {
+        pattern = "DTSTART;VALUE=DATE:";
+        if (line.find(pattern) == 0) { //if line starts with the pattern
+            string date = line.substr(pattern.length(),line.length()-pattern.length());
+            start.tm_year = stoi(date.substr(0,4)) - 1900;
+            start.tm_mon = stoi(date.substr(4,2)) - 1;
+            start.tm_mday = stoi(date.substr(6,2));
+            start.tm_isdst = ((start.tm_mon > 2) && (start.tm_mon < 10+s));
+        } else {
+            pattern = "DTEND;VALUE=DATE:";
+            if (line.find(pattern) == 0) {
+                string date = line.substr(pattern.length(),line.length()-pattern.length());
+                end.tm_year = stoi(date.substr(0,4)) - 1900;
+                end.tm_mon = stoi(date.substr(4,2)) - 1;
+                end.tm_mday = stoi(date.substr(6,2));
+                end.tm_isdst = ((end.tm_mon > 2) && (end.tm_mon < 10+s));
+            } else {
+                pattern = "SUMMARY:";
+                if (line.find(pattern) == 0) {
+                    summary = line.substr(pattern.length(),line.length()-pattern.length());
+                } else {
+                    pattern = "END:VEVENT";
+                    if (line.find(pattern) == 0) {
+                        if (this->add_event(new Event(0,summary,string(""),string(""),this->get_category(1),mktime(&start),mktime(&end))))
+                            counter++;
+                        else
+                            printf("Error: %s not imported\n", summary.c_str());
+                    }
+                }
+            }
+        }
+    }
+    file.close();
+    return counter;
+}

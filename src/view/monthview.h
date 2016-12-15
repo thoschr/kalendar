@@ -69,7 +69,7 @@ public slots:
 private slots:
     void save_events();
     void load_events();
-    //void import_events();
+    void import_events();
     void add_event();
     void edit_categories();
     void show_agenda();

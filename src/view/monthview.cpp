@@ -172,11 +172,14 @@ MonthView::~MonthView()
 
 void MonthView::createMenu() {
     QAction *loadAct = new QAction(tr("&Load events"), this);
-    loadAct->setStatusTip(tr("Load events with Kal format"));
+    loadAct->setStatusTip(tr("Load events in Kal format"));
     connect(loadAct, &QAction::triggered, this, &MonthView::load_events);
     QAction *saveAct = new QAction(tr("&Save events"), this);
-    saveAct->setStatusTip(tr("Save events with Kal format"));
+    saveAct->setStatusTip(tr("Save events in Kal format"));
     connect(saveAct, &QAction::triggered, this, &MonthView::save_events);
+    QAction *importAct = new QAction(tr("&Import events"), this);
+    importAct->setStatusTip(tr("Import events in iCal format"));
+    connect(importAct, &QAction::triggered, this, &MonthView::import_events);
     QAction *addEventAct = new QAction(tr("&Add new event"), this);
     addEventAct->setStatusTip(tr("Show a dialog to add a new event"));
     connect(addEventAct, &QAction::triggered, this, &MonthView::add_event);
@@ -190,6 +193,7 @@ void MonthView::createMenu() {
     fileMenu = menuBar()->addMenu(tr("&File"));
     fileMenu->addAction(loadAct);
     fileMenu->addAction(saveAct);
+    fileMenu->addAction(importAct);
     QMenu *editMenu;
     editMenu = menuBar()->addMenu(tr("&Edit"));
     editMenu->addAction(addEventAct);
@@ -217,6 +221,14 @@ void MonthView::save_events() {
     QString path = QFileDialog::getSaveFileName(this, "Save events and categories", QDir::homePath(), "Kalendar Files (*.kal)");
     int result = this->pm->save_db(path.toStdString());
     QMessageBox::information(this, "Success", "Saved " + QString::number(result) + " events/categories", QMessageBox::Ok);
+}
+
+void MonthView::import_events() {
+    QString path = QFileDialog::getOpenFileName(this, "Import events from other calendars", QDir::homePath(), "iCal Files (*.ics)");
+    QMessageBox::information(this, "Please wait", "Importing events may requires some minutes", QMessageBox::Ok);
+    int result = this->pm->import_db_iCal_format(path.toStdString());
+    //TODO Show a dialog with a combobox to choose the category where to put the imported events
+    QMessageBox::information(this, "Success", "Imported " + QString::number(result) + " events", QMessageBox::Ok);
 }
 
 void MonthView::add_event() {

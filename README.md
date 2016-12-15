@@ -8,7 +8,6 @@ The project was inspired by gnome-calendar, but I'm writing it from scratch.
 
 TODO:
 * External plugins support
-* Support iCalendar format [as plugin]
 * Notify system [as plugin]
 * Year view for long-term events
 * Meteo plugin
