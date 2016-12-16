@@ -415,10 +415,12 @@ QLabelEvent* MonthView::createLabelEvent(Event *event) {
     label_event->setFixedHeight(26);
     label_event->setMargin(0);
     QString tooltip_text;
+    if (newEvent->getName().length() > 20)
+        tooltip_text = QString("<b>Name: </b>") + newEvent->getName().c_str() + QString("\n");
     if (newEvent->getPlace() != "")
-        tooltip_text = QString("<b>Place: </b>") + newEvent->getPlace().c_str();
+        tooltip_text = tooltip_text + QString("<b>Place: </b>") + newEvent->getPlace().c_str() + QString("\n");
     if (newEvent->getDescription() != "")
-        tooltip_text = tooltip_text + QString("\n<b>Description:</b>\n") + newEvent->getDescription().c_str();
+        tooltip_text = tooltip_text + QString("<b>Description: </b>") + newEvent->getDescription().c_str();
     label_event->setToolTip(tooltip_text);
     label_event->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
     connect(label_event, &QLabelEvent::clicked, this, &MonthView::on_event_click);
