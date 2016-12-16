@@ -25,7 +25,8 @@ SOURCES += main.cpp\
     view/categorydialog.cpp \
     view/qpushbutton_extended.cpp \
     view/customdialog.cpp \
-    view/categoryeditdialog.cpp
+    view/categoryeditdialog.cpp \
+    view/categoryselectdialog.cpp
 
 HEADERS  += model/event.h \
     persistence/pmanager.h \
@@ -46,7 +47,8 @@ HEADERS  += model/event.h \
     view/categorydialog.h \
     view/qpushbutton_extended.h \
     view/customdialog.h \
-    view/categoryeditdialog.h
+    view/categoryeditdialog.h \
+    view/categoryselectdialog.h
 
 QMAKE_LIBS += -lsqlite3
 QMAKE_CXXFLAGS += -std=c++11

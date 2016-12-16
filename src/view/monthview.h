@@ -23,6 +23,7 @@
 #include "qlabel_event.h"
 #include "qpushbutton_extended.h"
 #include "customdialog.h"
+#include "categoryselectdialog.h"
 
 namespace Ui {
     class MonthView;

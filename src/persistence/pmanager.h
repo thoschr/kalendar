@@ -45,7 +45,7 @@ public:
     int save_db(string path);
     int export_db_iCal_format(string path);
     int load_db(string path);
-    int import_db_iCal_format(string path);
+    int import_db_iCal_format(string path,unsigned int category_id);
 };
 
 #endif // PMANAGER_H

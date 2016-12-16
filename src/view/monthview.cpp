@@ -226,10 +226,15 @@ void MonthView::save_events() {
 void MonthView::import_events() {
     QString path = QFileDialog::getOpenFileName(this, "Import events from other calendars", QDir::homePath(), "iCal Files (*.ics)");
     if (path.length() > 0) {
-        QMessageBox::information(this, "Please wait", "Importing events may requires some minutes", QMessageBox::Ok);
-        int result = this->pm->import_db_iCal_format(path.toStdString());
-        //TODO Show a dialog with a combobox to choose the category where to put the imported events
-        QMessageBox::information(this, "Success", "Imported " + QString::number(result) + " events", QMessageBox::Ok);
+        CategorySelectDialog *dialog = new CategorySelectDialog(this);
+        dialog->setModal(true);
+        dialog->exec(); //Blocking call
+        unsigned int category_id = dialog->getSelectedCategory();
+        if (category_id > 0) {
+            QMessageBox::information(this, "Please wait", "Importing events may requires some minutes", QMessageBox::Ok);
+            int result = this->pm->import_db_iCal_format(path.toStdString(),category_id);
+            QMessageBox::information(this, "Success", "Imported " + QString::number(result) + " events", QMessageBox::Ok);
+        }
     }
 }
 

@@ -392,7 +392,7 @@ int PManager::load_db(string path) {
     return counter;
 }
 
-int PManager::import_db_iCal_format(string path) {
+int PManager::import_db_iCal_format(string path, unsigned int category_id) {
     if ((path.length() < 5) || (path.substr(path.length()-4, 4) != ".ics")) return 0;
     ifstream file;
     string line;
@@ -434,7 +434,7 @@ int PManager::import_db_iCal_format(string path) {
                 } else {
                     pattern = "END:VEVENT";
                     if (line.find(pattern) == 0) {
-                        if (this->add_event(new Event(0,summary,string(""),string(""),this->get_category(1),mktime(&start),mktime(&end))))
+                        if (this->add_event(new Event(0,summary,string(""),string(""),this->get_category(category_id),mktime(&start),mktime(&end))))
                             counter++;
                         else
                             printf("Error: %s not imported\n", summary.c_str());
