@@ -2,6 +2,7 @@
 #define QLABELEVENT_H
 
 #include <QLabel>
+#include <QMouseEvent>
 #include "model/event.h"
 
 class QLabelEvent : public QLabel
@@ -16,10 +17,10 @@ public:
     void setEvent(Event *event);
     Event* getEvent();
 protected:
-    virtual void mouseReleaseEvent(QMouseEvent *);
+    virtual void mousePressEvent(QMouseEvent *e);
 
 signals:
-    void clicked(Event *event);
+    void clicked(QLabelEvent *event, Qt::MouseButton button);
 
 public slots:
 

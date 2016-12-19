@@ -460,8 +460,13 @@ bool MonthView::is_color_dark(string colorName) {
         return false;
 }
 
-void MonthView::on_event_click(Event *event) {
-    EventDialog *eventDialog = new EventDialog(this);
-    eventDialog->setEvent(event);
-    eventDialog->show();
+void MonthView::on_event_click(QLabelEvent *label_event, Qt::MouseButton button) {
+    if ((button == Qt::RightButton) && (label_event != NULL)) {
+        this->pm->remove_event(label_event->getEvent());
+        label_event->setHidden(true); // The label will be destroyed at the next refresh of the view (i.e. next refresh_events call)
+    } else {
+        EventDialog *eventDialog = new EventDialog(this);
+        eventDialog->setEvent(label_event->getEvent());
+        eventDialog->show();
+    }
 }

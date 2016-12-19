@@ -65,7 +65,7 @@ public slots:
     void on_mouse_move(QFrameExtended *frame);
     void on_back_button_click();
     void on_next_button_click();
-    void on_event_click(Event *event);
+    void on_event_click(QLabelEvent *label_event, Qt::MouseButton button);
 
 private slots:
     void save_events();
