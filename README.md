@@ -8,10 +8,10 @@ The project was inspired by gnome-calendar, but I'm writing it from scratch.
 
 TODO:
 * [x] \(_partial_\) iCal format support - **work in progress**
-* [] External plugins support
-* [] Notify system [as plugin]
-* [] Year view for long-term events
-* [] Meteo plugin
+* [ ] External plugins support
+* [ ] Notify system [as plugin]
+* [ ] Year view for long-term events
+* [ ] Meteo plugin
 
 ### Screenshots
 
