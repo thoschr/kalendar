@@ -7,7 +7,7 @@ Kalendar is a Gregorian calendar application written in C++ with the QT library 
 The project was inspired by gnome-calendar, but I'm writing it from scratch.
 
 TODO:
-* [x] (_partial_) iCal format support
+* [x] \(_partial_\) iCal format support
 * External plugins support
 * Notify system [as plugin]
 * Year view for long-term events
