@@ -399,7 +399,6 @@ int PManager::import_db_iCal_format(string path, unsigned int category_id) {
     string pattern;
     string summary;
     int counter = 0;
-    Event *e;
     struct tm start;
     start.tm_sec = start.tm_min = start.tm_hour = start.tm_wday = start.tm_yday = start.tm_year = start.tm_mday = start.tm_mon = 0;
     struct tm end;
