@@ -13,9 +13,10 @@
 int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
+    int ret = 0;
     #if RUN_TESTS
     Test t;
-    //t.test_persistence();
+    t.test_persistence();
     t.test_util();
     #else
     MonthView window;
@@ -30,10 +31,14 @@ int main(int argc, char *argv[])
     QString notify =  parser.value("notify");
     if (notify == "") {
         window.show();
+        ret = a.exec();
     } else { /* Show notifications about the events in the next days */
         LinuxNotifyManager nm;
-        nm.notifyEvents(notify.toInt());
+        if (!nm.notifyEvents(notify.toInt())) {
+            printf("Error in notifyEvents");
+            ret = 1;
+        }
     }
     #endif
-    return a.exec();
+    return ret;
 }
