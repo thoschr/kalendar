@@ -24,6 +24,8 @@ public:
     static Date get_last_day_of_month(Date &date);
     static Date increase_month(Date date);
     static Date decrease_month(Date date);
+    static Date increase_day(Date date);
+    static Date decrease_day(Date date);
 };
 
 #endif

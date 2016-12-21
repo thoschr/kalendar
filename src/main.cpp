@@ -7,9 +7,16 @@
 #include <QHBoxLayout>
 #include "test/test.h"
 
+#define RUN_TESTS 1
+
 int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
+    #if RUN_TESTS
+    Test t;
+    //t.test_persistence();
+    t.test_util();
+    #else
     MonthView window;
     QCommandLineParser parser;
     parser.addHelpOption();
@@ -23,10 +30,6 @@ int main(int argc, char *argv[])
     if (notify == "") {
         window.show();
     } /* Show notifications about the events in the next days */
-
-    //Test t;
-    //t.test_persistence();
-    //t.test_util();
-
+    #endif
     return a.exec();
 }

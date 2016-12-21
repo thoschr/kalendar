@@ -7,19 +7,22 @@
 class DateUtilTest
 {
 private:
-    Date *march_2016;
-    Date *sep_1927;
-    Date *leap_year_2016;
-    Date *firstday_of_year_2015;
-    Date *lastday_of_year_2014;
-    Date *may_2102;
-    Date *first_march_2016;
-    Date *first_sep_1927;
-    Date *jan_2015;
-    Date *feb_2016;
-    Date *first_feb_2016;
-    Date *dec_2014;
-    Date *lastday_jan_2015;
+    Date *march_10_2016;
+    Date *sep_28_1927;
+    Date *feb_29_2016;
+    Date *jan_1_2015;
+    Date *dec_31_2014;
+    Date *may_1_2102;
+    Date *mar_1_2016;
+    Date *sep_1_1927;
+    Date *jan_12_2015;
+    Date *feb_21_2016;
+    Date *feb_1_2016;
+    Date *dec_14_2014;
+    Date *jan_31_2015;
+    Date *aug_20_2000;
+    Date *aug_21_2000;
+
 public:
     DateUtilTest();
     ~DateUtilTest();
@@ -33,6 +36,8 @@ public:
     void test_get_last_day_of_month();
     void test_increase_month();
     void test_decrease_month();
+    void test_increase_day();
+    void test_decrease_day();
 };
 
 #endif

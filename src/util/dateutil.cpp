@@ -102,3 +102,22 @@ Date DateUtil::decrease_month(Date date) {
     Date first_day_prev_month = get_first_day_of_month(last_day_prev_month);
     return Date(date.getMonthDay(), (date.getMonthDay() % 7 ?: 7) + first_day_prev_month.getWeekDay() - 1, last_day_prev_month.getMonth(), last_day_prev_month.getYear());
 }
+
+Date DateUtil::increase_day(Date date) {
+    Date last_day_curr_month = get_last_day_of_month(date);
+    if (date.getMonthDay() < last_day_curr_month.getMonthDay())
+        return Date(date.getMonthDay() + 1, ((date.getWeekDay() + 1) % 7) ?: 7, date.getMonth(), date.getYear());
+    else { //This is the last day of the current month
+        Date tomorrow = increase_month(date);
+        return get_first_day_of_month(tomorrow);
+    }
+}
+
+Date DateUtil::decrease_day(Date date) {
+    if (date.getMonthDay() > 1)
+        return Date(date.getMonthDay() - 1, (date.getWeekDay() - 1) ?: 7, date.getMonth(), date.getYear());
+    else { //This is the first day of the current month
+        Date yesterday = decrease_month(date);
+        return get_last_day_of_month(yesterday);
+    }
+}
