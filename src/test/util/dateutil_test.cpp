@@ -40,7 +40,7 @@ DateUtilTest::~DateUtilTest()
 }
 
 void DateUtilTest::test_all() {
-    /*test_get_days_in_month();
+    test_get_days_in_month();
     test_literal2numeric_day_of_week();
     test_numeric2literal_day_of_week();
     test_get_literal_month();
@@ -48,7 +48,7 @@ void DateUtilTest::test_all() {
     test_get_first_day_of_month();
     test_get_last_day_of_month();
     test_increase_month();
-    test_decrease_month();*/
+    test_decrease_month();
     test_increase_day();
     test_decrease_day();
 }

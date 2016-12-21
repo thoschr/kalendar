@@ -6,8 +6,9 @@
 #include <QPushButton>
 #include <QHBoxLayout>
 #include "test/test.h"
+#include "util/linuxnotifymanager.h"
 
-#define RUN_TESTS 1
+#define RUN_TESTS 0
 
 int main(int argc, char *argv[])
 {
@@ -22,14 +23,17 @@ int main(int argc, char *argv[])
     parser.addHelpOption();
     parser.addOptions({
             {{"n", "notify"},
-                QCoreApplication::translate("main", "Notify the events in the future <day> starting from today"),
+                QCoreApplication::translate("main", "Notify the events in the future <dayoffset> starting from today"),
                 QCoreApplication::translate("main", "notifynextdays")},
         });
     parser.process(a);
     QString notify =  parser.value("notify");
     if (notify == "") {
         window.show();
-    } /* Show notifications about the events in the next days */
+    } else { /* Show notifications about the events in the next days */
+        LinuxNotifyManager nm;
+        nm.notifyEvents(notify.toInt());
+    }
     #endif
     return a.exec();
 }

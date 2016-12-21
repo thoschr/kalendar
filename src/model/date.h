@@ -60,9 +60,12 @@ public:
                (this->year == d.getYear());
     }
 
-    string toString() {
+    string toString(bool weekday) {
         /* In this project the standard format for dates is: d/m/y */
-        return to_string(this->mday) + "/" + to_string(this->month) + "/" + to_string(this->year) + " Week-day: " + to_string(this->wday);
+        string ret = to_string(this->mday) + "/" + to_string(this->month) + "/" + to_string(this->year);
+        if (weekday)
+            ret += " Week-day: " + to_string(this->wday);
+        return ret;
     }
 };
 
