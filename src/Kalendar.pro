@@ -26,7 +26,8 @@ SOURCES += main.cpp\
     view/qpushbutton_extended.cpp \
     view/customdialog.cpp \
     view/categoryeditdialog.cpp \
-    view/categoryselectdialog.cpp
+    view/categoryselectdialog.cpp \
+    util/linuxnotifymanager.cpp
 
 HEADERS  += model/event.h \
     persistence/pmanager.h \
@@ -48,7 +49,9 @@ HEADERS  += model/event.h \
     view/qpushbutton_extended.h \
     view/customdialog.h \
     view/categoryeditdialog.h \
-    view/categoryselectdialog.h
+    view/categoryselectdialog.h \
+    util/notifymanager.h \
+    util/linuxnotifymanager.h
 
 QMAKE_LIBS += -lsqlite3
 QMAKE_CXXFLAGS += -std=c++11

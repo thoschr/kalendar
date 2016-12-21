@@ -10,6 +10,7 @@
 int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
+    MonthView window;
     QCommandLineParser parser;
     parser.addHelpOption();
     parser.addOptions({
@@ -20,7 +21,6 @@ int main(int argc, char *argv[])
     parser.process(a);
     QString notify =  parser.value("notify");
     if (notify == "") {
-        MonthView window;
         window.show();
     } /* Show notifications about the events in the next days */
 
