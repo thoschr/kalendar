@@ -32,4 +32,4 @@ You should get the Kalendar executable inside the same folder.
 Note: Kalendar will create the following folder: ~/kalendar, so remember to delete it if you decide to delete Kalendar.
 
 ### License
-GPLv3
+GPLv3+
