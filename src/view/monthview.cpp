@@ -1,19 +1,6 @@
 #include "monthview.h"
 #include <QDebug>
 
-/* Gets the current month displayed using an hack. Infact, the cell in the middle will have always a value setted.
- * This should be used when you don't care about the day */
-#define CURRENT_MONTH *this->frames[21]->getDate()
-
-#define MAINWINDOW_STYLE "#mainwindow { background-color: #FFFFFF; border: 2px solid #DDDDFF; }"
-
-#define CELL_STYLE "QFrame { background-color: #FFFFFF; border: 1px solid #555555; }" \
-                   "QLabel { border: none; font-size: 16px; padding: 5px; background-color:rgba(0,0,0,0); }" \
-                   "QLabel#today { background-color: #FFFF88; }" \
-                   "QFrame#selected { background-color: #EEEEFF; }" \
-                   "QLabel#header { font-weight: bold; }" \
-                   "QFrame#header { background-color: #DDDDFF; }"
-
 void MonthView::on_mouse_move(QFrameExtended *frame) {
     if ((frame->getDate() != NULL) && //Checks if the frame is valid
         (this->selection_start != NULL) && //and if the selection is already started

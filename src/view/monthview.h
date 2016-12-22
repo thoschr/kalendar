@@ -25,6 +25,19 @@
 #include "customdialog.h"
 #include "categoryselectdialog.h"
 
+/* Gets the current month displayed using an hack. Infact, the cell in the middle will have always a value setted.
+ * This should be used when you don't care about the day */
+#define CURRENT_MONTH *this->frames[21]->getDate()
+
+#define MAINWINDOW_STYLE "#mainwindow { background-color: #FFFFFF; border: 2px solid #DDDDFF; }"
+
+#define CELL_STYLE "QFrame { background-color: #FFFFFF; border: 1px solid #555555; }" \
+                   "QLabel { border: none; font-size: 16px; padding: 5px; background-color:rgba(0,0,0,0); }" \
+                   "QLabel#today { background-color: #FFFF88; color: #FF0000; }" \
+                   "QFrame#selected { background-color: #EEEEFF; }" \
+                   "QLabel#header { font-weight: bold; }" \
+                   "QFrame#header { background-color: #DDDDFF; }"
+
 namespace Ui {
     class MonthView;
 }
