@@ -91,7 +91,7 @@ bool PManager::add_event(Event *e) {
     return true;
 }
 
-bool PManager::edit_event(Event *old_event, Event *new_event) {
+bool PManager::replace_event(Event *old_event, Event *new_event) {
     char *err_msg = 0;
     sqlite3_stmt *stmt;
     string filteredName, filteredDescription, filteredPlace;
@@ -125,7 +125,7 @@ bool PManager::edit_event(Event *old_event, Event *new_event) {
     return true;
 }
 
-bool PManager::edit_category(Category *old_category, Category *new_category) {
+bool PManager::replace_category(Category *old_category, Category *new_category) {
     char *err_msg = 0;
     char sql[1024];
     if (new_category->getName().length() < 3) return false;

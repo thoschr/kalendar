@@ -57,7 +57,7 @@ void CategoryEditDialog::on_button_save_click() {
         this->close();
         delete this;
     }else //Change the selected category
-    if (this->parentDialog->getPManager()->edit_category(this->parentDialog->getCategoryList()[this->parentDialog->getListWidget()->currentIndex().row()], &category)) {
+    if (this->parentDialog->getPManager()->replace_category(this->parentDialog->getCategoryList()[this->parentDialog->getListWidget()->currentIndex().row()], &category)) {
         this->parentDialog->load_categories();
         this->parentDialog->getParentView()->refresh_events();
         this->close();

@@ -186,8 +186,8 @@ void PManagerTest::test_edit_event() {
     Test::print("test_edit_event ");
     PManager pm;
     pm.add_event(this->valid_event);
-    ASSERT (pm.edit_event(this->valid_event, this->valid_event_2) &&
-            (!pm.edit_event(this->valid_event_2, this->noname_event)))
+    ASSERT (pm.replace_event(this->valid_event, this->valid_event_2) &&
+            (!pm.replace_event(this->valid_event_2, this->noname_event)))
     pm.remove_all();
 }
 
@@ -231,8 +231,8 @@ void PManagerTest::test_edit_category() {
     Test::print("test_edit_category ");
     PManager pm;
     pm.add_category(this->valid_category);
-    ASSERT (!pm.edit_category(this->valid_category, this->noname_category) &&
-            (pm.edit_category(this->valid_category, this->valid_category_2)))
+    ASSERT (!pm.replace_category(this->valid_category, this->noname_category) &&
+            (pm.replace_category(this->valid_category, this->valid_category_2)))
     pm.remove_all();
 }
 

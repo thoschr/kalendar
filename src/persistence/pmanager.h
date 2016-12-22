@@ -30,13 +30,13 @@ public:
     PManager();
     ~PManager();
     bool add_event (Event *e);
-    bool edit_event (Event *old_event, Event *new_event); //return true also if before doesn't exist
+    bool replace_event (Event *old_event, Event *new_event); //return true also if old_event doesn't exist
     bool remove_event(Event *e);
     bool remove_all();
     list<Event*> get_events_of_month(int month, int year);
     bool add_category (Category *c);
     /* Note: the id will not be changed (to avoid to change the events with a reference to the category */
-    bool edit_category(Category *old_category, Category *new_category);
+    bool replace_category(Category *old_category, Category *new_category);
     bool remove_category(Category *c);
     vector<Category*> get_categories();
     Category *get_category(unsigned int id);

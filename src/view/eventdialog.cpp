@@ -141,7 +141,7 @@ void EventDialog::on_button_save_click() {
     Event newEvent(0, this->edit_name->text().toStdString(), this->edit_description->toPlainText().toStdString(), this->edit_place->text().toStdString(), category, this->edit_start->dateTime().toTime_t(), this->edit_end->dateTime().toTime_t());
 
     /* If the users has changed an existent event, I'll call the right function */
-    if ((this->event != NULL) && (this->pm->edit_event(this->event, &newEvent))) {
+    if ((this->event != NULL) && (this->pm->replace_event(this->event, &newEvent))) {
         refresh();
     } else if ((this->event == NULL) && (this->pm->add_event(&newEvent))) { //else I'll create a new Event
         refresh();
