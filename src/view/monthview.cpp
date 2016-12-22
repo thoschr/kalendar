@@ -60,14 +60,22 @@ void MonthView::on_mouse_release(QFrameExtended *frame) {
 }
 
 void MonthView::on_back_button_click() {
-    Date newDate = DateUtil::decrease_month(CURRENT_MONTH);
+    Date newDate;
+    if (QGuiApplication::queryKeyboardModifiers().testFlag(Qt::ControlModifier))
+        newDate = DateUtil::decrease_year(CURRENT_MONTH);
+    else
+        newDate = DateUtil::decrease_month(CURRENT_MONTH);
     display_days(newDate);
     /* Reload events */
     display_events(newDate);
 }
 
 void MonthView::on_next_button_click() {
-    Date newDate = DateUtil::increase_month(CURRENT_MONTH);
+    Date newDate;
+    if (QGuiApplication::queryKeyboardModifiers().testFlag(Qt::ControlModifier))
+        newDate = DateUtil::increase_year(CURRENT_MONTH);
+    else
+        newDate = DateUtil::increase_month(CURRENT_MONTH);
     display_days(newDate);
     /* Reload events */
     display_events(newDate);
@@ -93,6 +101,8 @@ MonthView::MonthView(QWidget *parent) :
     next->setMaximumHeight(40);
     back->setShortcut(QKeySequence(Qt::Key_Left));
     next->setShortcut(QKeySequence(Qt::Key_Right));
+    next->setToolTip("Go to the next month, press ctrl to move to the next year");
+    back->setToolTip("Go to the previous month, press ctrl to move to the previous year");
     connect(back, &QPushButton::clicked, this, &MonthView::on_back_button_click);
     connect(next, &QPushButton::clicked, this, &MonthView::on_next_button_click);
     QHBoxLayout *hl = new QHBoxLayout;

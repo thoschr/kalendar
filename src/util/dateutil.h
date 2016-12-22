@@ -26,9 +26,9 @@ public:
     static Date decrease_month(Date date);
     static Date increase_day(Date date);
     static Date decrease_day(Date date);
-    //TODO
     static Date increase_year(Date date);
     static Date decrease_year(Date date);
+    static bool is_leap(int year);
 };
 
 #endif

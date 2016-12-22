@@ -7,13 +7,16 @@
 class DateUtilTest
 {
 private:
-    Date *march_10_2016;
+    Date *mar_10_2016;
     Date *sep_28_1927;
     Date *feb_29_2016;
     Date *jan_1_2015;
     Date *dec_31_2014;
     Date *may_1_2102;
+    Date *mar_1_2015;
     Date *mar_1_2016;
+    Date *mar_1_2017;
+    Date *mar_1_2018;
     Date *sep_1_1927;
     Date *jan_12_2015;
     Date *feb_21_2016;
@@ -38,6 +41,9 @@ public:
     void test_decrease_month();
     void test_increase_day();
     void test_decrease_day();
+    void test_increase_year();
+    void test_decrease_year();
+    void test_is_leap();
 };
 
 #endif

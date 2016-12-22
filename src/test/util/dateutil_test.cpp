@@ -4,13 +4,16 @@
 
 DateUtilTest::DateUtilTest()
 {
-    this->march_10_2016 = new Date(10, 4, 3, 2016);
+    this->mar_10_2016 = new Date(10, 4, 3, 2016);
     this->may_1_2102 = new Date(1, 1, 5, 2102);
     this->sep_28_1927 = new Date(28, 3, 9, 1927);
     this->jan_1_2015 = new Date(1, 4, 1, 2015);
     this->dec_31_2014 = new Date(31, 3, 12, 2014);
     this->feb_29_2016 = new Date(29, 1, 2, 2016);
+    this->mar_1_2015 = new Date(1, 7, 3, 2015);
     this->mar_1_2016 = new Date(1, 2, 3, 2016);
+    this->mar_1_2017 = new Date(1, 3, 3, 2017);
+    this->mar_1_2018 = new Date(1, 4, 3, 2018);
     this->sep_1_1927 = new Date(1, 4, 9, 1927);
     this->jan_12_2015 = new Date(12, 1, 1, 2015);
     this->jan_31_2015 = new Date(31, 6, 1, 2015);
@@ -23,13 +26,16 @@ DateUtilTest::DateUtilTest()
 
 DateUtilTest::~DateUtilTest()
 {
-    delete this->march_10_2016;
+    delete this->mar_10_2016;
     delete this->may_1_2102;
     delete this->sep_28_1927;
     delete this->jan_1_2015;
     delete this->dec_31_2014;
     delete this->feb_29_2016;
+    delete this->mar_1_2015;
     delete this->mar_1_2016;
+    delete this->mar_1_2017;
+    delete this->mar_1_2018;
     delete this->sep_1_1927;
     delete this->jan_12_2015;
     delete this->feb_21_2016;
@@ -51,6 +57,9 @@ void DateUtilTest::test_all() {
     test_decrease_month();
     test_increase_day();
     test_decrease_day();
+    test_increase_year();
+    test_decrease_year();
+    test_is_leap();
 }
 
 void DateUtilTest::test_get_days_in_month() {
@@ -89,7 +98,7 @@ void DateUtilTest::test_get_literal_month() {
 void DateUtilTest::test_get_first_day_of_month() {
     Test::print("test_get_first_day_of_month ");
     ASSERT ((DateUtil::get_first_day_of_month(*this->jan_1_2015) == *this->jan_1_2015) &&
-            (DateUtil::get_first_day_of_month(*this->march_10_2016) == *this->mar_1_2016) &&
+            (DateUtil::get_first_day_of_month(*this->mar_10_2016) == *this->mar_1_2016) &&
             (DateUtil::get_first_day_of_month(*this->sep_28_1927) == *this->sep_1_1927) &&
             (DateUtil::get_first_day_of_month(*this->jan_12_2015)) == *this->jan_1_2015 &&
             (DateUtil::get_first_day_of_month(*this->feb_21_2016)) == *this->feb_1_2016)
@@ -135,4 +144,26 @@ void DateUtilTest::test_decrease_day() {
     ASSERT (DateUtil::decrease_day(*this->mar_1_2016) == *this->feb_29_2016 &&
             DateUtil::decrease_day(*this->jan_1_2015) == *this->dec_31_2014 &&
             DateUtil::decrease_day(*this->aug_21_2000) == *this->aug_20_2000)
+}
+
+void DateUtilTest::test_increase_year() {
+    Test::print("test_increase_year ");
+    ASSERT (DateUtil::increase_year(*this->feb_29_2016) == *this->mar_1_2017 &&
+            DateUtil::increase_year(*this->mar_1_2016) == *this->mar_1_2017 &&
+            DateUtil::increase_year(*this->mar_1_2017) == *this->mar_1_2018 &&
+            DateUtil::increase_year(*this->mar_1_2015) == *this->mar_1_2016)
+}
+
+void DateUtilTest::test_decrease_year() {
+    Test::print("test_decrease_year ");
+    ASSERT (DateUtil::decrease_year(*this->mar_1_2017) == *this->mar_1_2016 &&
+            DateUtil::decrease_year(*this->mar_1_2018) == *this->mar_1_2017 &&
+            DateUtil::decrease_year(*this->mar_1_2016) == *this->mar_1_2015)
+}
+
+void DateUtilTest::test_is_leap() {
+    Test::print("test_is_leap ");
+    ASSERT (DateUtil::is_leap(this->mar_1_2016->getYear()) &&
+            DateUtil::is_leap(this->aug_20_2000->getYear()) &&
+            !DateUtil::is_leap(this->jan_12_2015->getYear()))
 }

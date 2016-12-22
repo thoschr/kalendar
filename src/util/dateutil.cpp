@@ -37,13 +37,17 @@ int DateUtil::literal2numeric_day_of_week(string d) {
     return -1;
 }
 
+bool DateUtil::is_leap(int year) {
+    return ((year % 4 == 0 && year % 100 != 0) || (year % 400 == 0));
+}
+
 int DateUtil::get_days_in_month(int month, int year) {
     int numberOfDays;
     if (month == 4 || month == 6 || month == 9 || month == 11)
         numberOfDays = 30;
     else if (month == 2)
     {
-        if ((year % 4 == 0 && year % 100 != 0) || (year % 400 == 0))
+        if (is_leap(year))
             numberOfDays = 29;
         else
             numberOfDays = 28;
@@ -108,8 +112,8 @@ Date DateUtil::increase_day(Date date) {
     if (date.getMonthDay() < last_day_curr_month.getMonthDay())
         return Date(date.getMonthDay() + 1, ((date.getWeekDay() + 1) % 7) ?: 7, date.getMonth(), date.getYear());
     else { //This is the last day of the current month
-        Date tomorrow = increase_month(date);
-        return get_first_day_of_month(tomorrow);
+        Date next_month = increase_month(date);
+        return get_first_day_of_month(next_month);
     }
 }
 
@@ -117,7 +121,25 @@ Date DateUtil::decrease_day(Date date) {
     if (date.getMonthDay() > 1)
         return Date(date.getMonthDay() - 1, (date.getWeekDay() - 1) ?: 7, date.getMonth(), date.getYear());
     else { //This is the first day of the current month
-        Date yesterday = decrease_month(date);
-        return get_last_day_of_month(yesterday);
+        Date previous_month = decrease_month(date);
+        return get_last_day_of_month(previous_month);
     }
+}
+
+Date DateUtil::increase_year(Date date) {
+    if ((date.getMonthDay() == 29) && (date.getMonth() == 2)) /* Leap year */
+        return Date(1, ((date.getWeekDay() + 2) % 7) ?: 7, date.getMonth() + 1, date.getYear() + 1);
+    else {
+        int offset = 1;
+        if (is_leap(date.getYear() + 1))
+            offset = 2;
+        return Date(date.getMonthDay(), ((date.getWeekDay() + offset) % 7) ?: 7, date.getMonth(), date.getYear() + 1);
+    }
+}
+
+Date DateUtil::decrease_year(Date date) {
+    int weekday = ((date.getWeekDay() - 1) % 7) ?: 7;
+    if (is_leap(date.getYear()))
+        weekday = ((weekday - 1) % 7) ?: 7;
+    return Date(date.getMonthDay(), weekday, date.getMonth(), date.getYear() - 1);
 }
