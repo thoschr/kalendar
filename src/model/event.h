@@ -5,6 +5,11 @@
 
 #include "category.h"
 
+/* A todo is defined as an event with a special dates, they are the following:
+ * start = end = 29/01/2105 09:40 , the UTC timestamp is: 4262665200
+ * The todo is only an high-level concept managed by the view logic, thus the persistence part consider them as normal events. */
+#define TODO_DATE 4262665200
+
 using namespace std;
 
 class Event

@@ -9,6 +9,7 @@
 #include <QLineEdit>
 #include <QPlainTextEdit>
 #include <QDateTimeEdit>
+#include <QCheckBox>
 #include <QComboBox>
 #include <QMessageBox>
 #include <QIconEngine>
@@ -35,6 +36,7 @@ private:
     QDateTimeEdit *edit_end;
     QPlainTextEdit *edit_description;
     QPushButton *button_delete;
+    QCheckBox *cbtodo;
     View *parent;
     PManager *pm;
     Event *event;
@@ -50,6 +52,7 @@ public slots:
     void on_button_cancel_click();
     void on_button_save_click();
     void on_button_delete_click();
+    void on_checkbox_todo_toggle(bool checked);
 };
 
 #endif // EVENTDIALOG_H

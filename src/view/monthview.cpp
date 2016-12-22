@@ -81,9 +81,12 @@ MonthView::MonthView(QWidget *parent) :
     this->layout = new QVBoxLayout;
     this->label_date = new QLabel;
     this->label_date->setMaximumHeight(40);
+    this->label_date->setFixedWidth(360);
     this->label_date->setStyleSheet("QLabel { padding-left: 100px; padding-right: 100px; font-size: 20px; } ");
     QPushButton *back = new QPushButton("<");
     QPushButton *next = new QPushButton(">");
+    this->todobutton = new QPushButton;
+    refresh_todos();
     back->setMaximumWidth(60);
     next->setMaximumWidth(60);
     back->setMaximumHeight(40);
@@ -92,13 +95,16 @@ MonthView::MonthView(QWidget *parent) :
     next->setShortcut(QKeySequence(Qt::Key_Right));
     next->setToolTip("Go to the next month, press ctrl to move to the next year");
     back->setToolTip("Go to the previous month, press ctrl to move to the previous year");
+    this->todobutton->setToolTip("Show the list of TODOs");
+    this->todobutton->setStyleSheet("QPushButton { border: 1px solid #000000; padding: 5px; font-weight: bold; border-radius: 10px; } QPushButton:hover { color: #2222BB; }");
     connect(back, &QPushButton::clicked, this, &MonthView::on_back_button_click);
     connect(next, &QPushButton::clicked, this, &MonthView::on_next_button_click);
+    connect(this->todobutton, &QPushButton::clicked, this, &MonthView::on_todo_button_click);
     QHBoxLayout *hl = new QHBoxLayout;
-    hl->setAlignment(Qt::AlignCenter);
-    hl->addWidget(back);
-    hl->addWidget(label_date);
-    hl->addWidget(next);
+    hl->addWidget(back, 1, Qt::AlignRight);
+    hl->addWidget(label_date, 1, Qt::AlignCenter);
+    hl->addWidget(next, 1, Qt::AlignLeft);
+    hl->addWidget(this->todobutton);
     this->layout->addLayout(hl);
 
     //Create 7x7 grid
@@ -249,8 +255,18 @@ void MonthView::edit_categories() {
     category_dialog->show();
 }
 
-void MonthView::show_agenda() {
-    list<Event*> events_list = this->pm->get_all_events();
+void MonthView::on_todo_button_click() {
+    /* Show only TODOs */
+    show_agenda(true);
+}
+
+void MonthView::show_agenda(bool only_todos) {
+    list<Event*> events_list;
+    if (only_todos) {
+        Date todoDate = DateUtil::date_from_timestamp(TODO_DATE);
+        events_list = this->pm->get_events_of_month(todoDate.getMonth(), todoDate.getYear());
+    } else
+        events_list = this->pm->get_all_events();
     QFrameExtended *frame = createQFrameExtended(NULL);
     QLabel *header = static_cast<QLabel*> (frame->children().at(1));
     header->setText(QString::number(events_list.size()) + QString(" Events"));
@@ -258,13 +274,16 @@ void MonthView::show_agenda() {
     header->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
     for (Event *event : events_list) {
         QHBoxLayout *hl = new QHBoxLayout;
+        QString text;
+        if ((!only_todos) && (event->getStart() == TODO_DATE))
+            continue; //skip the todo
         Date start = DateUtil::date_from_timestamp(event->getStart());
         Date end = DateUtil::date_from_timestamp(event->getEnd());
-        QString text = QString::number(start.getMonthDay()) + QString("/") + QString::number(start.getMonth()) + QString("/") + QString::number(start.getYear()) +
-                       QString(" - ") + QString::number(end.getMonthDay()) + QString("/") + QString::number(end.getMonth()) + QString("/") + QString::number(end.getYear());
+        text = QString(start.toString(false).c_str()) + QString(" - ") + QString(end.toString(false).c_str());
         QLabel *label_time = new QLabel(text);
         label_time->setFixedWidth(200);
-        hl->addWidget(label_time);
+        if (!only_todos)
+            hl->addWidget(label_time);
         hl->addWidget(createLabelEvent(event));
         (static_cast <QVBoxLayout*> (frame->layout()))->addLayout(hl);
     }
@@ -321,8 +340,16 @@ void MonthView::display_days(Date date) {
     }
 }
 
+void MonthView::refresh_todos() {
+    Date todoDate = DateUtil::date_from_timestamp(TODO_DATE);
+    list<Event*> todos = this->pm->get_events_of_month(todoDate.getMonth(), todoDate.getYear());
+    this->todobutton->setText(QString::number(todos.size()));
+    for (Event *e : todos) delete e;
+}
+
 void MonthView::refresh_events() {
     display_events(CURRENT_MONTH);
+    refresh_todos();
 }
 
 void MonthView::display_events(Date date) {

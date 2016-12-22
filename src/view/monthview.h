@@ -49,6 +49,7 @@ class MonthView : public QMainWindow, public View
 private:
     QVBoxLayout *layout;
     QLabel *label_date;
+    QPushButton *todobutton;
     Date *selection_start;
     Date *selection_end;
     Ui::MonthView *ui;
@@ -69,9 +70,11 @@ protected:
 public:
     explicit MonthView(QWidget *parent = 0);
     void refresh_events();
+    void refresh_todos();
     void display_events(Date date);
     void display_events(Date date, Category category);
     ~MonthView();
+
 public slots:
     void on_mouse_press(QFrameExtended *frame);
     void on_mouse_release(QFrameExtended *frame);
@@ -79,6 +82,7 @@ public slots:
     void on_back_button_click();
     void on_next_button_click();
     void on_event_click(QLabelEvent *label_event, Qt::MouseButton button);
+    void on_todo_button_click();
 
 private slots:
     void save_events();
@@ -86,7 +90,7 @@ private slots:
     void import_events();
     void add_event();
     void edit_categories();
-    void show_agenda();
+    void show_agenda(bool only_todos = false);
 };
 
 #endif // MONTHVIEW_H

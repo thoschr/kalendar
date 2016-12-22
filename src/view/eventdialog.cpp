@@ -15,8 +15,19 @@ void EventDialog::setEvent(Event *event) {
                 this->edit_category->setCurrentIndex(index);
             index++;
         }
-        this->edit_start->setDateTime(QDateTime::fromTime_t(event->getStart()));
-        this->edit_end->setDateTime(QDateTime::fromTime_t(event->getEnd()));
+
+        if (event->getStart() == TODO_DATE) {
+            Date today = DateUtil::get_current_date();
+            /* Set the current date, so if the user uncheck the "TODO" there is already a valid date set */
+            this->edit_start->setDateTime(QDateTime(QDate(today.getYear(), today.getMonth(), today.getMonthDay())));
+            this->edit_start->setEnabled(false);
+            this->edit_end->setDateTime(QDateTime(QDate(today.getYear(), today.getMonth(), today.getMonthDay())));
+            this->edit_end->setEnabled(false);
+            this->cbtodo->setChecked(true);
+        } else {
+            this->edit_start->setDateTime(QDateTime::fromTime_t(event->getStart()));
+            this->edit_end->setDateTime(QDateTime::fromTime_t(event->getEnd()));
+        }
         this->button_delete->setEnabled(true);
     }
 }
@@ -63,24 +74,32 @@ EventDialog::EventDialog(View *parentView, Date start_date, Date end_date, QWidg
     third_row->addWidget(this->edit_category);
     main_layout->addLayout(third_row);
     QHBoxLayout *fourth_row = new QHBoxLayout;
+    QLabel *label_todo = new QLabel("TODO: ");
+    this->cbtodo = new QCheckBox;
+    connect(cbtodo, &QCheckBox::toggled, this, &EventDialog::on_checkbox_todo_toggle);
+    fourth_row->addWidget(label_todo);
+    fourth_row->addWidget(cbtodo);
+    main_layout->addLayout(fourth_row);
+    QHBoxLayout *fifth_row = new QHBoxLayout;
     QLabel *label_start = new QLabel("Start: ");
     this->edit_start = new QDateTimeEdit;
     this->edit_start->setCalendarPopup(true);
+    QDateTime todoDate = QDateTime::fromTime_t(TODO_DATE);
     this->edit_start->setDateTime(QDateTime(QDate(start_date.getYear(), start_date.getMonth(), start_date.getMonthDay())));
     //I set a specific hour because the default is the midnight, but this could lead more easily problems caused by daylight saving time
     this->edit_start->setTime(QTime(8,0,0));
-    fourth_row->addWidget(label_start);
-    fourth_row->addWidget(this->edit_start);
-    main_layout->addLayout(fourth_row);
-    QHBoxLayout *fifth_row = new QHBoxLayout;
+    fifth_row->addWidget(label_start);
+    fifth_row->addWidget(this->edit_start);
+    main_layout->addLayout(fifth_row);
+    QHBoxLayout *sixth_row = new QHBoxLayout;
     QLabel *label_end = new QLabel("End: ");
     this->edit_end = new QDateTimeEdit;
     this->edit_end->setCalendarPopup(true);
     this->edit_end->setDateTime(QDateTime(QDate(end_date.getYear(), end_date.getMonth(), end_date.getMonthDay())));
     this->edit_end->setTime(QTime(9,0,0));
-    fifth_row->addWidget(label_end);
-    fifth_row->addWidget(this->edit_end);
-    main_layout->addLayout(fifth_row);
+    sixth_row->addWidget(label_end);
+    sixth_row->addWidget(this->edit_end);
+    main_layout->addLayout(sixth_row);
     QHBoxLayout *last_row = new QHBoxLayout;
     QPushButton *button_cancel = new QPushButton("Cancel");
     connect(button_cancel, &QPushButton::clicked, this, &EventDialog::on_button_cancel_click);
@@ -121,13 +140,22 @@ void EventDialog::refresh() {
 }
 
 void EventDialog::on_button_save_click() {
+    bool isTodo = !this->edit_start->isEnabled();
+
     if (this->edit_name->text().length() < 3) {
         QMessageBox::critical(this, "Error", "The name must have a length greater than 2", QMessageBox::Ok);
         return;
     }
-    if (this->edit_start->dateTime() > this->edit_end->dateTime()) {
-        QMessageBox::critical(this, "Error", "Invalid range of time selected", QMessageBox::Ok);
-        return;
+
+    if (isTodo) {
+        QDateTime todoDate = QDateTime::fromTime_t(TODO_DATE);
+        this->edit_start->setDateTime(todoDate);
+        this->edit_end->setDateTime(todoDate);
+    } else {
+        if (this->edit_start->dateTime() > this->edit_end->dateTime()) {
+            QMessageBox::critical(this, "Error", "Invalid range of time selected", QMessageBox::Ok);
+            return;
+        }
     }
 
     Category *category = NULL;
@@ -148,4 +176,9 @@ void EventDialog::on_button_save_click() {
     } else {
         QMessageBox::critical(this, "Error", "Persistence error. Try with a different name.", QMessageBox::Ok);
     }
+}
+
+void EventDialog::on_checkbox_todo_toggle(bool checked) {
+    this->edit_start->setEnabled(!checked);
+    this->edit_end->setEnabled(!checked);
 }
