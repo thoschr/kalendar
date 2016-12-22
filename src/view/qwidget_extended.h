@@ -4,6 +4,10 @@
 #include <QWidget>
 #include <QString>
 #include <QMouseEvent>
+#include <QPaintEvent>
+#include <QStyle>
+#include <QStyleOption>
+#include <QStylePainter>
 #include "qframe_extended.h"
 
 enum { PRESSED, RELEASED, MOVED };
@@ -22,6 +26,7 @@ protected:
     virtual void mousePressEvent(QMouseEvent *);
     virtual void mouseReleaseEvent(QMouseEvent *);
     virtual void mouseMoveEvent(QMouseEvent *);
+    virtual void paintEvent(QPaintEvent *pe);
 
 signals:
     void mousePress(QFrameExtended *);

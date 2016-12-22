@@ -41,3 +41,10 @@ void QWidgetExtended::mouseReleaseEvent(QMouseEvent *event) {
 void QWidgetExtended::mouseMoveEvent(QMouseEvent *event) {
     signalEvent(event, MOVED);
 }
+
+void QWidgetExtended::paintEvent(QPaintEvent *pe) {
+    QStyleOption opt;
+    opt.initFrom(this);
+    QStylePainter p(this);
+    p.drawPrimitive(QStyle::PE_Widget, opt);
+}
