@@ -42,6 +42,7 @@ void QWidgetExtended::mouseMoveEvent(QMouseEvent *event) {
     signalEvent(event, MOVED);
 }
 
+/* This method needs to be overrided to allow CSS styling also for QWidgetExtended */
 void QWidgetExtended::paintEvent(QPaintEvent *pe) {
     QStyleOption opt;
     opt.initFrom(this);

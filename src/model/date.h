@@ -62,7 +62,9 @@ public:
 
     string toString(bool weekday) {
         /* In this project the standard format for dates is: d/m/y */
-        string ret = to_string(this->mday) + "/" + to_string(this->month) + "/" + to_string(this->year);
+        char sdate[11];
+        snprintf(sdate, 11, "%02d/%02d/%d", this->mday, this->month, this->year);
+        string ret (sdate);
         if (weekday)
             ret += " Week-day: " + to_string(this->wday);
         return ret;
