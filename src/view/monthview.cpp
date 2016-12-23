@@ -81,8 +81,8 @@ MonthView::MonthView(QWidget *parent) :
     this->layout = new QVBoxLayout;
     this->label_date = new QLabel;
     this->label_date->setMaximumHeight(40);
-    this->label_date->setFixedWidth(360);
-    this->label_date->setStyleSheet("QLabel { padding-left: 100px; padding-right: 100px; font-size: 20px; } ");
+    this->label_date->setFixedWidth(400);
+    this->label_date->setStyleSheet("QLabel { qproperty-alignment: AlignCenter; padding-left: 100px; padding-right: 100px; font-size: 20px; } ");
     QPushButton *back = new QPushButton("<");
     QPushButton *next = new QPushButton(">");
     this->todobutton = new QPushButton;
