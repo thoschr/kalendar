@@ -54,6 +54,24 @@ public:
         if (this->category != NULL) delete this->category;
     }
 
+    void copy(Event* e) {
+        this->id = e->getId();
+        this->name = e->getName();
+        this->description = e->getDescription();
+        this->place = e->getPlace();
+        this->category = e->getCategory();
+        this->start = e->getStart();
+        this->end = e->getEnd();
+    }
+
+    void setInvalid() {
+        this->id = -1;
+    }
+
+    bool isInvalid() {
+        return this->id == -1;
+    }
+
     unsigned int getId() { return id; }
     string getName() { return name; }
     string getDescription() { return description; }

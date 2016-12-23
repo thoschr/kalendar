@@ -269,14 +269,18 @@ void MonthView::show_agenda(bool only_todos) {
         events_list = this->pm->get_all_events();
     QFrameExtended *frame = createQFrameExtended(NULL);
     QLabel *header = static_cast<QLabel*> (frame->children().at(1));
-    header->setText(QString::number(events_list.size()) + QString(" Events"));
     header->setStyleSheet("QLabel { background-color: #ffffb3; border-bottom: 1px solid #000000; margin-bottom: 2px; }");
     header->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
+    QString title(" Event(s)");
+    if (only_todos) title = QString(" TODO(s)");
+    int list_size = events_list.size();
     for (Event *event : events_list) {
         QHBoxLayout *hl = new QHBoxLayout;
         QString text;
-        if ((!only_todos) && (event->getStart() == TODO_DATE))
+        if ((!only_todos) && (event->getStart() == TODO_DATE)) {
+            list_size--;
             continue; //skip the todo
+        }
         Date start = DateUtil::date_from_timestamp(event->getStart());
         Date end = DateUtil::date_from_timestamp(event->getEnd());
         text = QString(start.toString(false).c_str()) + QString(" - ") + QString(end.toString(false).c_str());
@@ -287,6 +291,7 @@ void MonthView::show_agenda(bool only_todos) {
         hl->addWidget(createLabelEvent(event));
         (static_cast <QVBoxLayout*> (frame->layout()))->addLayout(hl);
     }
+    header->setText(QString::number(list_size) + title);
     QVBoxLayout *main_layout = new QVBoxLayout;
     QScrollArea *scroll_area = new QScrollArea;
     scroll_area->setMaximumHeight(600);
@@ -434,22 +439,7 @@ QLabelEvent* MonthView::createLabelEvent(Event *event) {
     //Make a copy
     Event *newEvent = new Event(*event);
     QLabelEvent *label_event = new QLabelEvent;
-    label_event->setText(newEvent->getName().c_str());
     label_event->setEvent(newEvent);
-    QString textColor("#000000");
-    if (is_color_dark(newEvent->getCategory()->getColor()))
-        textColor = "#FFFFFF";
-    label_event->setStyleSheet(QString("QLabel { font-size: 14px; background-color : ") + QString(newEvent->getCategory()->getColor().c_str()) + QString("; color: ") + textColor + QString("};"));
-    label_event->setFixedHeight(26);
-    label_event->setMargin(0);
-    QString tooltip_text;
-    if (newEvent->getName().length() > 20)
-        tooltip_text = QString("<b>Name: </b>") + newEvent->getName().c_str() + QString("\n");
-    if (newEvent->getPlace() != "")
-        tooltip_text = tooltip_text + QString("<b>Place: </b>") + newEvent->getPlace().c_str() + QString("\n");
-    if (newEvent->getDescription() != "")
-        tooltip_text = tooltip_text + QString("<b>Description: </b>") + newEvent->getDescription().c_str();
-    label_event->setToolTip(tooltip_text);
     label_event->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
     connect(label_event, &QLabelEvent::clicked, this, &MonthView::on_event_click);
     return label_event;
@@ -478,23 +468,16 @@ void MonthView::remove_events_from_frame(int i) {
     }
 }
 
-bool MonthView::is_color_dark(string colorName) {
-    QColor color(colorName.c_str());
-    //Formula to calculate luminance from ITU-R BT.709
-    int l = 0.2126 * color.red() + 0.7152 * color.green() + 0.0722 * color.blue();
-    if (l < 50)
-        return true;
-    else
-        return false;
-}
-
 void MonthView::on_event_click(QLabelEvent *label_event, Qt::MouseButton button) {
     if ((button == Qt::RightButton) && (label_event != NULL)) {
         this->pm->remove_event(label_event->getEvent());
-        label_event->setHidden(true); // The label will be destroyed at the next refresh of the view (i.e. next refresh_events call)
+        label_event->getEvent()->setInvalid();
+        label_event->drawUI();
+        refresh_events();
     } else {
         EventDialog *eventDialog = new EventDialog(this);
         eventDialog->setEvent(label_event->getEvent());
-        eventDialog->show();
+        eventDialog->exec();
+        label_event->drawUI(); //Maybe the event has changed, reload the label
     }
 }

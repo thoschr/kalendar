@@ -16,6 +16,12 @@ public:
     ~QLabelEvent();
     void setEvent(Event *event);
     Event* getEvent();
+    bool drawUI();
+    bool is_color_dark(string colorName);
+
+private:
+    bool drawInvalidEvent();
+
 protected:
     virtual void mousePressEvent(QMouseEvent *e);
 

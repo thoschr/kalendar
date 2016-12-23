@@ -56,7 +56,6 @@ private:
     PManager *pm;
     QFrameExtended *frames[42]; //I have a 7x7 grid, but without consider the first row I've a total of 6x7 cells
     void display_days(Date date);
-    bool is_color_dark(string colorName);
     void remove_events_from_all_frames();
     void remove_events_from_frame(int i);
     QLabelEvent *createLabelEvent(Event *event);
