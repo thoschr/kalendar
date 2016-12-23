@@ -271,21 +271,24 @@ void MonthView::show_agenda(bool only_todos) {
     QLabel *header = static_cast<QLabel*> (frame->children().at(1));
     header->setStyleSheet("QLabel { background-color: #ffffb3; border-bottom: 1px solid #000000; margin-bottom: 2px; }");
     header->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
+    Date today = DateUtil::get_current_date();
     QString title(" Event(s)");
     if (only_todos) title = QString(" TODO(s)");
     int list_size = events_list.size();
     for (Event *event : events_list) {
         QHBoxLayout *hl = new QHBoxLayout;
         QString text;
-        if ((!only_todos) && (event->getStart() == TODO_DATE)) {
-            list_size--;
-            continue; //skip the todo
+        if (!only_todos) {
+            if ((event->getStart() == TODO_DATE) || (DateUtil::date_from_timestamp(event->getEnd()).compareTo(today) < 0)) {
+                list_size--;
+                continue; //skip the todo or the past event
+            }
         }
         Date start = DateUtil::date_from_timestamp(event->getStart());
         Date end = DateUtil::date_from_timestamp(event->getEnd());
         text = QString(start.toString(false).c_str()) + QString(" - ") + QString(end.toString(false).c_str());
         QLabel *label_time = new QLabel(text);
-        label_time->setFixedWidth(200);
+        label_time->setFixedWidth(215);
         if (!only_todos)
             hl->addWidget(label_time);
         hl->addWidget(createLabelEvent(event));
