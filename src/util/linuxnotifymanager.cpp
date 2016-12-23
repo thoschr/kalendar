@@ -33,6 +33,13 @@ bool LinuxNotifyManager::notifyEvents(int dayoffset) {
 bool LinuxNotifyManager::notifyEvent(Event *e) {
     QProcess process;
     Date start = DateUtil::date_from_timestamp(e->getStart());
-    process.start("notify-send", QStringList() << "-i" << ICON_NAME << start.toString(false).c_str() << e->getName().c_str());
+    Date today = DateUtil::get_current_date();
+    Date tomorrow = DateUtil::increase_day(today);
+    QString title(start.toString(false).c_str());
+    if (start == today)
+        title = QString("Today");
+    else if (start == tomorrow)
+        title = QString("Tomorrow");
+    process.start("notify-send", QStringList() << "-i" << ICON_NAME << title << e->getName().c_str());
     return process.waitForFinished();
 }
