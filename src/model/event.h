@@ -65,11 +65,11 @@ public:
     }
 
     void setInvalid() {
-        this->id = -1;
+        this->id = 65535;
     }
 
     bool isInvalid() {
-        return this->id == -1;
+        return this->id == 65535;
     }
 
     unsigned int getId() { return id; }
