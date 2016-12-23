@@ -12,7 +12,6 @@ TODO:
 * [x] Notification system
 * [ ] Year view for long-term events
 * [ ] Meteo plugin
-* [ ] Fix 'no-refresh' bug in Agenda
 
 ### Screencast
 
