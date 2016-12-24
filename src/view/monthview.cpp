@@ -82,7 +82,7 @@ MonthView::MonthView(QWidget *parent) :
     this->label_date = new QLabel;
     this->label_date->setMaximumHeight(40);
     this->label_date->setFixedWidth(400);
-    this->label_date->setStyleSheet("QLabel { qproperty-alignment: AlignCenter; padding-left: 100px; padding-right: 100px; font-size: 20px; } ");
+    this->label_date->setStyleSheet(LABELDATE_STYLE);
     QPushButton *back = new QPushButton("<");
     QPushButton *next = new QPushButton(">");
     this->todobutton = new QPushButton;
@@ -96,7 +96,7 @@ MonthView::MonthView(QWidget *parent) :
     next->setToolTip("Go to the next month, press ctrl to move to the next year");
     back->setToolTip("Go to the previous month, press ctrl to move to the previous year");
     this->todobutton->setToolTip("Show the list of TODOs");
-    this->todobutton->setStyleSheet("QPushButton { border: 1px solid #000000; padding: 5px; font-weight: bold; border-radius: 10px; } QPushButton:hover { color: #2222BB; }");
+    this->todobutton->setStyleSheet(TODOSBUTTON_STYLE);
     connect(back, &QPushButton::clicked, this, &MonthView::on_back_button_click);
     connect(next, &QPushButton::clicked, this, &MonthView::on_next_button_click);
     connect(this->todobutton, &QPushButton::clicked, this, &MonthView::on_todo_button_click);
