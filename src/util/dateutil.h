@@ -19,7 +19,6 @@ public:
     static int literal2numeric_day_of_week(string d); /* 1 => Monday, 2 => Tuesday, ... */
     static int get_days_in_month(int month, int year);
     static Date date_from_timestamp(time_t timestamp);
-    static list<int> get_special_days_in_month(int month, int year); /* TODO: implement this [priority: low] */
     static Date get_first_day_of_month(Date &date);
     static Date get_last_day_of_month(Date &date);
     static Date increase_month(Date date);
