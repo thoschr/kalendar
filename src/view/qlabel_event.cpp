@@ -8,7 +8,8 @@ QLabelEvent::QLabelEvent(QWidget *parent) : QLabel(parent)
 }
 
 QLabelEvent::~QLabelEvent() {
-    delete this->event;
+    if (this->event != NULL)
+        delete this->event;
 }
 
 void QLabelEvent::mousePressEvent(QMouseEvent *e) {
@@ -43,7 +44,7 @@ bool QLabelEvent::drawUI() {
     QString textColor("#000000");
     if (is_color_dark(this->event->getCategory()->getColor()))
         textColor = "#FFFFFF";
-    this->setStyleSheet(QString("QLabel { font-size: 14px; background-color : ") + QString(this->event->getCategory()->getColor().c_str()) + QString("; color: ") + textColor + QString("};"));
+    this->setStyleSheet(QString("QLabel { font-size: 14px; border-radius: 2px; background-color : ") + QString(this->event->getCategory()->getColor().c_str()) + QString("; color: ") + textColor + QString("};"));
     this->setFixedHeight(26);
     this->setMargin(0);
     QString tooltip_text;
