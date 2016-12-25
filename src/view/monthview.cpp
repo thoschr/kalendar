@@ -426,14 +426,22 @@ void MonthView::on_button_extended_click(int index) {
     QLabel *label_day = static_cast<QLabel*> (frame->children().at(1));
     label_day->setText(text);
     label_day->setStyleSheet("QLabel { background-color: #ffffb3; border-bottom: 1px solid #000000; margin-bottom: 2px; }");
+    char stime[14];
     for (QLabelEvent *label_event : this->frames[index]->findChildren<QLabelEvent*>()) {
         Event *event = new Event(*label_event->getEvent());
-        frame->layout()->addWidget(createLabelEvent(event));
+        QTime start = QDateTime::fromTime_t(event->getStart()).time();
+        QTime end = QDateTime::fromTime_t(event->getEnd()).time();
+        snprintf(stime, 14, "%02d:%02d - %02d:%02d", start.hour(), start.minute(), end.hour(), end.minute());
+        QLabel *time = new QLabel(stime);
+        QHBoxLayout *hl = new QHBoxLayout;
+        hl->addWidget(time);
+        hl->addWidget(createLabelEvent(event));
+        (static_cast <QVBoxLayout*> (frame->layout()))->addLayout(hl); //TODO: add the entries ordered by timestamp
     }
     QVBoxLayout *main_layout = new QVBoxLayout;
     main_layout->addWidget(frame);
     CustomDialog *custom_dialog = new CustomDialog(main_layout);
-    custom_dialog->setFixedWidth(300);
+    custom_dialog->setFixedWidth(400);
     custom_dialog->setWindowTitle("Day Dialog");
     custom_dialog->show();
 }
