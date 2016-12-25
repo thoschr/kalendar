@@ -448,7 +448,7 @@ void MonthView::on_button_extended_click(int index) {
 
 QLabelEvent* MonthView::createLabelEvent(Event *event) {
     //Make a copy
-    Event *newEvent = new Event(*event); //TODO: avoid the copy
+    Event *newEvent = new Event(*event);
     QLabelEvent *label_event = new QLabelEvent;
     label_event->setEvent(newEvent);
     label_event->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
