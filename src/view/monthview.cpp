@@ -466,7 +466,11 @@ void MonthView::remove_events_from_frame(int i) {
     QListIterator<QObject *> it (this->frames[i]->children());
     while (it.hasNext()) {
         QObject *o = qobject_cast<QObject*> (it.next());
-        if (o->metaObject()->className() == label_event.metaObject()->className()) delete o;
+        /* Don't delete a QLabelEvent before returning to the event loop (on_event_click), otherwise will be triggered a segmentation fault */
+        if (o->metaObject()->className() == label_event.metaObject()->className()) {
+            (qobject_cast<QLabelEvent*>(o))->setHidden(true);
+            (qobject_cast<QLabelEvent*>(o))->deleteLater();
+        }
         else if (o->metaObject()->className() == button.metaObject()->className()) delete o;
     }
 }
