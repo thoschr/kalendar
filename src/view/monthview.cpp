@@ -440,7 +440,7 @@ void MonthView::on_button_extended_click(int index) {
 
 QLabelEvent* MonthView::createLabelEvent(Event *event) {
     //Make a copy
-    Event *newEvent = new Event(*event);
+    Event *newEvent = new Event(*event); //TODO: avoid the copy
     QLabelEvent *label_event = new QLabelEvent;
     label_event->setEvent(newEvent);
     label_event->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
@@ -469,6 +469,7 @@ void MonthView::remove_events_from_frame(int i) {
         /* Don't delete a QLabelEvent before returning to the event loop (on_event_click), otherwise will be triggered a segmentation fault */
         if (o->metaObject()->className() == label_event.metaObject()->className()) {
             (qobject_cast<QLabelEvent*>(o))->setHidden(true);
+            (qobject_cast<QLabelEvent*>(o))->setParent(NULL); //Detach from parent QFrame
             (qobject_cast<QLabelEvent*>(o))->deleteLater();
         }
         else if (o->metaObject()->className() == button.metaObject()->className()) delete o;
