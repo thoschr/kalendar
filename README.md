@@ -19,6 +19,8 @@ TODO:
 
 ### Screencast
 
+Screencast from Kalendar-alpha-1.3-x86\_64
+
 ![screencast](https://raw.githubusercontent.com/echo-devim/kalendar/master/screencast.gif)
 
 ### Motivations
