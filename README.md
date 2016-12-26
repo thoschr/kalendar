@@ -6,12 +6,16 @@ Kalendar is a Gregorian calendar application written in C++ with the QT library 
 
 The project was inspired by gnome-calendar, but I'm writing it from scratch.
 
+FEATURES:
+* Manage your events
+* Manage your TODOs
+* Notify future events
+
 TODO:
-* [x] \(_partial_\) iCal format support - **work in progress**
-* [ ] External plugins support
-* [x] Notification system
-* [ ] Year view for long-term events
-* [ ] Meteo plugin
+* Better iCal format support
+* External plugins support
+* Year view for long-term events
+* Meteo plugin
 
 ### Screencast
 
