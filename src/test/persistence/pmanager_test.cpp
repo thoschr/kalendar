@@ -257,9 +257,9 @@ void PManagerTest::test_load_db() {
         ret = ret && this->valid_event->equals(**it); // *it has type Event*
         delete *it;
     } else ret = false;
-    ASSERT (ret)
     pm.remove_all();
     remove("testdb.kal");
+    ASSERT (ret)
 }
 
 void PManagerTest::test_save_db() {
@@ -281,10 +281,10 @@ void PManagerTest::test_save_db() {
     ret = ret && ((line == insert_event) || (line == insert_category));
     getline (file,line);
     ret = ret && (line == "");
-    ASSERT (ret)
     file.close();
     pm.remove_all();
     remove("testdb.kal");
+    ASSERT (ret)
 }
 
 void PManagerTest::test_import_db_iCal_format() {
@@ -296,16 +296,18 @@ void PManagerTest::test_import_db_iCal_format() {
     ret = !ret && !pm.import_db_iCal_format("notexists",this->valid_default_category->getId());
     file.open("temp.ics");
     file << "BEGIN:VEVENT" << endl << "UID:0" << endl << "DTSTART;VALUE=DATE:20161231" << endl << "DTEND;VALUE=DATE:20170101" << endl << "SUMMARY:test" << endl << "END:VEVENT" << endl;
+    file << "BEGIN:VEVENT" << endl << "UID:1" << endl << "DTSTART;VALUE=DATE:20130512" << endl << "DTEND;VALUE=DATE:20130513" << endl << "SUMMARY:test2" << endl << "END:VEVENT" << endl;
     file.close();
     ret = ret && pm.import_db_iCal_format("temp.ics",this->valid_default_category->getId());
     list<Event*> events = pm.get_all_events();
-    if (events.size() == 1) {
+    if (events.size() == 2) {
        list<Event*>::iterator it = events.begin();
-       ret = ret && ((**it).getName().compare("test") == 0); // *it has type Event*
+       ret = ret && ((**it).getName().compare("test2") == 0); // *it has type Event*
        ret = ret && ((**it).getCategory()->getId() == 1);
        ret = ret && ((**it).getStart() == (**it).getEnd());
        delete *it;
     } else ret = false;
+    pm.remove_all();
+    remove("temp.ics");
     ASSERT (ret)
-    remove("test");
 }

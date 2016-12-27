@@ -413,12 +413,16 @@ int PManager::import_db_iCal_format(string path, unsigned int category_id) {
 
     file.open(path);
     while ( getline (file,line) ) {
+        location = "";
+        description = "";
+
         pattern = "DTSTART;VALUE=DATE:";
         if (line.find(pattern) == 0) { //if line starts with the pattern
             string date = line.substr(pattern.length(),line.length()-pattern.length());
             start.tm_year = stoi(date.substr(0,4)) - 1900;
             start.tm_mon = stoi(date.substr(4,2)) - 1;
             start.tm_mday = stoi(date.substr(6,2));
+            start.tm_hour = 8;
             start.tm_isdst = ((start.tm_mon > 2) && (start.tm_mon < 10+s));
             continue;
         }
@@ -428,6 +432,7 @@ int PManager::import_db_iCal_format(string path, unsigned int category_id) {
             end.tm_year = stoi(date.substr(0,4)) - 1900;
             end.tm_mon = stoi(date.substr(4,2)) - 1;
             end.tm_mday = stoi(date.substr(6,2)) - 1; /* -1 is to get the day before, mktime will normalize it */
+            end.tm_hour = 22;
             end.tm_isdst = ((end.tm_mon > 2) && (end.tm_mon < 10+s));
             continue;
         }

@@ -239,19 +239,22 @@ void MonthView::import_events() {
         unsigned int category_id = dialog->getSelectedCategory();
         if (category_id > 0) {
             QMessageBox::information(this, "Please wait", "Importing events may requires some minutes", QMessageBox::Ok);
-            //TODO: show progress bar
-            /*QVBoxLayout *main_layout = new QVBoxLayout;
+            QVBoxLayout *main_layout = new QVBoxLayout;
             QProgressBar* bar = new QProgressBar();
             bar->setRange(0,0);
             main_layout->addWidget(bar);
             CustomDialog *custom_dialog = new CustomDialog(main_layout);
             custom_dialog->setFixedWidth(500);
             custom_dialog->setWindowTitle("Importing events...");
+            custom_dialog->setModal(true);
             custom_dialog->show();
-            */
-            int result = this->pm->import_db_iCal_format(path.toStdString(),category_id);
+            QFuture<int> ret =  QtConcurrent::run([this,path,category_id] { return this->pm->import_db_iCal_format(path.toStdString(),category_id); });
+            while (!ret.isFinished()) {
+                QCoreApplication::processEvents();
+            }
+            int result = ret.result();
             refresh_events();
-            //custom_dialog->close();
+            custom_dialog->close();
             QMessageBox::information(this, "Success", "Imported " + QString::number(result) + " events", QMessageBox::Ok);
         }
     }

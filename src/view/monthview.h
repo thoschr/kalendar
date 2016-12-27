@@ -7,6 +7,7 @@
 #include <QListIterator>
 #include <QColor>
 #include <QProgressBar>
+#include <QtConcurrent/QtConcurrent>
 #include <QPushButton>
 #include <QHBoxLayout>
 #include <QVBoxLayout>

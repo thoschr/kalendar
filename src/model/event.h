@@ -55,6 +55,7 @@ public:
         if (this->category != NULL) delete this->category;
     }
 
+    //TODO: remove this function, use the constructor
     void copy(Event* e) {
         this->id = e->getId();
         this->name = e->getName();
