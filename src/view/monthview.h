@@ -6,6 +6,7 @@
 #include <QLabel>
 #include <QListIterator>
 #include <QColor>
+#include <QProgressBar>
 #include <QPushButton>
 #include <QHBoxLayout>
 #include <QVBoxLayout>

@@ -295,7 +295,7 @@ void PManagerTest::test_import_db_iCal_format() {
     ret = pm.import_db_iCal_format("",this->valid_default_category->getId());
     ret = !ret && !pm.import_db_iCal_format("notexists",this->valid_default_category->getId());
     file.open("temp.ics");
-    file << "BEGIN:VEVENT" << endl << "UID:0" << endl << "DTSTART;VALUE=DATE:20170117" << endl << "DTEND;VALUE=DATE:20170118" << endl << "SUMMARY:test" << endl << "END:VEVENT" << endl;
+    file << "BEGIN:VEVENT" << endl << "UID:0" << endl << "DTSTART;VALUE=DATE:20161231" << endl << "DTEND;VALUE=DATE:20170101" << endl << "SUMMARY:test" << endl << "END:VEVENT" << endl;
     file.close();
     ret = ret && pm.import_db_iCal_format("temp.ics",this->valid_default_category->getId());
     list<Event*> events = pm.get_all_events();
@@ -303,6 +303,7 @@ void PManagerTest::test_import_db_iCal_format() {
        list<Event*>::iterator it = events.begin();
        ret = ret && ((**it).getName().compare("test") == 0); // *it has type Event*
        ret = ret && ((**it).getCategory()->getId() == 1);
+       ret = ret && ((**it).getStart() == (**it).getEnd());
        delete *it;
     } else ret = false;
     ASSERT (ret)

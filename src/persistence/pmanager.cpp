@@ -398,6 +398,8 @@ int PManager::import_db_iCal_format(string path, unsigned int category_id) {
     string line;
     string pattern;
     string summary;
+    string location("");
+    string description("");
     int counter = 0;
     struct tm start;
     start.tm_sec = start.tm_min = start.tm_hour = start.tm_wday = start.tm_yday = start.tm_year = start.tm_mday = start.tm_mon = 0;
@@ -418,28 +420,40 @@ int PManager::import_db_iCal_format(string path, unsigned int category_id) {
             start.tm_mon = stoi(date.substr(4,2)) - 1;
             start.tm_mday = stoi(date.substr(6,2));
             start.tm_isdst = ((start.tm_mon > 2) && (start.tm_mon < 10+s));
-        } else {
-            pattern = "DTEND;VALUE=DATE:";
-            if (line.find(pattern) == 0) {
-                string date = line.substr(pattern.length(),line.length()-pattern.length());
-                end.tm_year = stoi(date.substr(0,4)) - 1900;
-                end.tm_mon = stoi(date.substr(4,2)) - 1;
-                end.tm_mday = stoi(date.substr(6,2));
-                end.tm_isdst = ((end.tm_mon > 2) && (end.tm_mon < 10+s));
-            } else {
-                pattern = "SUMMARY:";
-                if (line.find(pattern) == 0) {
-                    summary = line.substr(pattern.length(),line.length()-pattern.length());
-                } else {
-                    pattern = "END:VEVENT";
-                    if (line.find(pattern) == 0) {
-                        if (this->add_event(new Event(0,summary,string(""),string(""),this->get_category(category_id),mktime(&start),mktime(&end))))
-                            counter++;
-                        else
-                            printf("Error: %s not imported\n", summary.c_str());
-                    }
-                }
-            }
+            continue;
+        }
+        pattern = "DTEND;VALUE=DATE:";
+        if (line.find(pattern) == 0) {
+            string date = line.substr(pattern.length(),line.length()-pattern.length());
+            end.tm_year = stoi(date.substr(0,4)) - 1900;
+            end.tm_mon = stoi(date.substr(4,2)) - 1;
+            end.tm_mday = stoi(date.substr(6,2)) - 1; /* -1 is to get the day before, mktime will normalize it */
+            end.tm_isdst = ((end.tm_mon > 2) && (end.tm_mon < 10+s));
+            continue;
+        }
+        pattern = "SUMMARY:";
+        if (line.find(pattern) == 0) {
+            summary = line.substr(pattern.length(),line.length()-pattern.length());
+            continue;
+        }
+        pattern = "LOCATION:";
+        if (line.find(pattern) == 0) {
+            location = line.substr(pattern.length(),line.length()-pattern.length());
+            if (location.length() < 3) location = "";
+            continue;
+        }
+        pattern = "DESCRIPTION:";
+        if (line.find(pattern) == 0) {
+            description = line.substr(pattern.length(),line.length()-pattern.length());
+            if (description.length() < 3) description = "";
+            continue;
+        }
+        pattern = "END:VEVENT";
+        if (line.find(pattern) == 0) {
+            if (this->add_event(new Event(0,summary,description,location,this->get_category(category_id),mktime(&start),mktime(&end))))
+                counter++;
+            else
+                printf("Error: %s not imported\n", summary.c_str());
         }
     }
     file.close();
