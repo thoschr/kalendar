@@ -55,6 +55,7 @@ void PManagerTest::test_all() {
     test_load_db();
     test_save_db();
     test_import_db_iCal_format();
+    test_export_db_iCal_format();
 }
 
 void PManagerTest::test_remove_all() {
@@ -307,6 +308,50 @@ void PManagerTest::test_import_db_iCal_format() {
        ret = ret && ((**it).getStart() == (**it).getEnd());
        delete *it;
     } else ret = false;
+    pm.remove_all();
+    remove("temp.ics");
+    ASSERT (ret)
+}
+
+void PManagerTest::test_export_db_iCal_format() {
+    Test::print("test_export_db_iCal_format ");
+    string line;
+    PManager pm;
+    pm.add_event(this->valid_event);
+    ifstream file;
+    bool ret;
+    ret = pm.export_db_iCal_format(pm.get_all_events(),"");
+    ret = !ret && pm.export_db_iCal_format(pm.get_all_events(),"temp.ics");
+    file.open("temp.ics");
+    int linenumber = 0;
+    while ( getline (file,line,'\n') ) {
+
+        if (linenumber == 0) {
+            ret = ret && (line == "BEGIN:VCALENDAR");
+            linenumber++;
+            continue;
+        }
+        if (linenumber == 3) {
+            char buff[9];
+            time_t start = this->valid_event->getStart();
+            strftime(buff, sizeof(buff),"%Y%m%d",localtime((const time_t*)&start));
+            ret = ret && (line == string("DTSTART;VALUE=DATE:") + string(buff));
+            linenumber++;
+            continue;
+        }
+        if (linenumber == 5) {
+            ret = ret && (line == string("UID:") + to_string(this->valid_event->getId()));
+            linenumber++;
+            continue;
+        }
+        if (linenumber == 8) {
+            ret = ret && (line == string("SUMMARY:") + this->valid_event->getName());
+            linenumber++;
+            continue;
+        }
+        linenumber++;
+    }
+    file.close();
     pm.remove_all();
     remove("temp.ics");
     ASSERT (ret)

@@ -43,7 +43,7 @@ public:
     bool remove_past_events(time_t timestamp);
     list<Event*> get_all_events();
     int save_db(string path);
-    int export_db_iCal_format(string path);
+    int export_db_iCal_format(list<Event *> events, string path);
     int load_db(string path);
     int import_db_iCal_format(string path,unsigned int category_id);
 };

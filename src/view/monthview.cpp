@@ -187,6 +187,9 @@ void MonthView::createMenu() {
     QAction *importAct = new QAction(tr("&Import events"), this);
     importAct->setStatusTip(tr("Import events in iCal format"));
     connect(importAct, &QAction::triggered, this, &MonthView::import_events);
+    QAction *exportAct = new QAction(tr("&Export events"), this);
+    exportAct->setStatusTip(tr("Export events in iCal format"));
+    connect(exportAct, &QAction::triggered, this, &MonthView::export_events);
     QAction *addEventAct = new QAction(tr("&Add new event"), this);
     addEventAct->setStatusTip(tr("Show a dialog to add a new event"));
     connect(addEventAct, &QAction::triggered, this, &MonthView::add_event);
@@ -201,6 +204,7 @@ void MonthView::createMenu() {
     fileMenu->addAction(loadAct);
     fileMenu->addAction(saveAct);
     fileMenu->addAction(importAct);
+    fileMenu->addAction(exportAct);
     QMenu *editMenu;
     editMenu = menuBar()->addMenu(tr("&Edit"));
     editMenu->addAction(addEventAct);
@@ -228,6 +232,17 @@ void MonthView::save_events() {
     QString path = QFileDialog::getSaveFileName(this, "Save events and categories", QDir::homePath(), "Kalendar Files (*.kal)");
     int result = this->pm->save_db(path.toStdString());
     QMessageBox::information(this, "Success", "Saved " + QString::number(result) + " events/categories", QMessageBox::Ok);
+}
+
+void MonthView::export_events() {
+    QString path = QFileDialog::getSaveFileName(this, "Export events to other calendars", QDir::homePath(), "iCal Files (*.ics)");
+    if (path.length() > 0) {
+        QMessageBox::information(this, "Please wait", "Exporting events may requires some minutes", QMessageBox::Ok);
+        list<Event*> events = this->pm->get_all_events();
+        int result = this->pm->export_db_iCal_format(events,path.toStdString());
+        for (Event *event : events) delete event;
+        QMessageBox::information(this, "Success", "Exported " + QString::number(result) + " events", QMessageBox::Ok);
+    }
 }
 
 void MonthView::import_events() {

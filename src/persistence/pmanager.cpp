@@ -398,8 +398,8 @@ int PManager::import_db_iCal_format(string path, unsigned int category_id) {
     string line;
     string pattern;
     string summary;
-    string location("");
-    string description("");
+    string location;
+    string description;
     int counter = 0;
     struct tm start;
     start.tm_sec = start.tm_min = start.tm_hour = start.tm_wday = start.tm_yday = start.tm_year = start.tm_mday = start.tm_mon = 0;
@@ -463,4 +463,34 @@ int PManager::import_db_iCal_format(string path, unsigned int category_id) {
     }
     file.close();
     return counter;
+}
+
+int PManager::export_db_iCal_format(list<Event*> events, string path) {
+    if (path.length() < 5) return 0;
+    if (path.substr(path.length()-4, 4) != ".ics") path = path + ".ics";
+    char buff[9];
+    ofstream file;
+    file.open(path);
+    file << "BEGIN:VCALENDAR" << endl;
+    file << "CALSCALE:GREGORIAN" << endl;
+    for (Event *event : events) {
+        file << "BEGIN:VEVENT" << endl;
+        time_t tmp = event->getStart();
+        strftime(buff, sizeof(buff),"%Y%m%d",localtime((const time_t*)&tmp));
+        file << "DTSTART;VALUE=DATE:" << buff << endl;
+        tmp = event->getEnd();
+        struct tm *end = localtime((const time_t*)&tmp);
+        end->tm_mday += 1;
+        tmp = mktime(end);
+        strftime(buff, sizeof(buff),"%Y%m%d",localtime((const time_t*)&tmp));
+        file << "DTEND;VALUE=DATE:" << buff << endl;
+        file << "UID:" << to_string(event->getId()) << endl;
+        file << "DESCRIPTION:" << event->getDescription() << endl;
+        file << "LOCATION:" << event->getPlace() << endl;
+        file << "SUMMARY:" << event->getName() << endl;
+        file << "END:VEVENT" << endl;
+    }
+    file << "END:VCALENDAR" << endl;
+    file.close();
+    return events.size();
 }
