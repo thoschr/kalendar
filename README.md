@@ -17,6 +17,8 @@ TODO:
 * Year view for long-term events
 * Meteo plugin
 
+*Warning:* This application isn't compatible with 32 bit systems (see: [year 2038 problem] (https://en.wikipedia.org/wiki/Year_2038_problem))
+
 ### Screencast
 
 Screencast from Kalendar-alpha-1.3-x86\_64
