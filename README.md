@@ -10,9 +10,9 @@ FEATURES:
 * Manage your events
 * Manage your TODOs
 * Notify future events
+* iCal format support
 
 TODO:
-* Better iCal format support
 * External plugins support
 * Year view for long-term events
 * Meteo plugin
