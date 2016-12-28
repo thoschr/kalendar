@@ -42,7 +42,7 @@ EventDialog::EventDialog(View *parentView, Date start_date, Date end_date, QWidg
     this->setModal(true);
     this->setWindowTitle("Event Manager");
 
-    this->pm = new PManager;
+    this->pm = new SecurePManager;
     this->event = NULL;
 
     QVBoxLayout *main_layout = new QVBoxLayout;

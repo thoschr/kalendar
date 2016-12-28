@@ -75,7 +75,7 @@ MonthView::MonthView(QWidget *parent) :
     ui(new Ui::MonthView)
 {
     Date current_date = DateUtil::get_current_date();
-    this->pm = new PManager;
+    this->pm = new SecurePManager;
     this->selection_start = NULL;
     this->selection_end = NULL;
     this->layout = new QVBoxLayout;

@@ -17,7 +17,7 @@
 #include <QIcon>
 #include "util/dateutil.h"
 #include "view.h"
-#include "persistence/pmanager.h"
+#include "persistence/securepmanager.h"
 
 namespace Ui {
 class EventDialog;
