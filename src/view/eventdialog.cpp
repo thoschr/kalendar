@@ -4,7 +4,8 @@
 #include <QDebug>
 
 void EventDialog::setEvent(Event *event) {
-    this->cbrecurrent->setEnabled(false); /* Not supported for now */
+    this->everyMonth->setEnabled(false); /* Not supported for now */
+    this->everyYear->setEnabled(false);
     this->event = event;
     if (event != NULL) {
         this->edit_name->setText(event->getName().c_str());
@@ -103,11 +104,14 @@ EventDialog::EventDialog(View *parentView, Date start_date, Date end_date, QWidg
     main_layout->addLayout(sixth_row);
     QHBoxLayout *seventh_row = new QHBoxLayout;
     QLabel *label_recurrent = new QLabel("Recurrent: ");
-    this->cbrecurrent = new QCheckBox;
-    this->cbrecurrent->setToolTip("Check this to make the event recurrent");
+    this->everyMonth = new QRadioButton("Monthly");
+    this->everyYear = new QRadioButton("Yearly");
+    QGroupBox *options = new QGroupBox;
     seventh_row->addWidget(label_recurrent);
-    seventh_row->addWidget(this->cbrecurrent);
-    main_layout->addLayout(seventh_row);
+    seventh_row->addWidget(this->everyMonth);
+    seventh_row->addWidget(this->everyYear);
+    options->setLayout(seventh_row);
+    main_layout->addWidget(options);
     QHBoxLayout *last_row = new QHBoxLayout;
     QPushButton *button_cancel = new QPushButton("Cancel");
     connect(button_cancel, &QPushButton::clicked, this, &EventDialog::on_button_cancel_click);
@@ -184,15 +188,22 @@ void EventDialog::on_button_save_click() {
     if ((this->event != NULL) && (this->pm->replace_event(this->event, newEvent))) {
         refresh();
         this->event = new Event(*newEvent);
-    } else if ((this->event == NULL) && (this->cbrecurrent->isChecked())) {
+    } else if ((this->event == NULL) && (this->everyMonth->isChecked() || this->everyYear->isChecked())) {
         int reply = QMessageBox::warning(this, "Attention", "A recurrent event is considered as multiple independent events, after this operation you can delete or modify it only as a single event.", QMessageBox::Yes | QMessageBox::No);
         if (reply == QMessageBox::Yes) {
             /* Add the same event to the next 5 years */
-            for (int i = 0; ret && (i < 12*5); i++) {
+            int offset = 1;
+            if (this->everyMonth->isChecked()) offset = 12;
+            for (int i = 0; ret && (i < offset*5); i++) {
                 ret = ret && this->pm->add_event(newEvent);
                 delete newEvent;
-                start = start.addMonths(1);
-                end = end.addMonths(1);
+                if (this->everyMonth->isChecked()) {
+                    start = start.addMonths(1);
+                    end = end.addMonths(1);
+                } else {
+                    start = start.addYears(1);
+                    end = end.addYears(1);
+                }
                 newEvent = new Event(0, this->edit_name->text().toStdString(), this->edit_description->toPlainText().toStdString(), this->edit_place->text().toStdString(), category, start.toTime_t(), end.toTime_t());
             }
             delete newEvent;

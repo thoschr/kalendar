@@ -10,6 +10,8 @@
 #include <QPlainTextEdit>
 #include <QDateTimeEdit>
 #include <QCheckBox>
+#include <QRadioButton>
+#include <QGroupBox>
 #include <QComboBox>
 #include <QMessageBox>
 #include <QIconEngine>
@@ -37,7 +39,8 @@ private:
     QPlainTextEdit *edit_description;
     QPushButton *button_delete;
     QCheckBox *cbtodo;
-    QCheckBox *cbrecurrent;
+    QRadioButton *everyMonth;
+    QRadioButton *everyYear;
     View *parent;
     PManager *pm;
     Event *event;
