@@ -47,6 +47,7 @@ public:
     explicit EventDialog(View *parentView, Date start_date = Date(), Date end_date = Date(), QWidget *parent = 0);
     ~EventDialog();
     void setEvent(Event *event);
+    Event* getEvent();
 
 public slots:
     void on_button_cancel_click();

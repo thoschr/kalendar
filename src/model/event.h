@@ -5,7 +5,7 @@
 
 #include "category.h"
 
-/* A todo is defined as an event with a special dates, they are the following:
+/* A todo is defined as an event with special dates, they are the following:
  * start = end = 29/01/2105 09:40 , the UTC timestamp is: 4262665200
  * Note: this value is incompatible for 32bit systems due to the 2038 year bug (Reference: https://en.wikipedia.org/wiki/Year_2038_problem)
  * The todo is only an high-level concept managed by the view logic, thus the persistence part consider them as normal events. */
@@ -40,7 +40,7 @@ public:
         this->name = name;
         this->description = description;
         this->place = place;
-        this->category = category;
+        this->category = new Category(*category);
         this->start = start;
         this->end = end;
         if (id == 0)
@@ -53,17 +53,6 @@ public:
 
     ~Event() {
         if (this->category != NULL) delete this->category;
-    }
-
-    //TODO: remove this function, use the constructor
-    void copy(Event* e) {
-        this->id = e->getId();
-        this->name = e->getName();
-        this->description = e->getDescription();
-        this->place = e->getPlace();
-        this->category = e->getCategory();
-        this->start = e->getStart();
-        this->end = e->getEnd();
     }
 
     void setInvalid() {

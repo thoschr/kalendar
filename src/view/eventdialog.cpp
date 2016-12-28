@@ -172,7 +172,7 @@ void EventDialog::on_button_save_click() {
     /* If the users has changed an existent event, I'll call the right function */
     if ((this->event != NULL) && (this->pm->replace_event(this->event, newEvent))) {
         refresh();
-        this->event->copy(newEvent);
+        this->event = new Event(*newEvent);
     } else if ((this->event == NULL) && (this->pm->add_event(newEvent))) { //else I'll create a new Event
         refresh();
     } else {
@@ -184,4 +184,8 @@ void EventDialog::on_button_save_click() {
 void EventDialog::on_checkbox_todo_toggle(bool checked) {
     this->edit_start->setEnabled(!checked);
     this->edit_end->setEnabled(!checked);
+}
+
+Event* EventDialog::getEvent() {
+    return this->event;
 }

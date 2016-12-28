@@ -524,6 +524,10 @@ void MonthView::on_event_click(QLabelEvent *label_event, Qt::MouseButton button)
         EventDialog *eventDialog = new EventDialog(this);
         eventDialog->setEvent(label_event->getEvent());
         eventDialog->exec();
-        label_event->drawUI(); //Maybe the event has changed, reload the label
+        //if the event has changed, we'll update the label
+        if (!eventDialog->getEvent()->equals(*label_event->getEvent())) {
+            label_event->setEvent(eventDialog->getEvent()); /* Automatically free the old event */
+            label_event->drawUI();
+        }
     }
 }
