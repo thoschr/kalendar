@@ -386,11 +386,12 @@ void MonthView::refresh_todos() {
 }
 
 void MonthView::refresh_events() {
+    //TODO: Add to the gui the option to show the events filtered by category
     display_events(CURRENT_MONTH);
     refresh_todos();
 }
 
-void MonthView::display_events(Date date) {
+void MonthView::display_events(Date date, Category *category) {
     list<Event*> event_list = this->pm->get_events_of_month(date.getMonth(), date.getYear());
     int start_offset;
 
@@ -404,6 +405,8 @@ void MonthView::display_events(Date date) {
     }
     //Add events to the gui
     for (Event *event : event_list) {
+        if ((category != NULL) && (!event->getCategory()->equals(*category)))
+            continue; //Don't add this event to the view
         Date start = DateUtil::date_from_timestamp(event->getStart());
         Date end = DateUtil::date_from_timestamp(event->getEnd());
         if (((start.getMonth() < date.getMonth()) && (start.getYear() == date.getYear())) || (start.getYear() < date.getYear()))
@@ -484,10 +487,6 @@ QLabelEvent* MonthView::createLabelEvent(Event *event) {
     label_event->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
     connect(label_event, &QLabelEvent::clicked, this, &MonthView::on_event_click);
     return label_event;
-}
-
-void MonthView::display_events(Date date, Category category) {
-    //TODO: implement me
 }
 
 void MonthView::remove_events_from_all_frames() {

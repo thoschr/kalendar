@@ -77,8 +77,7 @@ public:
     explicit MonthView(QWidget *parent = 0);
     void refresh_events();
     void refresh_todos();
-    void display_events(Date date);
-    void display_events(Date date, Category category);
+    void display_events(Date date, Category *category = NULL);
     ~MonthView();
 
 public slots:
