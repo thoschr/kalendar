@@ -191,10 +191,9 @@ void EventDialog::on_button_save_click() {
     } else if ((this->event == NULL) && (this->everyMonth->isChecked() || this->everyYear->isChecked())) {
         int reply = QMessageBox::warning(this, "Attention", "A recurrent event is considered as multiple independent events, after this operation you can delete or modify it only as a single event.", QMessageBox::Yes | QMessageBox::No);
         if (reply == QMessageBox::Yes) {
-            /* Add the same event to the next 5 years */
-            int offset = 1;
-            if (this->everyMonth->isChecked()) offset = 12;
-            for (int i = 0; ret && (i < offset*5); i++) {
+            int offset = 3; /* Add the same event to the next 9 years */
+            if (this->everyMonth->isChecked()) offset = 12; /* Add the same event to every month of the next 3 years */
+            for (int i = 0; ret && (i < offset*3); i++) {
                 ret = ret && this->pm->add_event(newEvent);
                 delete newEvent;
                 if (this->everyMonth->isChecked()) {
