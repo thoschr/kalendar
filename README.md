@@ -17,6 +17,7 @@ TODO:
 * Year view for long-term events
 * Meteo plugin
 * Add an encryption layer
+* Improve support for recurrent events
 
 *Warning:* This application isn't compatible with 32 bit systems (see: [year 2038 problem] (https://en.wikipedia.org/wiki/Year_2038_problem))
 

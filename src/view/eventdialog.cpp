@@ -4,6 +4,7 @@
 #include <QDebug>
 
 void EventDialog::setEvent(Event *event) {
+    this->cbrecurrent->setEnabled(false); /* Not supported for now */
     this->event = event;
     if (event != NULL) {
         this->edit_name->setText(event->getName().c_str());
@@ -100,6 +101,13 @@ EventDialog::EventDialog(View *parentView, Date start_date, Date end_date, QWidg
     sixth_row->addWidget(label_end);
     sixth_row->addWidget(this->edit_end);
     main_layout->addLayout(sixth_row);
+    QHBoxLayout *seventh_row = new QHBoxLayout;
+    QLabel *label_recurrent = new QLabel("Recurrent: ");
+    this->cbrecurrent = new QCheckBox;
+    this->cbrecurrent->setToolTip("Check this to make the event recurrent");
+    seventh_row->addWidget(label_recurrent);
+    seventh_row->addWidget(this->cbrecurrent);
+    main_layout->addLayout(seventh_row);
     QHBoxLayout *last_row = new QHBoxLayout;
     QPushButton *button_cancel = new QPushButton("Cancel");
     connect(button_cancel, &QPushButton::clicked, this, &EventDialog::on_button_cancel_click);
@@ -141,6 +149,7 @@ void EventDialog::refresh() {
 }
 
 void EventDialog::on_button_save_click() {
+    bool ret = true;
     bool isTodo = !this->edit_start->isEnabled();
 
     if (this->edit_name->text().length() < 3) {
@@ -167,17 +176,36 @@ void EventDialog::on_button_save_click() {
         }
     }
 
-    Event *newEvent = new Event(0, this->edit_name->text().toStdString(), this->edit_description->toPlainText().toStdString(), this->edit_place->text().toStdString(), category, this->edit_start->dateTime().toTime_t(), this->edit_end->dateTime().toTime_t());
+    QDateTime start = this->edit_start->dateTime();
+    QDateTime end = this->edit_end->dateTime();
+    Event *newEvent = new Event(0, this->edit_name->text().toStdString(), this->edit_description->toPlainText().toStdString(), this->edit_place->text().toStdString(), category, start.toTime_t(), end.toTime_t());
 
     /* If the users has changed an existent event, I'll call the right function */
     if ((this->event != NULL) && (this->pm->replace_event(this->event, newEvent))) {
         refresh();
         this->event = new Event(*newEvent);
+    } else if ((this->event == NULL) && (this->cbrecurrent->isChecked())) {
+        int reply = QMessageBox::warning(this, "Attention", "A recurrent event is considered as multiple independent events, after this operation you can delete or modify it only as a single event.", QMessageBox::Yes | QMessageBox::No);
+        if (reply == QMessageBox::Yes) {
+            /* Add the same event to the next 5 years */
+            for (int i = 0; ret && (i < 12*5); i++) {
+                ret = ret && this->pm->add_event(newEvent);
+                delete newEvent;
+                start = start.addMonths(1);
+                end = end.addMonths(1);
+                newEvent = new Event(0, this->edit_name->text().toStdString(), this->edit_description->toPlainText().toStdString(), this->edit_place->text().toStdString(), category, start.toTime_t(), end.toTime_t());
+            }
+            delete newEvent;
+            refresh();
+        }
     } else if ((this->event == NULL) && (this->pm->add_event(newEvent))) { //else I'll create a new Event
+        delete newEvent;
         refresh();
-    } else {
+    } else
+        ret = false;
+
+    if (!ret)
         QMessageBox::critical(this, "Error", "Persistence error. Try with a different name.", QMessageBox::Ok);
-    }
 
 }
 

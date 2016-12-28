@@ -37,6 +37,7 @@ private:
     QPlainTextEdit *edit_description;
     QPushButton *button_delete;
     QCheckBox *cbtodo;
+    QCheckBox *cbrecurrent;
     View *parent;
     PManager *pm;
     Event *event;
