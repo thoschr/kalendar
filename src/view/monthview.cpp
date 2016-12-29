@@ -405,6 +405,7 @@ void MonthView::display_events(Date date, Category *category) {
     }
     //Add events to the gui
     for (Event *event : event_list) {
+        /* TODO: maybe it's better to move this filter at low level, i.e. in the persistence class */
         if ((category != NULL) && (!event->getCategory()->equals(*category)))
             continue; //Don't add this event to the view
         Date start = DateUtil::date_from_timestamp(event->getStart());
