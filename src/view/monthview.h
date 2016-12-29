@@ -90,6 +90,7 @@ public slots:
     void on_todo_button_click();
 
 private slots:
+    void exit();
     void save_events();
     void load_events();
     void import_events();

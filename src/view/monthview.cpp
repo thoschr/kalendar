@@ -187,9 +187,12 @@ void MonthView::createMenu() {
     QAction *importAct = new QAction(tr("&Import events"), this);
     importAct->setStatusTip(tr("Import events in iCal format"));
     connect(importAct, &QAction::triggered, this, &MonthView::import_events);
-    QAction *exportAct = new QAction(tr("&Export events"), this);
+    QAction *exportAct = new QAction(tr("E&xport events"), this);
     exportAct->setStatusTip(tr("Export events in iCal format"));
     connect(exportAct, &QAction::triggered, this, &MonthView::export_events);
+    QAction *exitAct = new QAction(tr("&Exit"), this);
+    exitAct->setStatusTip(tr("Exit from the application"));
+    connect(exitAct, &QAction::triggered, this, &MonthView::exit);
     QAction *addEventAct = new QAction(tr("&Add new event"), this);
     addEventAct->setStatusTip(tr("Show a dialog to add a new event"));
     connect(addEventAct, &QAction::triggered, this, &MonthView::add_event);
@@ -205,6 +208,7 @@ void MonthView::createMenu() {
     fileMenu->addAction(saveAct);
     fileMenu->addAction(importAct);
     fileMenu->addAction(exportAct);
+    fileMenu->addAction(exitAct);
     QMenu *editMenu;
     editMenu = menuBar()->addMenu(tr("&Edit"));
     editMenu->addAction(addEventAct);
@@ -219,6 +223,10 @@ void MonthView::contextMenuEvent(QContextMenuEvent *event)
 {
     QMenu menu(this);
     menu.exec(event->globalPos());
+}
+
+void MonthView::exit() {
+    QApplication::quit();
 }
 
 void MonthView::load_events() {
