@@ -199,6 +199,9 @@ void MonthView::createMenu() {
     QAction *editCategoriesAct = new QAction(tr("Edit &Categories"), this);
     editCategoriesAct->setStatusTip(tr("Show a dialog to edit the categories"));
     connect(editCategoriesAct, &QAction::triggered, this, &MonthView::edit_categories);
+    QAction *deleteAllAct = new QAction(tr("&Delete all"), this);
+    deleteAllAct->setStatusTip(tr("Delete all the events and categories"));
+    connect(deleteAllAct, &QAction::triggered, this, &MonthView::delete_all);
     QAction *showAgendaAct = new QAction(tr("Show &Agenda"), this);
     showAgendaAct->setStatusTip(tr("Show a dialog with all the events"));
     connect(showAgendaAct, &QAction::triggered, this, &MonthView::show_agenda);
@@ -208,11 +211,13 @@ void MonthView::createMenu() {
     fileMenu->addAction(saveAct);
     fileMenu->addAction(importAct);
     fileMenu->addAction(exportAct);
+    fileMenu->addSeparator();
     fileMenu->addAction(exitAct);
     QMenu *editMenu;
     editMenu = menuBar()->addMenu(tr("&Edit"));
     editMenu->addAction(addEventAct);
     editMenu->addAction(editCategoriesAct);
+    editMenu->addAction(deleteAllAct);
     QMenu *viewsMenu;
     viewsMenu = menuBar()->addMenu(tr("&Views"));
     viewsMenu->addAction(showAgendaAct);
@@ -227,6 +232,17 @@ void MonthView::contextMenuEvent(QContextMenuEvent *event)
 
 void MonthView::exit() {
     QApplication::quit();
+}
+
+void MonthView::delete_all() {
+    int ret = QMessageBox::question(this, "Confirm", "Do you really want to delete all the events and categories?", QMessageBox::Yes | QMessageBox::No);
+    if (ret == QMessageBox::Yes) {
+        this->pm->remove_all();
+        delete this->pm;
+        this->pm = new SecurePManager;
+        refresh_events();
+        refresh_todos();
+    }
 }
 
 void MonthView::load_events() {
