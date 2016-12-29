@@ -8,6 +8,7 @@
 #include <QLabel>
 #include <QLineEdit>
 #include <QPlainTextEdit>
+#include <QProgressBar>
 #include <QDateTimeEdit>
 #include <QCheckBox>
 #include <QRadioButton>

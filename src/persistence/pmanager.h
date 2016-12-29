@@ -15,7 +15,7 @@
 #include "../model/category.h"
 
 #define FOLDER_NAME "kalendar"
-#define DATABASE_NAME "revents.sql"
+#define DATABASE_NAME "events.sql"
 
 using namespace std;
 

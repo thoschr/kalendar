@@ -103,7 +103,7 @@ EventDialog::EventDialog(View *parentView, Date start_date, Date end_date, QWidg
     sixth_row->addWidget(this->edit_end);
     main_layout->addLayout(sixth_row);
     QHBoxLayout *seventh_row = new QHBoxLayout;
-    QLabel *label_recurrent = new QLabel("Recurrent: ");
+    QLabel *label_recurrent = new QLabel("Recurrence: ");
     this->everyMonth = new QRadioButton("Monthly");
     this->everyYear = new QRadioButton("Yearly");
     QGroupBox *options = new QGroupBox;
@@ -153,6 +153,7 @@ void EventDialog::refresh() {
 }
 
 void EventDialog::on_button_save_click() {
+    QProgressBar *bar = new QProgressBar;
     bool ret = true;
     bool isTodo = !this->edit_start->isEnabled();
 
@@ -191,11 +192,14 @@ void EventDialog::on_button_save_click() {
     } else if ((this->event == NULL) && (this->everyMonth->isChecked() || this->everyYear->isChecked())) {
         int reply = QMessageBox::warning(this, "Attention", "A recurrent event is considered as multiple independent events, after this operation you can delete or modify it only as a single event.", QMessageBox::Yes | QMessageBox::No);
         if (reply == QMessageBox::Yes) {
-            int offset = 3; /* Add the same event to the next 9 years */
-            if (this->everyMonth->isChecked()) offset = 12; /* Add the same event to every month of the next 3 years */
-            for (int i = 0; ret && (i < offset*3); i++) {
+            int offset = 8; /* Add the same event to the next 8 years */
+            if (this->everyMonth->isChecked()) offset = 24; /* Add the same event to every month of the next 2 years */
+            bar->setRange(0, offset);
+            this->layout()->addWidget(bar);
+            for (int i = 0; i < offset; i++) {
                 ret = ret && this->pm->add_event(newEvent);
                 delete newEvent;
+                if (!ret) break;
                 if (this->everyMonth->isChecked()) {
                     start = start.addMonths(1);
                     end = end.addMonths(1);
@@ -204,9 +208,13 @@ void EventDialog::on_button_save_click() {
                     end = end.addYears(1);
                 }
                 newEvent = new Event(0, this->edit_name->text().toStdString(), this->edit_description->toPlainText().toStdString(), this->edit_place->text().toStdString(), category, start.toTime_t(), end.toTime_t());
+                bar->setValue(i);
+                QCoreApplication::processEvents();
             }
-            delete newEvent;
-            refresh();
+            if (ret) {
+                delete newEvent;
+                refresh();
+            }
         }
     } else if ((this->event == NULL) && (this->pm->add_event(newEvent))) { //else I'll create a new Event
         delete newEvent;
@@ -214,9 +222,10 @@ void EventDialog::on_button_save_click() {
     } else
         ret = false;
 
-    if (!ret)
+    if (!ret) {
         QMessageBox::critical(this, "Error", "Persistence error. Try with a different name.", QMessageBox::Ok);
-
+        delete bar;
+    }
 }
 
 void EventDialog::on_checkbox_todo_toggle(bool checked) {
