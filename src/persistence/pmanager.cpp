@@ -48,7 +48,7 @@ PManager::~PManager() {
 
 string PManager::filterSpecialChars(string str) {
     int start_pos = 0;
-    string to = "\\'";
+    string to = "’";
     while((str.find('\'', start_pos)) != std::string::npos) {
         start_pos = str.find('\'', start_pos);
         str.replace(start_pos, 1, to);
