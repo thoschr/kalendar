@@ -90,6 +90,7 @@ EventDialog::EventDialog(View *parentView, Date start_date, Date end_date, QWidg
     this->edit_start->setDateTime(QDateTime(QDate(start_date.getYear(), start_date.getMonth(), start_date.getMonthDay())));
     //I set a specific hour because the default is the midnight, but this could lead more easily problems caused by daylight saving time
     this->edit_start->setTime(QTime(8,0,0));
+    connect(this->edit_start, &QDateTimeEdit::dateChanged, this, &EventDialog::on_date_start_change);
     fifth_row->addWidget(label_start);
     fifth_row->addWidget(this->edit_start);
     main_layout->addLayout(fifth_row);
@@ -231,6 +232,11 @@ void EventDialog::on_button_save_click() {
 void EventDialog::on_checkbox_todo_toggle(bool checked) {
     this->edit_start->setEnabled(!checked);
     this->edit_end->setEnabled(!checked);
+}
+
+void EventDialog::on_date_start_change() {
+    if (this->edit_start->date() > this->edit_end->date())
+        this->edit_end->setDate(this->edit_start->date());
 }
 
 Event* EventDialog::getEvent() {

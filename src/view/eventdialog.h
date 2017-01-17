@@ -58,6 +58,7 @@ public slots:
     void on_button_cancel_click();
     void on_button_save_click();
     void on_button_delete_click();
+    void on_date_start_change();
     void on_checkbox_todo_toggle(bool checked);
 };
 
