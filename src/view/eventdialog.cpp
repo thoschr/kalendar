@@ -114,12 +114,12 @@ EventDialog::EventDialog(View *parentView, Date start_date, Date end_date, QWidg
     options->setLayout(seventh_row);
     main_layout->addWidget(options);
     QHBoxLayout *last_row = new QHBoxLayout;
-    QPushButton *button_cancel = new QPushButton("Cancel");
+    QPushButton *button_cancel = new QPushButton("&Cancel");
     connect(button_cancel, &QPushButton::clicked, this, &EventDialog::on_button_cancel_click);
-    button_delete = new QPushButton("Delete");
+    button_delete = new QPushButton("&Delete");
     button_delete->setEnabled(false);
     connect(button_delete, &QPushButton::clicked, this, &EventDialog::on_button_delete_click);
-    QPushButton *button_save = new QPushButton("Save");
+    QPushButton *button_save = new QPushButton("&Save");
     connect(button_save, &QPushButton::clicked, this, &EventDialog::on_button_save_click);
     last_row->addWidget(button_cancel);
     last_row->addWidget(button_delete);

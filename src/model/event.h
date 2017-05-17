@@ -40,7 +40,12 @@ public:
         this->name = name;
         this->description = description;
         this->place = place;
-        this->category = new Category(*category);
+        if (category == NULL) {
+            /* An event with a NULL category is inconsistent, it shouldn't exist */
+            this->category = NULL;
+            fprintf(stderr, "Event %d (%s) received NULL category.\n", id, name.c_str());
+        } else
+            this->category = new Category(*category);
         this->start = start;
         this->end = end;
         if (id == 0)

@@ -1,11 +1,16 @@
 #ifndef EVENTUTIL_H
 #define EVENTUTIL_H
 
+#include <string>
+#include "../model/event.h"
+#include "../persistence/securepmanager.h"
 
-class eventutil
+using namespace std;
+
+class EventUtil
 {
 public:
-    eventutil();
+    static Event *parseString(string str_event);
 };
 
 #endif // EVENTUTIL_H

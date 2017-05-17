@@ -28,7 +28,9 @@ SOURCES += main.cpp\
     view/categoryeditdialog.cpp \
     view/categoryselectdialog.cpp \
     util/linuxnotifymanager.cpp \
-    persistence/securepmanager.cpp
+    persistence/securepmanager.cpp \
+    util/eventutil.cpp \
+    test/util/eventutil_test.cpp
 
 HEADERS  += model/event.h \
     persistence/pmanager.h \
@@ -53,7 +55,9 @@ HEADERS  += model/event.h \
     view/categoryselectdialog.h \
     util/notifymanager.h \
     util/linuxnotifymanager.h \
-    persistence/securepmanager.h
+    persistence/securepmanager.h \
+    util/eventutil.h \
+    test/util/eventutil_test.h
 
 QMAKE_LIBS += -lsqlite3
 QMAKE_CXXFLAGS += -std=c++11

@@ -17,6 +17,9 @@ void Test::test_persistence() {
 }
 void Test::test_util() {
     print("\nStarting util tests\n");
-    DateUtilTest tut;
-    tut.test_all();
+    DateUtilTest dut;
+    dut.test_all();
+    printf("date util disabilitato\n");
+    EventUtilTest eut;
+    eut.test_all();
 }

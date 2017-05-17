@@ -9,7 +9,6 @@ class SecurePManager : public PManager
 {
 public:
     SecurePManager();
-    ~SecurePManager();
 };
 
 #endif // SECUREPMANAGER_H
