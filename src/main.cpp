@@ -20,6 +20,7 @@ int main(int argc, char *argv[])
     t.test_persistence();
     t.test_util();
     #else
+    bool cli = false;
     QCommandLineParser parser;
     parser.addHelpOption();
     parser.addOptions({
@@ -34,25 +35,26 @@ int main(int argc, char *argv[])
                 QCoreApplication::translate("main", "event")},
         });
     parser.process(a);
-    if (parser.isSet("add")) {
+    if (cli = parser.isSet("add")) {
         QString event = parser.value("add");
         SecurePManager spm;
         spm.add_event(EventUtil::parseString(event.toStdString()));
-    } else if(parser.isSet("delete")) {
+    } else if(cli = parser.isSet("delete")) {
         /* TODO: implement me */
         printf("Not implemented yet");
-    }
-    MonthView window;
-    QString notify =  parser.value("notify");
-    if (notify == "") {
-        window.show();
-        ret = a.exec();
-    } else { /* Show notifications about the events in the next days */
+    } else if (cli = parser.isSet("notify")) {
+        /* Show notifications about the events in the next days */
+        QString notify =  parser.value("notify");
         LinuxNotifyManager nm;
         if (!nm.notifyEvents(notify.toInt())) {
             printf("Error in notifyEvents");
             ret = 1;
         }
+    }
+    MonthView window;
+    if (!cli) {
+        window.show();
+        ret = a.exec();
     }
     #endif
     return ret;
