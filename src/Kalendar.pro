@@ -30,7 +30,8 @@ SOURCES += main.cpp\
     util/linuxnotifymanager.cpp \
     persistence/securepmanager.cpp \
     util/eventutil.cpp \
-    test/util/eventutil_test.cpp
+    test/util/eventutil_test.cpp \
+    util/pluginmanager.cpp
 
 HEADERS  += model/event.h \
     persistence/pmanager.h \
@@ -57,9 +58,12 @@ HEADERS  += model/event.h \
     util/linuxnotifymanager.h \
     persistence/securepmanager.h \
     util/eventutil.h \
-    test/util/eventutil_test.h
+    test/util/eventutil_test.h \
+    util/pluginmanager.h
 
 QMAKE_LIBS += -lsqlite3
+QMAKE_LIBS += -lstdc++fs
 QMAKE_CXXFLAGS += -std=c++11
+
 #For DEBUG purpose
 #QMAKE_CXXFLAGS += -g

@@ -74,6 +74,7 @@ MonthView::MonthView(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MonthView)
 {
+    this->plm = new PluginManager;
     Date current_date = DateUtil::get_current_date();
     this->pm = new SecurePManager;
     this->selection_start = NULL;
@@ -171,6 +172,8 @@ MonthView::MonthView(QWidget *parent) :
 
 MonthView::~MonthView()
 {
+    delete this->pm;
+    delete this->plm;
     delete ui;
     /* this->selection_start and this->selection_end are pointers to dates wrapped inside some QFrameExtended widgets. When
      * Qt frees QFrameExtended widgets they will free their dates.
@@ -222,6 +225,19 @@ void MonthView::createMenu() {
     viewsMenu = menuBar()->addMenu(tr("&Views"));
     viewsMenu->addAction(showAgendaAct);
     //TODO: Add the other future views (each view will be displayed in a different window)
+    QMenu *toolsMenu;
+    toolsMenu = menuBar()->addMenu(tr("&Tools"));
+    /* Dinamically generate the tools submenu */
+    for (string tool : this->plm->get_tools()) {
+        string text = tool.substr(0, tool.find('.'));
+        QAction *t = new QAction(tr(text.c_str()), this);
+        connect(t, &QAction::triggered, this, [this,tool]{ run_tool(tool); });
+        toolsMenu->addAction(t);
+    }
+}
+
+void MonthView::run_tool(string tool) {
+    this->plm->runTool(tool);
 }
 
 void MonthView::contextMenuEvent(QContextMenuEvent *event)

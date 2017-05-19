@@ -26,6 +26,7 @@
 #include "qpushbutton_extended.h"
 #include "customdialog.h"
 #include "categoryselectdialog.h"
+#include "util/pluginmanager.h"
 
 /* Gets the current month displayed using an hack. Infact, the cell in the middle will have always a value setted.
  * This should be used when you don't care about the day */
@@ -54,6 +55,7 @@ class MonthView : public QMainWindow, public View
     Q_OBJECT
 
 private:
+    PluginManager *plm;
     QVBoxLayout *layout;
     QLabel *label_date;
     QPushButton *todobutton;
@@ -69,6 +71,7 @@ private:
     QFrameExtended *createQFrameExtended(Date *date);
     void createMenu();
     void on_button_extended_click(int index);
+    void run_tool(string tool);
 
 protected:
     void contextMenuEvent(QContextMenuEvent *event) Q_DECL_OVERRIDE;
