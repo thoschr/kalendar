@@ -13,7 +13,15 @@ import java.util.Date;
 
 public class FBParser {
 	
-	private static FBEvent createEvent(String html) {
+	private String filterSpecialChars(String str) {
+		return str.replaceAll("&#039;", "'")
+					.replaceAll("&quot;", "\\\"")
+					.replaceAll("&#064;", "@")
+					.replaceAll("<br[^a-z]*>", "\r\n")
+					.replaceAll("(?s)<[^>]*>(\\s*<[^>]*>)*", " ");
+	}
+	
+	private FBEvent createEvent(String html) {
 		String title;
 		String description;
 		String place;
@@ -21,7 +29,7 @@ public class FBParser {
 		ZonedDateTime end = null;
 		
 		int pos = html.indexOf("pageTitle") + 11;
-		title = html.substring(pos, html.indexOf("</title", pos));
+		title = filterSpecialChars(html.substring(pos, html.indexOf("</title", pos)));
 		try {
 			pos = html.indexOf("timeRowTitle", pos) + 29;
 			start = ZonedDateTime.parse(html.substring(pos, html.indexOf(" to", pos)));
@@ -35,11 +43,7 @@ public class FBParser {
 		place = html.substring(pos, html.indexOf("</div", pos));
 		pos = html.indexOf("event-permalink-details", pos) + 25;
 		html = html.replace("<span class=\"text_exposed_hide\">...</span>", "");
-		String rawDescription = html.substring(pos, html.indexOf("</span", pos) - 2);
-		description = rawDescription.replaceAll("&#039;", "'")
-									.replaceAll("&#064;", "@")
-									.replaceAll("<br[^a-z]*>", "\n")
-									.replaceAll("(?s)<[^>]*>(\\s*<[^>]*>)*", " ");
+		description = filterSpecialChars(html.substring(pos, html.indexOf("</span", pos) - 2));
 		return new FBEvent(title, description, place, start, end);
 	}
 		
@@ -63,7 +67,7 @@ public class FBParser {
 				if (fbe == null)
 					return false;
 				else {
-					String[] command = new String[]{"kalendar", "-a", fbe.getTitle() + "##" + fbe.getDescription() + "##"
+					String[] command = new String[]{"kalendar", "-a", fbe.getTitle() + "##" + fbe.getDescription() + "\r\n\r\nLink: " + uri + "##"
 							+ fbe.getPlace() + "##facebook##" + fbe.getStart().toEpochSecond() + "##"
 							+ fbe.getEnd().toEpochSecond()};
 					String output = "";
