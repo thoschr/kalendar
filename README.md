@@ -51,6 +51,7 @@ cd /absolute/path/to/the/bin/directory/
 ./Kalendar-version "$@"
 ```
 Remember to give the right permissions with `# chmod +x /bin/kalendar`. To see the effects of the plugins you may need to restart the application or refresh the view.
+If you create a desktop file, you shall use `kalendar` for the **Exec** field.
 
 ### License
 GPLv3+
