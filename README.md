@@ -3,7 +3,7 @@
 ![project status](https://img.shields.io/badge/project%20status-active-brightgreen.svg)
 ![version] (https://img.shields.io/badge/version-stable-blue.svg)
 
-Kalendar is a Gregorian calendar application written in C++ with the QT library for the gui. This project **is not related** with KDE, but this desktop environment is the main target of this project. I'm trying to keep Kalendar as simple as possible and I want to avoid annoying dependencies (so you can easly install it everywhere).
+Kalendar is a cross-platform Gregorian calendar application written in C++ with the QT library for the gui. This project **is not related** with KDE, but this desktop environment is the main target of this project. I'm trying to keep Kalendar as simple as possible and I want to avoid annoying dependencies (so you can easly install it everywhere).
 
 The project was inspired by gnome-calendar, but I'm writing it from scratch.
 
@@ -16,7 +16,6 @@ FEATURES:
 TODO:
 * External plugins support
 * Year view for long-term events
-* Meteo plugin
 * Add an encryption layer
 * Improve support for recurrent events
 
@@ -41,6 +40,17 @@ After you've installed these packages, you can run `qmake` (or `qmake-qt5` in Fe
 You should get the Kalendar executable inside the same folder.
 
 Note: Kalendar will create the following folder: ~/kalendar, so remember to delete it if you decide to delete Kalendar.
+
+### Further Notes
+
+In the `tools` folder, you can put **sh** or **bat** scripts that will be integrated in the tools menu of the application. The plugins at the moment are only external tools. They require to run `kalendar` without the absolute path, so (on linux) you should create the script `/bin/kalendar` with the following content:
+
+```
+#! /bin/bash
+cd /absolute/path/to/the/bin/directory/
+./Kalendar-version "$@"
+```
+Remember to give the right permissions with `# chmod +x /bin/kalendar`. To see the effects of the plugins you may need to restart the application or refresh the view.
 
 ### License
 GPLv3+
