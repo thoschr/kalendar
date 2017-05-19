@@ -87,8 +87,11 @@ void CategoryEditDialog::on_button_delete_click() {
 }
 
 void CategoryEditDialog::on_button_color_click() {
-    this->selected_color = QColorDialog::getColor(QColor(DEFAULT_COLOR));
-    QPixmap pixmap(ICON_SIZE, ICON_SIZE);
-    pixmap.fill(QColor(this->selected_color));
-    button_color->setIcon(QIcon(pixmap));
+    QColor color = QColorDialog::getColor(QColor(this->selected_color));
+    if (color.isValid()) {
+        this->selected_color = color;
+        QPixmap pixmap(ICON_SIZE, ICON_SIZE);
+        pixmap.fill(QColor(this->selected_color));
+        button_color->setIcon(QIcon(pixmap));
+    }
 }
