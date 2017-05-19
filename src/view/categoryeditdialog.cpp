@@ -27,8 +27,8 @@ CategoryEditDialog::CategoryEditDialog(CategoryDialog *parentDialog, QWidget *pa
     hl->addWidget(edit_name);
     hl->addWidget(button_color);
     connect(button_color, &QPushButton::clicked, this, &CategoryEditDialog::on_button_color_click);
-    QPushButton *button_save = new QPushButton("Save");
-    QPushButton *button_delete = new QPushButton("Delete");
+    QPushButton *button_save = new QPushButton("&Save");
+    QPushButton *button_delete = new QPushButton("&Delete");
     connect(button_delete, &QPushButton::clicked, this, &CategoryEditDialog::on_button_delete_click);
     connect(button_save, &QPushButton::clicked, this, &CategoryEditDialog::on_button_save_click);
     hl2->addWidget(button_save);
