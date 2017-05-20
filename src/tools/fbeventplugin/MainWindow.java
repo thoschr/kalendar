@@ -73,7 +73,6 @@ public class MainWindow extends JFrame {
 				    	JOptionPane.showMessageDialog(null, "The link isn't correct. Please insert the full link.", "Error", JOptionPane.ERROR_MESSAGE);
 				    } else {
 				    	FBParser fbp = new FBParser();
-				    	if (fbeventlink.charAt(fbeventlink.length()-1) == '/') fbeventlink = fbeventlink.substring(0, fbeventlink.length()-1);
 				    	if (!fbp.addEvent(fbeventlink))
 				    		JOptionPane.showMessageDialog(null, "Ops, something has gone wrong. Is the link correct?", "Error", JOptionPane.ERROR_MESSAGE);
 				    	else
