@@ -34,6 +34,8 @@ public:
     bool remove_event(Event *e);
     bool remove_all();
     list<Event*> get_events_of_month(int month, int year);
+    list<Event*> get_events(Category *c);
+    list<Event*> get_all_events();
     bool add_category (Category *c);
     /* Note: the id will not be changed (to avoid to change the events with a reference to the category */
     bool replace_category(Category *old_category, Category *new_category);
@@ -41,10 +43,10 @@ public:
     vector<Category*> get_categories();
     Category *get_category(unsigned int id);
     bool remove_past_events(time_t timestamp);
-    list<Event*> get_all_events();
     int save_db(string path);
     int export_db_iCal_format(list<Event *> events, string path);
     int load_db(string path);
+    //TODO: change uint category_id to Category *object
     int import_db_iCal_format(string path,unsigned int category_id);
 };
 

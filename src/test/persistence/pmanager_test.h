@@ -11,6 +11,7 @@ class PManagerTest
 private:
     Event *valid_event;
     Event *valid_event_2;
+    Event *valid_event_3;
     Event *noname_event;
     Event *specialchars_event;
     Event *invalid_time_event;
@@ -35,6 +36,7 @@ public:
     void test_remove_all();
     void test_get_category();
     void test_edit_event();
+    void test_get_events();
     void test_get_all_events();
     void test_remove_past_events();
     void test_edit_category();

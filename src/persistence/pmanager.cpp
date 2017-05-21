@@ -139,7 +139,37 @@ bool PManager::replace_category(Category *old_category, Category *new_category) 
     return true;
 }
 
-std::list<Event*> PManager::get_events_of_month(int month, int year) {
+list<Event*> PManager::get_events(Category *c) {
+    if (c == NULL) return this->get_all_events();
+    list<Event*> result;
+    sqlite3_stmt *res;
+    int rc = sqlite3_prepare_v2(this->db, "SELECT * FROM Events WHERE category = ?;", -1, &res, NULL);
+    if (rc != SQLITE_OK) {
+        fprintf(stderr, "Failed to fetch data: %s\n", sqlite3_errmsg(db));
+        return result;
+    }
+    sqlite3_bind_int64(res, 1, (long)c->getId());
+    while (rc = sqlite3_step(res) == SQLITE_ROW) {
+        unsigned long id = (unsigned long)sqlite3_column_int(res, 0);
+        string name((const char*)sqlite3_column_text(res, 1));
+        string description((const char*)sqlite3_column_text(res, 2));
+        string place((const char*)sqlite3_column_text(res, 3));
+        Category *category = this->get_category((unsigned long)sqlite3_column_int64(res, 4));
+        if (category == NULL) {
+            fprintf(stderr, "Error: Received NULL category\n");
+            continue;
+        }
+        time_t start = (unsigned long)sqlite3_column_int64(res, 5);
+        time_t end = (unsigned long)sqlite3_column_int64(res, 6);
+        Event *e = new Event(id, name, description, place, category, start, end);
+
+        result.push_front(e);
+    }
+    sqlite3_finalize(res);
+    return result;
+}
+
+list<Event*> PManager::get_events_of_month(int month, int year) {
     list<Event*> result;
 
     /* A large number of countries use daylight saving time (DST) (called also summer time).

@@ -14,8 +14,9 @@ PManagerTest::PManagerTest()
     this->noname_category = new Category(0, string(""), test);
     this->specialchars_category = new Category(0, specialchars, specialchars);
     /* Events */
-    this->valid_event = new Event(0, test, test, test, new Category(1, test, test), timestamp, timestamp + 100);
-    this->valid_event_2 = new Event(100, test, test, test, new Category(1, test, test), timestamp - 500, timestamp + 1000000); //starts from current month, ends the next month
+    this->valid_event = new Event(0, test, test, test, this->valid_default_category, timestamp, timestamp + 100);
+    this->valid_event_2 = new Event(100, test, test, test, this->valid_default_category, timestamp - 500, timestamp + 1000000); //starts from current month, ends the next month
+    this->valid_event_3 = new Event(80, test, test, test, this->valid_category_2, timestamp - 500, timestamp + 1000000);
     /* Invalid Events */
     this->event_with_null_category = new Event(0, test, test, test, NULL, timestamp, timestamp);
     this->event_with_invalid_category = new Event(0, test, test, test, new Category(99, test, test), timestamp, timestamp);
@@ -27,6 +28,7 @@ PManagerTest::PManagerTest()
 PManagerTest::~PManagerTest() {
     delete this->valid_event;
     delete this->valid_event_2;
+    delete this->valid_event_3;
     delete this->noname_event;
     delete this->invalid_time_event;
     delete this->noname_category;
@@ -50,6 +52,7 @@ void PManagerTest::test_all() {
     test_get_category();
     test_edit_event();
     test_get_all_events();
+    test_get_events();
     test_remove_past_events();
     test_edit_category();
     test_load_db();
@@ -211,6 +214,29 @@ void PManagerTest::test_get_all_events() {
     pm.remove_all();
 }
 
+void PManagerTest::test_get_events() {
+    Test::print("test_get_events ");
+    bool ret = false;
+    PManager pm;
+    pm.add_event(this->valid_event);
+    pm.add_category(this->valid_category_2);
+    pm.add_event(this->valid_event_3);
+    list<Event*> events_cat1 = pm.get_events(this->valid_default_category);
+    ret = (events_cat1.size() == 1);
+    list<Event*>::iterator it1 = events_cat1.begin();
+    ret = ret && this->valid_event->equals(**it1);
+    delete *it1;
+    list<Event*> events_cat2 = pm.get_events(this->valid_category_2);
+    ret = ret && (events_cat2.size() == 1);
+    list<Event*>::iterator it2 = events_cat2.begin();
+    ret = ret && this->valid_event_3->equals(**it2);
+    delete *it2;
+    list<Event*> events = pm.get_events(NULL);
+    ret = ret && (events.size() == 2);
+    ASSERT (ret)
+    pm.remove_all();
+}
+
 void PManagerTest::test_remove_past_events() {
     Test::print("test_remove_past_events ");
     bool ret;
@@ -302,11 +328,12 @@ void PManagerTest::test_import_db_iCal_format() {
     ret = ret && pm.import_db_iCal_format("temp.ics",this->valid_default_category->getId());
     list<Event*> events = pm.get_all_events();
     if (events.size() == 2) {
-       list<Event*>::iterator it = events.begin();
-       ret = ret && ((**it).getName().compare("test2") == 0); // *it has type Event*
-       ret = ret && ((**it).getCategory()->getId() == 1);
-       ret = ret && ((**it).getStart() == (**it).getEnd());
-       delete *it;
+        list<Event*>::iterator it = events.begin();
+        ret = ret && ((**it).getName() == "test2");
+        ret = ret && ((**it).getCategory()->getId() == this->valid_default_category->getId());
+        //TODO: fix the following test
+        ret = ret && ((**it).getStart() < (**it).getEnd());
+        delete *it;
     } else ret = false;
     pm.remove_all();
     remove("temp.ics");
