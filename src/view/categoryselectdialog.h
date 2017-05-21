@@ -26,13 +26,13 @@ private:
     vector<Category*> category_list;
     PManager *pm;
     View *parent;
-    unsigned int selected_category;
+    Category *selected_category;
 
 public:
-    explicit CategorySelectDialog(View *parentView, QWidget *parent = 0);
+    explicit CategorySelectDialog(View *parentView, QString text, QWidget *parent = 0);
     ~CategorySelectDialog();
     void load_categories();
-    unsigned int getSelectedCategory();
+    Category *getSelectedCategory();
 
 public slots:
     void on_button_cancel_click();

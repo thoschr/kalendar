@@ -2,14 +2,14 @@
 
 #include <QDebug>
 
-CategorySelectDialog::CategorySelectDialog(View *parentView, QWidget *parent) :
+CategorySelectDialog::CategorySelectDialog(View *parentView, QString text, QWidget *parent) :
     QDialog(parent),
     ui(new Ui::CategorySelectDialog)
 {
     this->parent = parentView;
     this->setWindowTitle("Category Selector");
     this->pm = new PManager;
-    this->selected_category = 1;
+    this->selected_category = NULL;
     QHBoxLayout *button_layout = new QHBoxLayout;
     QVBoxLayout *main_layout = new QVBoxLayout;
     this->list_categories = new QComboBox;
@@ -20,7 +20,7 @@ CategorySelectDialog::CategorySelectDialog(View *parentView, QWidget *parent) :
     button_ok->setFixedWidth(50);
     connect(button_cancel, &QPushButton::clicked, this, &CategorySelectDialog::on_button_cancel_click);
     connect(button_ok, &QPushButton::clicked, this, &CategorySelectDialog::on_button_ok_click);
-    QLabel *message = new QLabel("Select a category for the imported events: ");
+    QLabel *message = new QLabel(text);
     main_layout->addWidget(message);
     main_layout->addWidget(this->list_categories);
     button_layout->addWidget(button_ok);
@@ -40,7 +40,7 @@ void CategorySelectDialog::load_categories() {
 }
 
 void CategorySelectDialog::on_button_cancel_click() {
-    this->selected_category = 0; /* Invalid category id */
+    this->selected_category = NULL;
     this->close();
     delete this;
 }
@@ -48,7 +48,7 @@ void CategorySelectDialog::on_button_cancel_click() {
 void CategorySelectDialog::on_button_ok_click() {
     for (Category *c : this->category_list) {
         if (this->list_categories->currentText().toStdString() == c->getName()) {
-            this->selected_category = c->getId();
+            this->selected_category = new Category(*c);
             break;
         }
     }
@@ -56,7 +56,7 @@ void CategorySelectDialog::on_button_ok_click() {
     delete this;
 }
 
-unsigned int CategorySelectDialog::getSelectedCategory() {
+Category* CategorySelectDialog::getSelectedCategory() {
     return this->selected_category;
 }
 

@@ -276,9 +276,18 @@ void MonthView::save_events() {
 
 void MonthView::export_events() {
     QString path = QFileDialog::getSaveFileName(this, "Export events to other calendars", QDir::homePath(), "iCal Files (*.ics)");
+    Category *c = NULL;
     if (path.length() > 0) {
+        QMessageBox::StandardButton reply;
+        reply = QMessageBox::question(this, "Export from single category", "Do you want export only the events belonging to a specific category?", QMessageBox::Yes|QMessageBox::No);
+        if (reply == QMessageBox::Yes) {
+            CategorySelectDialog *dialog = new CategorySelectDialog(this,"Select from which category export the events: ");
+            dialog->setModal(true);
+            dialog->exec(); //Blocking call
+            c = dialog->getSelectedCategory();
+        }
         QMessageBox::information(this, "Please wait", "Exporting events may requires some minutes", QMessageBox::Ok);
-        list<Event*> events = this->pm->get_all_events();
+        list<Event*> events = this->pm->get_events(c);
         int result = this->pm->export_db_iCal_format(events,path.toStdString());
         for (Event *event : events) delete event;
         QMessageBox::information(this, "Success", "Exported " + QString::number(result) + " events", QMessageBox::Ok);
@@ -288,11 +297,12 @@ void MonthView::export_events() {
 void MonthView::import_events() {
     QString path = QFileDialog::getOpenFileName(this, "Import events from other calendars", QDir::homePath(), "iCal Files (*.ics)");
     if (path.length() > 0) {
-        CategorySelectDialog *dialog = new CategorySelectDialog(this);
+        CategorySelectDialog *dialog = new CategorySelectDialog(this,"Select a category for the imported events: ");
         dialog->setModal(true);
         dialog->exec(); //Blocking call
-        unsigned int category_id = dialog->getSelectedCategory();
-        if (category_id > 0) {
+        if (dialog->getSelectedCategory() != NULL) {
+            unsigned int category_id = dialog->getSelectedCategory()->getId();
+            delete dialog->getSelectedCategory();
             QMessageBox::information(this, "Please wait", "Importing events may requires some minutes", QMessageBox::Ok);
             QVBoxLayout *main_layout = new QVBoxLayout;
             QProgressBar* bar = new QProgressBar();
