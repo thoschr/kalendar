@@ -191,15 +191,17 @@ void EventDialog::on_button_save_click() {
         refresh();
         this->event = new Event(*newEvent);
     } else if ((this->event == NULL) && (this->everyMonth->isChecked() || this->everyYear->isChecked())) {
-        int reply = QMessageBox::warning(this, "Attention", "A recurrent event is considered as multiple independent events, after this operation you can delete or modify it only as a single event.", QMessageBox::Yes | QMessageBox::No);
+        int reply = QMessageBox::warning(this, "Attention", "A recurrent event is considered as multiple independent events, after this operation you can modify it only as a single event.", QMessageBox::Yes | QMessageBox::No);
         if (reply == QMessageBox::Yes) {
             int offset = 8; /* Add the same event to the next 8 years */
             if (this->everyMonth->isChecked()) offset = 24; /* Add the same event to every month of the next 2 years */
             bar->setRange(0, offset);
             this->layout()->addWidget(bar);
+            Event *previous = NULL;
             for (int i = 0; i < offset; i++) {
-                ret = ret && this->pm->add_event(newEvent);
-                delete newEvent;
+                ret = ret && this->pm->add_event(newEvent, previous);
+                if (previous != NULL) delete previous;
+                previous = newEvent;
                 if (!ret) break;
                 if (this->everyMonth->isChecked()) {
                     start = start.addMonths(1);
@@ -212,6 +214,7 @@ void EventDialog::on_button_save_click() {
                 bar->setValue(i);
                 QCoreApplication::processEvents();
             }
+            delete previous;
             if (ret) {
                 delete newEvent;
                 refresh();

@@ -29,7 +29,7 @@ private:
 public:
     PManager();
     ~PManager();
-    bool add_event (Event *e);
+    bool add_event (Event *e, Event *child = NULL);
     bool replace_event (Event *old_event, Event *new_event); //return true also if old_event doesn't exist
     bool remove_event(Event *e);
     bool remove_all();

@@ -27,8 +27,9 @@ PManager::PManager()
     if (db_no_exists) {
         const char *sql = "CREATE TABLE Categories(id UNSIGNED INTEGER PRIMARY KEY, name TEXT, color TEXT);"
                           "CREATE TABLE Events(id UNSIGNED INTEGER PRIMARY KEY, name TEXT, description TEXT,"
-                          "place TEXT, category UNSIGNED INTEGER, start DATETIME, end DATETIME,"
-                          "FOREIGN KEY(category) REFERENCES Categories(id) ON DELETE RESTRICT);"
+                          "place TEXT, category UNSIGNED INTEGER, start DATETIME, end DATETIME, child UNSIGNED INTEGER,"
+                          "FOREIGN KEY(category) REFERENCES Categories(id) ON DELETE RESTRICT,"
+                          "FOREIGN KEY(child) REFERENCES Events(id) ON DELETE CASCADE);"
                           "INSERT INTO Categories VALUES(1, 'Default', '#1022A0');"
                           "PRAGMA foreign_keys = ON;";
 
@@ -57,12 +58,12 @@ string PManager::filterSpecialChars(string str) {
     return str;
 }
 
-bool PManager::add_event(Event *e) {
+bool PManager::add_event(Event *e, Event *child) {
     char *err_msg = 0;
     sqlite3_stmt *stmt;
     string filteredName, filteredDescription, filteredPlace;
     if ((e->getName().length() < 3) || (difftime(e->getStart(), e->getEnd()) > 0) || (e->getCategory() == NULL)) return false;
-    int rc = sqlite3_prepare_v2(this->db, "INSERT INTO Events VALUES(?, ?, ?, ?, ?, ?, ?);", -1, &stmt, NULL);
+    int rc = sqlite3_prepare_v2(this->db, "INSERT INTO Events VALUES(?, ?, ?, ?, ?, ?, ?, ?);", -1, &stmt, NULL);
     if (rc != SQLITE_OK ) {
         fprintf(stderr, "SQL error in prepare: %s\n", sqlite3_errmsg(this->db));
         sqlite3_free(err_msg);
@@ -79,6 +80,10 @@ bool PManager::add_event(Event *e) {
     sqlite3_bind_int64(stmt, 5, e->getCategory()->getId());
     sqlite3_bind_int64(stmt, 6, e->getStart());
     sqlite3_bind_int64(stmt, 7, e->getEnd());
+    if (child != NULL)
+        sqlite3_bind_int64(stmt, 8, child->getId());
+    else
+        sqlite3_bind_null(stmt, 8);
     //commit
     rc = sqlite3_step(stmt);
     if (rc != SQLITE_DONE ) {
