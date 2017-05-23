@@ -97,8 +97,8 @@ public slots:
 private slots:
     void exit();
     void delete_all();
-    void save_events();
-    void load_events();
+    void save_database();
+    void load_database();
     void import_events();
     void export_events();
     void add_event();

@@ -183,12 +183,12 @@ MonthView::~MonthView()
 }
 
 void MonthView::createMenu() {
-    QAction *loadAct = new QAction(tr("&Load events"), this);
-    loadAct->setStatusTip(tr("Load events in Kal format"));
-    connect(loadAct, &QAction::triggered, this, &MonthView::load_events);
-    QAction *saveAct = new QAction(tr("&Save events"), this);
-    saveAct->setStatusTip(tr("Save events in Kal format"));
-    connect(saveAct, &QAction::triggered, this, &MonthView::save_events);
+    QAction *loadAct = new QAction(tr("&Load database"), this);
+    loadAct->setStatusTip(tr("Load database in Kal format"));
+    connect(loadAct, &QAction::triggered, this, &MonthView::load_database);
+    QAction *saveAct = new QAction(tr("&Save database"), this);
+    saveAct->setStatusTip(tr("Save database in Kal format"));
+    connect(saveAct, &QAction::triggered, this, &MonthView::save_database);
     QAction *importAct = new QAction(tr("&Import events"), this);
     importAct->setStatusTip(tr("Import events in iCal format"));
     connect(importAct, &QAction::triggered, this, &MonthView::import_events);
@@ -275,7 +275,7 @@ void MonthView::delete_all() {
     }
 }
 
-void MonthView::load_events() {
+void MonthView::load_database() {
     QString path = QFileDialog::getOpenFileName(this, "Load events and categories", QDir::homePath(), "Kalendar Files (*.kal)");
     if (path != "") {
         CustomDialog *custom_dialog = this->show_progress_bar("Loading events and categories...");
@@ -290,7 +290,7 @@ void MonthView::load_events() {
     }
 }
 
-void MonthView::save_events() {
+void MonthView::save_database() {
     QString path = QFileDialog::getSaveFileName(this, "Save events and categories", QDir::homePath(), "Kalendar Files (*.kal)");
     if (path != "") {
         CustomDialog *custom_dialog = this->show_progress_bar("Saving events and categories...");
