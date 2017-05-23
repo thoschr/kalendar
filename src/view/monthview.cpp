@@ -330,6 +330,7 @@ CustomDialog* MonthView::show_progress_bar(QString title) {
     bar->setRange(0,0);
     main_layout->addWidget(bar);
     CustomDialog *custom_dialog = new CustomDialog(main_layout);
+    custom_dialog->setWindowFlags(Qt::Window | Qt::WindowTitleHint | Qt::CustomizeWindowHint);
     custom_dialog->setFixedWidth(500);
     custom_dialog->setWindowTitle(title);
     custom_dialog->setModal(true);
