@@ -55,6 +55,7 @@ class MonthView : public QMainWindow, public View
     Q_OBJECT
 
 private:
+    Category *selected_category;
     PluginManager *plm;
     QVBoxLayout *layout;
     QLabel *label_date;
@@ -102,6 +103,7 @@ private slots:
     void add_event();
     void edit_categories();
     void show_agenda(bool only_todos = false);
+    void filter_by_category();
 };
 
 #endif // MONTHVIEW_H

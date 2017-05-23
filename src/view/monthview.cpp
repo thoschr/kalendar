@@ -56,7 +56,7 @@ void MonthView::on_back_button_click() {
         newDate = DateUtil::decrease_month(CURRENT_MONTH);
     display_days(newDate);
     /* Reload events */
-    display_events(newDate);
+    display_events(newDate, this->selected_category);
 }
 
 void MonthView::on_next_button_click() {
@@ -67,13 +67,14 @@ void MonthView::on_next_button_click() {
         newDate = DateUtil::increase_month(CURRENT_MONTH);
     display_days(newDate);
     /* Reload events */
-    display_events(newDate);
+    display_events(newDate, this->selected_category);
 }
 
 MonthView::MonthView(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MonthView)
 {
+    this->selected_category = NULL;
     this->plm = new PluginManager;
     Date current_date = DateUtil::get_current_date();
     this->pm = new SecurePManager;
@@ -147,7 +148,7 @@ MonthView::MonthView(QWidget *parent) :
     display_days(current_date);
 
     //Load the events for the current month
-    display_events(current_date);
+    display_events(current_date, this->selected_category);
 
     grid_layout->setMargin(5);
     this->layout->addLayout(grid_layout);
@@ -172,6 +173,7 @@ MonthView::MonthView(QWidget *parent) :
 
 MonthView::~MonthView()
 {
+    delete this->selected_category;
     delete this->pm;
     delete this->plm;
     delete ui;
@@ -208,6 +210,9 @@ void MonthView::createMenu() {
     QAction *showAgendaAct = new QAction(tr("Show &Agenda"), this);
     showAgendaAct->setStatusTip(tr("Show a dialog with all the events"));
     connect(showAgendaAct, &QAction::triggered, this, &MonthView::show_agenda);
+    QAction *showOnlyAct = new QAction(tr("Show &only..."), this);
+    showOnlyAct->setStatusTip(tr("Show only events of a single category"));
+    connect(showOnlyAct, &QAction::triggered, this, &MonthView::filter_by_category);
     QMenu *fileMenu;
     fileMenu = menuBar()->addMenu(tr("&File"));
     fileMenu->addAction(loadAct);
@@ -221,6 +226,7 @@ void MonthView::createMenu() {
     editMenu->addAction(addEventAct);
     editMenu->addAction(editCategoriesAct);
     editMenu->addAction(deleteAllAct);
+    editMenu->addAction(showOnlyAct);
     QMenu *viewsMenu;
     viewsMenu = menuBar()->addMenu(tr("&Views"));
     viewsMenu->addAction(showAgendaAct);
@@ -248,6 +254,14 @@ void MonthView::contextMenuEvent(QContextMenuEvent *event)
 
 void MonthView::exit() {
     QApplication::quit();
+}
+
+void MonthView::filter_by_category() {
+    CategorySelectDialog *dialog = new CategorySelectDialog(this,"Show only events in this category: ");
+    dialog->setModal(true);
+    dialog->exec(); //Blocking call
+    this->selected_category = dialog->getSelectedCategory();
+    refresh_events();
 }
 
 void MonthView::delete_all() {
@@ -436,8 +450,7 @@ void MonthView::refresh_todos() {
 }
 
 void MonthView::refresh_events() {
-    //TODO: Add to the gui the option to show the events filtered by category
-    display_events(CURRENT_MONTH);
+    display_events(CURRENT_MONTH, this->selected_category);
     refresh_todos();
 }
 
