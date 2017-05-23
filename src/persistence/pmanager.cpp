@@ -374,10 +374,11 @@ int PManager::save_db(string path) {
     int counter = 0;
     ofstream file;
     file.open(path);
-    char sql[1024];
+    //TODO: An event with a description too long can exceed the buffer, use sqlite3_prepare_v2
+    char sql[4096];
     vector<Category*> categories_list = get_categories();
     for (Category *category : categories_list) {
-        snprintf(sql, 1024, "INSERT INTO Categories VALUES(%u, '%s', '%s');", category->getId(), category->getName().c_str(), category->getColor().c_str());
+        snprintf(sql, 4096, "INSERT INTO Categories VALUES(%u, '%s', '%s');", category->getId(), category->getName().c_str(), category->getColor().c_str());
         file << sql << endl;
         delete category;
         counter++;

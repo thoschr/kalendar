@@ -317,6 +317,7 @@ void MonthView::import_events() {
         if (dialog->getSelectedCategory() != NULL) {
             unsigned int category_id = dialog->getSelectedCategory()->getId();
             delete dialog->getSelectedCategory();
+            /* TODO: create a function to show the progress bar */
             QMessageBox::information(this, "Please wait", "Importing events may requires some minutes", QMessageBox::Ok);
             QVBoxLayout *main_layout = new QVBoxLayout;
             QProgressBar* bar = new QProgressBar();

@@ -51,6 +51,7 @@ EventDialog::EventDialog(View *parentView, Date start_date, Date end_date, QWidg
     QHBoxLayout *first_row = new QHBoxLayout;
     QLabel *label_name = new QLabel("Name: ");
     this->edit_name = new QLineEdit;
+    this->edit_name->setMaxLength(100);
     first_row->addWidget(label_name);
     first_row->addWidget(this->edit_name);
     main_layout->addLayout(first_row);
