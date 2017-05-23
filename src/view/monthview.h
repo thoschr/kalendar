@@ -73,6 +73,7 @@ private:
     void createMenu();
     void on_button_extended_click(int index);
     void run_tool(string tool);
+    CustomDialog *show_progress_bar(QString title);
 
 protected:
     void contextMenuEvent(QContextMenuEvent *event) Q_DECL_OVERRIDE;

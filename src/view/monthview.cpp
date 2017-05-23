@@ -277,21 +277,37 @@ void MonthView::delete_all() {
 
 void MonthView::load_events() {
     QString path = QFileDialog::getOpenFileName(this, "Load events and categories", QDir::homePath(), "Kalendar Files (*.kal)");
-    int result = this->pm->load_db(path.toStdString());
-    refresh_events();
-    QMessageBox::information(this, "Success", "Loaded " + QString::number(result) + " events/categories", QMessageBox::Ok);
+    if (path != "") {
+        CustomDialog *custom_dialog = this->show_progress_bar("Loading events and categories...");
+        QFuture<int> ret =  QtConcurrent::run([this,path] { return this->pm->load_db(path.toStdString()); });
+        while (!ret.isFinished()) {
+            QCoreApplication::processEvents();
+        }
+        int result = ret.result();
+        refresh_events();
+        custom_dialog->close();
+        QMessageBox::information(this, "Success", "Loaded " + QString::number(result) + " events/categories", QMessageBox::Ok);
+    }
 }
 
 void MonthView::save_events() {
     QString path = QFileDialog::getSaveFileName(this, "Save events and categories", QDir::homePath(), "Kalendar Files (*.kal)");
-    int result = this->pm->save_db(path.toStdString());
-    QMessageBox::information(this, "Success", "Saved " + QString::number(result) + " events/categories", QMessageBox::Ok);
+    if (path != "") {
+        CustomDialog *custom_dialog = this->show_progress_bar("Saving events and categories...");
+        QFuture<int> ret =  QtConcurrent::run([this,path] { return this->pm->save_db(path.toStdString()); });
+        while (!ret.isFinished()) {
+            QCoreApplication::processEvents();
+        }
+        int result = ret.result();
+        custom_dialog->close();
+        QMessageBox::information(this, "Success", "Saved " + QString::number(result) + " events/categories", QMessageBox::Ok);
+    }
 }
 
 void MonthView::export_events() {
     QString path = QFileDialog::getSaveFileName(this, "Export events to other calendars", QDir::homePath(), "iCal Files (*.ics)");
     Category *c = NULL;
-    if (path.length() > 0) {
+    if (path != "") {
         QMessageBox::StandardButton reply;
         reply = QMessageBox::question(this, "Export from single category", "Do you want export only the events belonging to a specific category?", QMessageBox::Yes|QMessageBox::No);
         if (reply == QMessageBox::Yes) {
@@ -308,9 +324,22 @@ void MonthView::export_events() {
     }
 }
 
+CustomDialog* MonthView::show_progress_bar(QString title) {
+    QVBoxLayout *main_layout = new QVBoxLayout;
+    QProgressBar* bar = new QProgressBar();
+    bar->setRange(0,0);
+    main_layout->addWidget(bar);
+    CustomDialog *custom_dialog = new CustomDialog(main_layout);
+    custom_dialog->setFixedWidth(500);
+    custom_dialog->setWindowTitle(title);
+    custom_dialog->setModal(true);
+    custom_dialog->show();
+    return custom_dialog;
+}
+
 void MonthView::import_events() {
     QString path = QFileDialog::getOpenFileName(this, "Import events from other calendars", QDir::homePath(), "iCal Files (*.ics)");
-    if (path.length() > 0) {
+    if (path != "") {
         CategorySelectDialog *dialog = new CategorySelectDialog(this,"Select a category for the imported events: ");
         dialog->setModal(true);
         dialog->exec(); //Blocking call
@@ -319,15 +348,7 @@ void MonthView::import_events() {
             delete dialog->getSelectedCategory();
             /* TODO: create a function to show the progress bar */
             QMessageBox::information(this, "Please wait", "Importing events may requires some minutes", QMessageBox::Ok);
-            QVBoxLayout *main_layout = new QVBoxLayout;
-            QProgressBar* bar = new QProgressBar();
-            bar->setRange(0,0);
-            main_layout->addWidget(bar);
-            CustomDialog *custom_dialog = new CustomDialog(main_layout);
-            custom_dialog->setFixedWidth(500);
-            custom_dialog->setWindowTitle("Importing events...");
-            custom_dialog->setModal(true);
-            custom_dialog->show();
+            CustomDialog *custom_dialog = this->show_progress_bar("Importing events...");
             QFuture<int> ret =  QtConcurrent::run([this,path,category_id] { return this->pm->import_db_iCal_format(path.toStdString(),category_id); });
             while (!ret.isFinished()) {
                 QCoreApplication::processEvents();
