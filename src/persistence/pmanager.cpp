@@ -436,6 +436,7 @@ int PManager::import_db_iCal_format(string path, unsigned int category_id) {
     string summary;
     string location;
     string description;
+    bool found_description = false;
     int counter = 0;
     struct tm start;
     start.tm_sec = start.tm_min = start.tm_hour = start.tm_wday = start.tm_yday = start.tm_year = start.tm_mday = start.tm_mon = 0;
@@ -449,11 +450,9 @@ int PManager::import_db_iCal_format(string path, unsigned int category_id) {
 
     file.open(path);
     while ( getline (file,line) ) {
-        location = "";
-        description = "";
-
         pattern = "DTSTART;VALUE=DATE:";
         if (line.find(pattern) == 0) { //if line starts with the pattern
+            found_description = false;
             string date = line.substr(pattern.length(),line.length()-pattern.length());
             start.tm_year = stoi(date.substr(0,4)) - 1900;
             start.tm_mon = stoi(date.substr(4,2)) - 1;
@@ -464,6 +463,7 @@ int PManager::import_db_iCal_format(string path, unsigned int category_id) {
         }
         pattern = "DTEND;VALUE=DATE:";
         if (line.find(pattern) == 0) {
+            found_description = false;
             string date = line.substr(pattern.length(),line.length()-pattern.length());
             end.tm_year = stoi(date.substr(0,4)) - 1900;
             end.tm_mon = stoi(date.substr(4,2)) - 1;
@@ -474,27 +474,38 @@ int PManager::import_db_iCal_format(string path, unsigned int category_id) {
         }
         pattern = "SUMMARY:";
         if (line.find(pattern) == 0) {
+            found_description = false;
             summary = line.substr(pattern.length(),line.length()-pattern.length());
             continue;
         }
         pattern = "LOCATION:";
         if (line.find(pattern) == 0) {
+            found_description = false;
             location = line.substr(pattern.length(),line.length()-pattern.length());
             if (location.length() < 3) location = "";
             continue;
         }
         pattern = "DESCRIPTION:";
         if (line.find(pattern) == 0) {
+            found_description = true;
             description = line.substr(pattern.length(),line.length()-pattern.length());
             if (description.length() < 3) description = "";
             continue;
         }
         pattern = "END:VEVENT";
         if (line.find(pattern) == 0) {
+            found_description = false;
             if (this->add_event(new Event(0,summary,description,location,this->get_category(category_id),mktime(&start),mktime(&end))))
                 counter++;
             else
                 printf("Error: %s not imported\n", summary.c_str());
+            /* Reset optional variables to import the next event without old values */
+            location = "";
+            description = "";
+            continue;
+        }
+        if (found_description) { /* Multi-line description */
+            description = description + "\n" + line;
         }
     }
     file.close();

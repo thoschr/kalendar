@@ -270,7 +270,7 @@ void PManagerTest::test_load_db() {
     ofstream file;
     file.open("testdb.kal");
     file << "INSERT INTO Categories VALUES(" << this->valid_category->getId() << ",'" << this->valid_category->getName() << "','" << this->valid_category->getColor() << "');" << endl;
-    file << "INSERT INTO Events VALUES(" << this->valid_event->getId() << ",'" << this->valid_event->getName() << "','" << this->valid_event->getDescription() << "','" << this->valid_event->getPlace() << "'," << this->valid_event->getCategory()->getId() << "," << this->valid_event->getStart() << "," << this->valid_event->getEnd() << ");" << endl;
+    file << "INSERT INTO Events VALUES(" << this->valid_event->getId() << ",'" << this->valid_event->getName() << "','" << this->valid_event->getDescription() << "','" << this->valid_event->getPlace() << "'," << this->valid_event->getCategory()->getId() << "," << this->valid_event->getStart() << "," << this->valid_event->getEnd() << ", NULL);" << endl;
     file.close();
     ret = pm.load_db("");
     ret = !ret && pm.load_db("notexist");
@@ -322,7 +322,7 @@ void PManagerTest::test_import_db_iCal_format() {
     ret = pm.import_db_iCal_format("",this->valid_default_category->getId());
     ret = !ret && !pm.import_db_iCal_format("notexists",this->valid_default_category->getId());
     file.open("temp.ics");
-    file << "BEGIN:VEVENT" << endl << "UID:0" << endl << "DTSTART;VALUE=DATE:20161231" << endl << "DTEND;VALUE=DATE:20170101" << endl << "SUMMARY:test" << endl << "END:VEVENT" << endl;
+    file << "BEGIN:VEVENT" << endl << "UID:0" << endl << "DTSTART;VALUE=DATE:20161231" << endl << "DTEND;VALUE=DATE:20170101" << endl << "SUMMARY:test" << endl << "DESCRIPTION:multi\nline\ndescription" << endl << "END:VEVENT" << endl;
     file << "BEGIN:VEVENT" << endl << "UID:1" << endl << "DTSTART;VALUE=DATE:20130512" << endl << "DTEND;VALUE=DATE:20130513" << endl << "SUMMARY:test2" << endl << "END:VEVENT" << endl;
     file.close();
     ret = ret && pm.import_db_iCal_format("temp.ics",this->valid_default_category->getId());
@@ -331,7 +331,7 @@ void PManagerTest::test_import_db_iCal_format() {
         list<Event*>::iterator it = events.begin();
         ret = ret && ((**it).getName() == "test2");
         ret = ret && ((**it).getCategory()->getId() == this->valid_default_category->getId());
-        //TODO: fix the following test
+        //TODO: checks if the following test is correct
         ret = ret && ((**it).getStart() < (**it).getEnd());
         delete *it;
     } else ret = false;
