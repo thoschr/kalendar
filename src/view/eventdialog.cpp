@@ -108,7 +108,7 @@ EventDialog::EventDialog(View *parentView, Date start_date, Date end_date, QWidg
     QLabel *label_recurrent = new QLabel("Recurrence: ");
     this->everyMonth = new QRadioButton("Monthly");
     this->everyYear = new QRadioButton("Yearly");
-    QGroupBox *options = new QGroupBox;
+    this->options = new QGroupBox;
     seventh_row->addWidget(label_recurrent);
     seventh_row->addWidget(this->everyMonth);
     seventh_row->addWidget(this->everyYear);
@@ -236,6 +236,7 @@ void EventDialog::on_button_save_click() {
 void EventDialog::on_checkbox_todo_toggle(bool checked) {
     this->edit_start->setEnabled(!checked);
     this->edit_end->setEnabled(!checked);
+    this->options->setEnabled(!checked);
 }
 
 void EventDialog::on_date_start_change() {
