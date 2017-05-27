@@ -35,14 +35,14 @@ int main(int argc, char *argv[])
                 QCoreApplication::translate("main", "event")},
         });
     parser.process(a);
-    if (cli = parser.isSet("add")) {
+    if ((cli = parser.isSet("add"))) {
         QString event = parser.value("add");
         SecurePManager spm;
         spm.add_event(EventUtil::parseString(event.toStdString()));
-    } else if(cli = parser.isSet("delete")) {
+    } else if((cli = parser.isSet("delete"))) {
         /* TODO: implement me */
         printf("Not implemented yet");
-    } else if (cli = parser.isSet("notify")) {
+    } else if ((cli = parser.isSet("notify"))) {
         /* Show notifications about the events in the next days */
         QString notify =  parser.value("notify");
         LinuxNotifyManager nm;
