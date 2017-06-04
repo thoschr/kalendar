@@ -44,7 +44,8 @@
                    "QLabel#today { background-color: #FFFF88; color: #FF0000; border: 1px solid #FF0000;}" \
                    "QFrame#selected { background-color: #EEEEFF; }" \
                    "QLabel#header { font-weight: bold; }" \
-                   "QFrame#header { background-color: #DDDDFF; }"
+                   "QFrame#header { background-color: #DDDDFF; }" \
+                   "QFrame#disabled { background-color: #EEEEEE; }"
 
 namespace Ui {
     class MonthView;

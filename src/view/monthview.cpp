@@ -458,7 +458,12 @@ void MonthView::display_days(Date date) {
             if ((x == current_date.getMonthDay()) && (date.getMonth() == current_date.getMonth()) && (date.getYear() == current_date.getYear()))
                 day->setObjectName("today");
             this->frames[i]->layout()->addWidget(day);
+            // mark the cell as enabled
+            this->frames[i]->setObjectName("enabled");
             x++;
+        } else {
+            // mark the cell as disabled
+            this->frames[i]->setObjectName("disabled");
         }
         //Refresh the css rules
         this->frames[i]->setStyleSheet(CELL_STYLE);
