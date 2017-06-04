@@ -452,8 +452,8 @@ void MonthView::display_days(Date date) {
             (i % 7 >= start_wday-1)) && //if I'm in the first week and I'm in the right days
             (x <= tot_days)) { //and I'm not out of bound
             this->frames[i]->setDate(new Date(x, (start_wday + (x-1)) % 7, date.getMonth(), date.getYear()));
-            //I'll insert into the label the number of the day
-            day->setText(QString::number(x));
+            //I'll insert into the label the zero-padded number of the day
+            day->setText(QString("%1").arg(x, 2, 10, QChar('0')));
             //Checks current day
             if ((x == current_date.getMonthDay()) && (date.getMonth() == current_date.getMonth()) && (date.getYear() == current_date.getYear()))
                 day->setObjectName("today");
