@@ -56,6 +56,7 @@ void MonthView::on_back_button_click() {
         newDate = DateUtil::decrease_month(CURRENT_MONTH);
     display_days(newDate);
     /* Reload events */
+    this->selected_event = NULL;
     display_events(newDate, this->selected_category);
 }
 
@@ -67,6 +68,7 @@ void MonthView::on_next_button_click() {
         newDate = DateUtil::increase_month(CURRENT_MONTH);
     display_days(newDate);
     /* Reload events */
+    this->selected_event = NULL;
     display_events(newDate, this->selected_category);
 }
 
@@ -74,6 +76,7 @@ MonthView::MonthView(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MonthView)
 {
+    this->selected_event = NULL;
     this->selected_category = NULL;
     this->plm = new PluginManager;
     Date current_date = DateUtil::get_current_date();
@@ -452,7 +455,7 @@ void MonthView::display_days(Date date) {
             (i % 7 >= start_wday-1)) && //if I'm in the first week and I'm in the right days
             (x <= tot_days)) { //and I'm not out of bound
             this->frames[i]->setDate(new Date(x, (start_wday + (x-1)) % 7, date.getMonth(), date.getYear()));
-            //I'll insert into the label the zero-padded number of the day
+            //insert into the label the zero-padded number of the day
             day->setText(QString("%1").arg(x, 2, 10, QChar('0')));
             //Checks current day
             if ((x == current_date.getMonthDay()) && (date.getMonth() == current_date.getMonth()) && (date.getYear() == current_date.getYear()))
@@ -485,6 +488,11 @@ void MonthView::refresh_events() {
 void MonthView::display_events(Date date, Category *category) {
     list<Event*> event_list = this->pm->get_events_of_month(date.getMonth(), date.getYear());
     int start_offset;
+    Event *selected_event = NULL;
+    //Check if there was a selected event
+    if (this->selected_event != NULL) {
+        selected_event = this->selected_event->getEvent();
+    }
 
     //Remove all displayed events
     remove_events_from_all_frames();
@@ -508,6 +516,11 @@ void MonthView::display_events(Date date, Category *category) {
 
         for (int i = start_offset+start.getMonthDay()-1; i < (start_offset+end.getMonthDay()); i++) {
             QLabelEvent *label_event = createLabelEvent(event);
+            /* Check if the event should be selected */
+            if ((selected_event != NULL) && (selected_event->getName() == event->getName())) {
+                label_event->markSelection(true);
+                this->selected_event = label_event;
+            }
             if (this->frames[i]->children().size() == 5) {
                 QPushButtonExtended *button_show_all = new QPushButtonExtended("Show All");
                 button_show_all->setIndex(i);
@@ -520,6 +533,8 @@ void MonthView::display_events(Date date, Category *category) {
         }
         delete event;
     }
+    if (this->selected_event != NULL)
+        this->selected_event->setFocus();
 }
 
 QFrameExtended* MonthView::createQFrameExtended(Date *date) {
@@ -578,6 +593,7 @@ QLabelEvent* MonthView::createLabelEvent(Event *event) {
     label_event->setEvent(newEvent);
     label_event->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
     connect(label_event, &QLabelEvent::clicked, this, &MonthView::on_event_click);
+    connect(label_event, &QLabelEvent::keyPressed, this, &MonthView::on_event_key_press);
     return label_event;
 }
 
@@ -605,17 +621,63 @@ void MonthView::remove_events_from_frame(int i) {
     }
 }
 
+void MonthView::on_event_key_press(int key) {
+    Event *newEvent;
+    time_t next_end_day = this->selected_event->getEvent()->getEnd() + SECONDS_IN_1DAY;
+    time_t previous_end_day = this->selected_event->getEvent()->getEnd() - SECONDS_IN_1DAY;
+    time_t next_start_day = this->selected_event->getEvent()->getStart() + SECONDS_IN_1DAY;
+    time_t previous_start_day = this->selected_event->getEvent()->getStart() - SECONDS_IN_1DAY;
+
+    switch(key) {
+    case Qt::Key_Delete:
+        this->selected_event->markSelection(false);
+        this->selected_event = NULL;
+        refresh_events();
+        break;
+    case Qt::Key_D:
+        newEvent = new Event(0, this->selected_event->getEvent()->getName(), this->selected_event->getEvent()->getDescription(),
+                                    this->selected_event->getEvent()->getPlace(), new Category(*this->selected_event->getEvent()->getCategory()), this->selected_event->getEvent()->getStart(), next_end_day);
+        this->pm->replace_event(this->selected_event->getEvent(), newEvent);
+        refresh_events();
+        break;
+    case Qt::Key_S:
+        if (previous_end_day >= this->selected_event->getEvent()->getStart()) {
+            newEvent = new Event(0, this->selected_event->getEvent()->getName(), this->selected_event->getEvent()->getDescription(),
+                                        this->selected_event->getEvent()->getPlace(), new Category(*this->selected_event->getEvent()->getCategory()), this->selected_event->getEvent()->getStart(), previous_end_day);
+            this->pm->replace_event(this->selected_event->getEvent(), newEvent);
+            refresh_events();
+        }
+        break;
+    case Qt::Key_A:
+        newEvent = new Event(0, this->selected_event->getEvent()->getName(), this->selected_event->getEvent()->getDescription(),
+                                    this->selected_event->getEvent()->getPlace(), new Category(*this->selected_event->getEvent()->getCategory()), previous_start_day, previous_end_day);
+        this->pm->replace_event(this->selected_event->getEvent(), newEvent);
+        refresh_events();
+        break;
+    case Qt::Key_F:
+        newEvent = new Event(0, this->selected_event->getEvent()->getName(), this->selected_event->getEvent()->getDescription(),
+                                    this->selected_event->getEvent()->getPlace(), new Category(*this->selected_event->getEvent()->getCategory()), next_start_day, next_end_day);
+        this->pm->replace_event(this->selected_event->getEvent(), newEvent);
+        refresh_events();
+        break;
+    }
+}
+
 void MonthView::on_event_click(QLabelEvent *label_event, Qt::MouseButton button) {
-    if ((button == Qt::RightButton) && (label_event != NULL)) {
+    if (button == Qt::RightButton) {
         this->pm->remove_event(label_event->getEvent());
         label_event->getEvent()->setInvalid();
         label_event->drawUI();
+        refresh_events();
+    } else if (button == Qt::MiddleButton) {
+        this->selected_event = label_event;
+        this->selected_event->markSelection(true);
         refresh_events();
     } else {
         EventDialog *eventDialog = new EventDialog(this);
         eventDialog->setEvent(label_event->getEvent());
         eventDialog->exec();
-        //if the event has changed, we'll update the label
+        //if the event is changed, we'll update the label
         if (!eventDialog->getEvent()->equals(*label_event->getEvent())) {
             label_event->setEvent(eventDialog->getEvent()); /* Automatically free the old event */
             label_event->drawUI();

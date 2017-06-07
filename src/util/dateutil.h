@@ -7,6 +7,8 @@
 
 #include "../model/date.h"
 
+#define SECONDS_IN_1DAY 86400
+
 using namespace std;
 
 class DateUtil

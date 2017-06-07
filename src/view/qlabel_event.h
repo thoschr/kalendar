@@ -14,6 +14,7 @@ private:
 public:
     explicit QLabelEvent(QWidget *parent = 0);
     ~QLabelEvent();
+    bool markSelection(bool selected);
     void setEvent(Event *event);
     Event* getEvent();
     bool drawUI();
@@ -24,9 +25,11 @@ private:
 
 protected:
     virtual void mousePressEvent(QMouseEvent *e);
+    virtual void keyPressEvent(QKeyEvent *e);
 
 signals:
     void clicked(QLabelEvent *event, Qt::MouseButton button);
+    void keyPressed(int key);
 
 public slots:
 

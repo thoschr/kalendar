@@ -45,7 +45,7 @@
                    "QFrame#selected { background-color: #EEEEFF; }" \
                    "QLabel#header { font-weight: bold; }" \
                    "QFrame#header { background-color: #DDDDFF; }" \
-                   "QFrame#disabled { background-color: #EEEEEE; }"
+                   "QFrame#disabled { background-color: #EFEFEF; }"
 
 namespace Ui {
     class MonthView;
@@ -60,6 +60,7 @@ private:
     PluginManager *plm;
     QVBoxLayout *layout;
     QLabel *label_date;
+    QLabelEvent *selected_event;
     QPushButton *todobutton;
     Date *selection_start;
     Date *selection_end;
@@ -93,6 +94,7 @@ public slots:
     void on_back_button_click();
     void on_next_button_click();
     void on_event_click(QLabelEvent *label_event, Qt::MouseButton button);
+    void on_event_key_press(int key);
     void on_todo_button_click();
 
 private slots:

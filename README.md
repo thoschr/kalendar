@@ -53,5 +53,9 @@ cd /absolute/path/to/the/bin/directory/
 Remember to give the right permissions with `# chmod +x /bin/kalendar`. To see the effects of the plugins you may need to restart the application or refresh the view.
 If you create a desktop file, you shall use `kalendar` for the **Exec** field.
 
+### Tips
+
+If you right-click on an event, it'll be deleted. If you middle-click on an event, it'll be selected. Once an event is selected, you can move it with A (backward) or F (forward) keys and resize using S and D keys. Press Canc to cancel the selection.
+
 ### License
 GPLv3+

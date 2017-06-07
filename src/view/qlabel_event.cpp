@@ -16,6 +16,10 @@ void QLabelEvent::mousePressEvent(QMouseEvent *e) {
     emit clicked(this, e->button());
 }
 
+void QLabelEvent::keyPressEvent(QKeyEvent *e) {
+    emit keyPressed(e->key());
+}
+
 void QLabelEvent::setEvent(Event *event) {
     if (this->event != NULL) delete this->event;
     this->event = event;
@@ -24,6 +28,17 @@ void QLabelEvent::setEvent(Event *event) {
 
 Event* QLabelEvent::getEvent() {
    return this->event;
+}
+
+bool QLabelEvent::markSelection(bool selected) {
+    if (this->event == NULL) return false;
+    if (selected)
+        this->setObjectName("selected");
+    else
+        this->setObjectName("");
+    //Update the ui
+    this->setStyleSheet(this->styleSheet());
+    return true;
 }
 
 bool QLabelEvent::drawInvalidEvent() {
@@ -44,7 +59,7 @@ bool QLabelEvent::drawUI() {
     QString textColor("#000000");
     if (is_color_dark(this->event->getCategory()->getColor()))
         textColor = "#FFFFFF";
-    this->setStyleSheet(QString("QLabel { font-size: 14px; border-radius: 2px; background-color : ") + QString(this->event->getCategory()->getColor().c_str()) + QString("; color: ") + textColor + QString("};"));
+    this->setStyleSheet(QString("QLabel#selected {border-top: 1px solid #FF0000; border-bottom: 1px solid #FF0000; font-weight: bold; font-size: 13px;} QLabel { font-size: 14px; border-radius: 2px; background-color : ") + QString(this->event->getCategory()->getColor().c_str()) + QString("; color: ") + textColor + QString("};"));
     this->setFixedHeight(26);
     this->setMargin(0);
     QString tooltip_text;
