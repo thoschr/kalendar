@@ -630,7 +630,6 @@ void MonthView::on_event_key_press(int key) {
 
     switch(key) {
     case Qt::Key_Delete:
-        this->selected_event->markSelection(false);
         this->selected_event = NULL;
         refresh_events();
         break;
@@ -669,9 +668,12 @@ void MonthView::on_event_click(QLabelEvent *label_event, Qt::MouseButton button)
         label_event->getEvent()->setInvalid();
         label_event->drawUI();
         refresh_events();
-    } else if (button == Qt::MiddleButton) {
+    } else if ((button == Qt::MiddleButton) && (this->selected_event == NULL)) {
         this->selected_event = label_event;
         this->selected_event->markSelection(true);
+        refresh_events();
+    } else if ((button == Qt::MiddleButton) && (this->selected_event != NULL)) {
+        this->selected_event = NULL;
         refresh_events();
     } else {
         EventDialog *eventDialog = new EventDialog(this);
