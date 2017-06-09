@@ -3,7 +3,7 @@
 ![project status](https://img.shields.io/badge/project%20status-active-brightgreen.svg)
 ![version] (https://img.shields.io/badge/version-stable-blue.svg)
 
-Kalendar is a cross-platform Gregorian calendar application written in C++ with the QT library for the gui. This project **is not related** with KDE, but this desktop environment is the main target of this project. I'm trying to keep Kalendar as simple as possible and I want to avoid annoying dependencies (so you can easly install it everywhere).
+Kalendar is a cross-platform Gregorian calendar application written in C++ with the Qt5 library for the gui. This project **is not related** with KDE, but this desktop environment is the main target of this project. I'm trying to keep Kalendar as simple as possible and I want to avoid annoying dependencies (so you can easly install it everywhere).
 
 The project was inspired by gnome-calendar, but I'm writing it from scratch.
 
@@ -60,7 +60,7 @@ If you create a desktop file, you shall use `kalendar` for the **Exec** field.
 
 ### Tips
 
-If you right-click on an event, it'll be deleted. If you middle-click on an event, it'll be selected. Once an event is selected, you can move it with A (backward) or F (forward) keys and resize using S and D keys. Press Canc to cancel the selection.
+If you right-click on an event, it'll be deleted. If you middle-click on an event, it'll be selected. Once an event is selected, you can move it with A (backward) or F (forward) keys and resize it using S and D keys. Press Canc to cancel the selection.
 
 ### License
 GPLv3+
