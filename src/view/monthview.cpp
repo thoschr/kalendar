@@ -517,7 +517,7 @@ void MonthView::display_events(Date date, Category *category) {
         for (int i = start_offset+start.getMonthDay()-1; i < (start_offset+end.getMonthDay()); i++) {
             QLabelEvent *label_event = createLabelEvent(event);
             /* Check if the event should be selected */
-            if ((selected_event != NULL) && (selected_event->getName() == event->getName())) {
+            if ((selected_event != NULL) && (selected_event->equals(*event))) {
                 label_event->markSelection(true);
                 this->selected_event = label_event;
             }
@@ -637,6 +637,7 @@ void MonthView::on_event_key_press(int key) {
         newEvent = new Event(0, this->selected_event->getEvent()->getName(), this->selected_event->getEvent()->getDescription(),
                                     this->selected_event->getEvent()->getPlace(), new Category(*this->selected_event->getEvent()->getCategory()), this->selected_event->getEvent()->getStart(), next_end_day);
         this->pm->replace_event(this->selected_event->getEvent(), newEvent);
+        this->selected_event->setEvent(newEvent);
         refresh_events();
         break;
     case Qt::Key_S:
@@ -644,6 +645,7 @@ void MonthView::on_event_key_press(int key) {
             newEvent = new Event(0, this->selected_event->getEvent()->getName(), this->selected_event->getEvent()->getDescription(),
                                         this->selected_event->getEvent()->getPlace(), new Category(*this->selected_event->getEvent()->getCategory()), this->selected_event->getEvent()->getStart(), previous_end_day);
             this->pm->replace_event(this->selected_event->getEvent(), newEvent);
+            this->selected_event->setEvent(newEvent);
             refresh_events();
         }
         break;
@@ -651,12 +653,14 @@ void MonthView::on_event_key_press(int key) {
         newEvent = new Event(0, this->selected_event->getEvent()->getName(), this->selected_event->getEvent()->getDescription(),
                                     this->selected_event->getEvent()->getPlace(), new Category(*this->selected_event->getEvent()->getCategory()), previous_start_day, previous_end_day);
         this->pm->replace_event(this->selected_event->getEvent(), newEvent);
+        this->selected_event->setEvent(newEvent);
         refresh_events();
         break;
     case Qt::Key_F:
         newEvent = new Event(0, this->selected_event->getEvent()->getName(), this->selected_event->getEvent()->getDescription(),
                                     this->selected_event->getEvent()->getPlace(), new Category(*this->selected_event->getEvent()->getCategory()), next_start_day, next_end_day);
         this->pm->replace_event(this->selected_event->getEvent(), newEvent);
+        this->selected_event->setEvent(newEvent);
         refresh_events();
         break;
     }
