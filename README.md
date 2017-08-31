@@ -1,7 +1,6 @@
 # Kalendar
 
 ![project status](https://img.shields.io/badge/project%20status-active-brightgreen.svg)
-![version](https://img.shields.io/badge/version-stable-blue.svg)
 
 Kalendar is a cross-platform Gregorian calendar application written in C++ with the Qt5 library for the gui. This project **is not related** with KDE, but this desktop environment is the main target of this project. I'm trying to keep Kalendar as simple as possible and I want to avoid annoying dependencies (so you can easly install it everywhere).
 
