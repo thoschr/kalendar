@@ -2,7 +2,7 @@
 
 #include <QDebug>
 
-Event* EventUtil::parseString(string str_event) {
+Event* EventUtil::parseString(const string &str_event) {
     string str = str_event;
     size_t pos = 0;
     string token[6];

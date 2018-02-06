@@ -16,7 +16,7 @@ private:
 
 public:
     PluginManager();
-    void runTool(string name);
+    void runTool(const string &name);
     vector<string> get_tools();
 };
 

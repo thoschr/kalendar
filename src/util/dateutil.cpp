@@ -28,7 +28,7 @@ string DateUtil::numeric2literal_day_of_week(int d) {
         return week_days[d-1];
 }
 
-int DateUtil::literal2numeric_day_of_week(string d) {
+int DateUtil::literal2numeric_day_of_week(const string &d) {
     int i = 0;
     for (i = 0; i < 7; i++) {
         if (d == week_days[i])
@@ -77,7 +77,7 @@ Date DateUtil::get_first_day_of_month(Date &date) {
 Date DateUtil::get_last_day_of_month(Date &date) {
     Date first_day = get_first_day_of_month(date);
     int tot_days = get_days_in_month(date.getMonth(), date.getYear());
-    int wday = (tot_days % 7 ?: 7) + first_day.getWeekDay() - 1;
+    int wday = ((tot_days % 7) ?: 7) + first_day.getWeekDay() - 1;
     return Date(tot_days, wday, date.getMonth(), date.getYear());
 }
 
@@ -91,7 +91,7 @@ Date DateUtil::increase_month(Date date) {
     } else { //Go to next year
         first_day_next_month = Date(1, (last_day_curr_month.getWeekDay() % 7) + 1, 1, date.getYear() + 1);
     }
-    return Date(date.getMonthDay(), (date.getMonthDay() % 7 ?: 7) + first_day_next_month.getWeekDay() - 1, first_day_next_month.getMonth(), first_day_next_month.getYear());
+    return Date(date.getMonthDay(), ((date.getMonthDay() % 7) ?: 7) + first_day_next_month.getWeekDay() - 1, first_day_next_month.getMonth(), first_day_next_month.getYear());
 }
 
 //Assume to get a valid time (i.e. no negative numbers, etc.)
@@ -99,12 +99,12 @@ Date DateUtil::decrease_month(Date date) {
     Date first_day_curr_month = get_first_day_of_month(date);
     Date last_day_prev_month;
     if (date.getMonth() > 1) {
-        last_day_prev_month = Date(get_days_in_month(date.getMonth() - 1, date.getYear()), first_day_curr_month.getWeekDay() - 1 ?: 7, date.getMonth() - 1, date.getYear());
+        last_day_prev_month = Date(get_days_in_month(date.getMonth() - 1, date.getYear()), (first_day_curr_month.getWeekDay() - 1) ?: 7, date.getMonth() - 1, date.getYear());
     } else { //Go to previous year
-        last_day_prev_month = Date(get_days_in_month(12, date.getYear() - 1), first_day_curr_month.getWeekDay() - 1 ?: 7, 12, date.getYear() - 1);
+        last_day_prev_month = Date(get_days_in_month(12, date.getYear() - 1), (first_day_curr_month.getWeekDay() - 1) ?: 7, 12, date.getYear() - 1);
     }
     Date first_day_prev_month = get_first_day_of_month(last_day_prev_month);
-    return Date(date.getMonthDay(), (date.getMonthDay() % 7 ?: 7) + first_day_prev_month.getWeekDay() - 1, last_day_prev_month.getMonth(), last_day_prev_month.getYear());
+    return Date(date.getMonthDay(), ((date.getMonthDay() % 7) ?: 7) + first_day_prev_month.getWeekDay() - 1, last_day_prev_month.getMonth(), last_day_prev_month.getYear());
 }
 
 Date DateUtil::increase_day(Date date) {

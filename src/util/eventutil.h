@@ -10,7 +10,7 @@ using namespace std;
 class EventUtil
 {
 public:
-    static Event *parseString(string str_event);
+    static Event *parseString(const string &str_event);
 };
 
 #endif // EVENTUTIL_H

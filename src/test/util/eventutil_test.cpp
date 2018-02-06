@@ -4,7 +4,6 @@ EventUtilTest::EventUtilTest()
 {
     time_t timestamp = 966038400L;
     string category("Default");
-    string category2("category2");
     string title("event title");
     string place("place");
     string description("this is a really complex description. Infact, there are several characters and white-spaces.");

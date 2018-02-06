@@ -43,7 +43,7 @@ public:
         this->end = event.getEnd();
     }
 
-    Event(unsigned int id, string name, string description, string place, Category *category, time_t start, time_t end) {
+    Event(unsigned int id, string name, const string &description, const string &place, Category *category, time_t start, time_t end) {
         this->name = name;
         this->description = description;
         this->place = place;

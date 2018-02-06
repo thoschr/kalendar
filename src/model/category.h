@@ -17,7 +17,7 @@ public:
         this->id = category.getId();
     }
 
-    Category(unsigned int id, string name, string color) {
+    Category(unsigned int id, const string &name, const string &color) {
         this->name = name;
         this->color = color;
         if (id == 0)

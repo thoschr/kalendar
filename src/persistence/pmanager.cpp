@@ -154,7 +154,7 @@ list<Event*> PManager::get_events(Category *c) {
         return result;
     }
     sqlite3_bind_int64(res, 1, (long)c->getId());
-    while (rc = sqlite3_step(res) == SQLITE_ROW) {
+    while ((rc = sqlite3_step(res)) == SQLITE_ROW) {
         unsigned long id = (unsigned long)sqlite3_column_int(res, 0);
         string name((const char*)sqlite3_column_text(res, 1));
         string description((const char*)sqlite3_column_text(res, 2));
@@ -218,7 +218,7 @@ list<Event*> PManager::get_events_of_month(int month, int year) {
     sqlite3_bind_int64(res, 2, last_month);
     sqlite3_bind_int64(res, 3, first_month);
     sqlite3_bind_int64(res, 4, last_month);
-    while (rc = sqlite3_step(res) == SQLITE_ROW) {
+    while ((rc = sqlite3_step(res)) == SQLITE_ROW) {
         unsigned long id = (unsigned long)sqlite3_column_int(res, 0);
         string name((const char*)sqlite3_column_text(res, 1));
         string description((const char*)sqlite3_column_text(res, 2));
@@ -280,7 +280,7 @@ vector<Category*> PManager::get_categories() {
         fprintf(stderr, "Failed to fetch data: %s\n", sqlite3_errmsg(db));
         return result;
     }
-    while (rc = sqlite3_step(res) == SQLITE_ROW) {
+    while ((rc = sqlite3_step(res)) == SQLITE_ROW) {
 
         Category *c = new Category( sqlite3_column_int(res, 0),
                               string((const char*)sqlite3_column_text(res, 1)),
@@ -348,7 +348,7 @@ list<Event*> PManager::get_all_events() {
         fprintf(stderr, "Failed to fetch data: %s\n", sqlite3_errmsg(db));
         return result;
     }
-    while (rc = sqlite3_step(res) == SQLITE_ROW) {
+    while ((rc = sqlite3_step(res)) == SQLITE_ROW) {
         unsigned long id = (unsigned long)sqlite3_column_int(res, 0);
         string name((const char*)sqlite3_column_text(res, 1));
         string description((const char*)sqlite3_column_text(res, 2));
