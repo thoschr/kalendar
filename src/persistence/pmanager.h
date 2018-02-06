@@ -46,8 +46,7 @@ public:
     int save_db(string path);
     int export_db_iCal_format(list<Event *> events, string path);
     int load_db(string path);
-    //TODO: change uint category_id to Category *object
-    int import_db_iCal_format(string path,unsigned int category_id);
+    int import_db_iCal_format(string path,Category *category);
 };
 
 #endif // PMANAGER_H

@@ -40,8 +40,13 @@ int main(int argc, char *argv[])
         SecurePManager spm;
         spm.add_event(EventUtil::parseString(event.toStdString()));
     } else if((cli = parser.isSet("delete"))) {
-        /* TODO: implement me */
-        printf("Not implemented yet");
+        /* TODO: implement deletion by id */
+        QString eventName = parser.value("delete");
+        SecurePManager spm;
+        for (Event *e : spm.get_all_events()) {
+            if (e->getName() == eventName.toStdString())
+                spm.remove_event(e);
+        }
     } else if ((cli = parser.isSet("notify"))) {
         /* Show notifications about the events in the next days */
         QString notify =  parser.value("notify");

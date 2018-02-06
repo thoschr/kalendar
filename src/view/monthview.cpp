@@ -349,11 +349,11 @@ void MonthView::import_events() {
         dialog->exec(); //Blocking call
         if (dialog->getSelectedCategory() != NULL) {
             unsigned int category_id = dialog->getSelectedCategory()->getId();
+            Category *category = pm->get_category(category_id);
             delete dialog->getSelectedCategory();
-            /* TODO: create a function to show the progress bar */
             QMessageBox::information(this, "Please wait", "Importing events may requires some minutes", QMessageBox::Ok);
             CustomDialog *custom_dialog = this->show_progress_bar("Importing events...");
-            QFuture<int> ret =  QtConcurrent::run([this,path,category_id] { return this->pm->import_db_iCal_format(path.toStdString(),category_id); });
+            QFuture<int> ret =  QtConcurrent::run([this,path,category] { return this->pm->import_db_iCal_format(path.toStdString(),category); });
             while (!ret.isFinished()) {
                 QCoreApplication::processEvents();
             }

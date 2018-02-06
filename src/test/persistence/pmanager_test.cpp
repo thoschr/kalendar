@@ -319,13 +319,13 @@ void PManagerTest::test_import_db_iCal_format() {
     PManager pm;
     ofstream file;
     bool ret;
-    ret = pm.import_db_iCal_format("",this->valid_default_category->getId());
-    ret = !ret && !pm.import_db_iCal_format("notexists",this->valid_default_category->getId());
+    ret = pm.import_db_iCal_format("",this->valid_default_category);
+    ret = !ret && !pm.import_db_iCal_format("notexists",this->valid_default_category);
     file.open("temp.ics");
     file << "BEGIN:VEVENT" << endl << "UID:0" << endl << "DTSTART;VALUE=DATE:20161231" << endl << "DTEND;VALUE=DATE:20170101" << endl << "SUMMARY:test" << endl << "DESCRIPTION:multi\nline\ndescription" << endl << "END:VEVENT" << endl;
     file << "BEGIN:VEVENT" << endl << "UID:1" << endl << "DTSTART;VALUE=DATE:20130512" << endl << "DTEND;VALUE=DATE:20130513" << endl << "SUMMARY:test2" << endl << "END:VEVENT" << endl;
     file.close();
-    ret = ret && pm.import_db_iCal_format("temp.ics",this->valid_default_category->getId());
+    ret = ret && pm.import_db_iCal_format("temp.ics",this->valid_default_category);
     list<Event*> events = pm.get_all_events();
     if (events.size() == 2) {
         list<Event*>::iterator it = events.begin();

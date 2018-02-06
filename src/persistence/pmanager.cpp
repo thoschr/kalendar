@@ -428,7 +428,8 @@ int PManager::load_db(string path) {
     return counter;
 }
 
-int PManager::import_db_iCal_format(string path, unsigned int category_id) {
+int PManager::import_db_iCal_format(string path, Category *category) {
+    auto category_id = category->getId();
     if ((path.length() < 5) || (path.substr(path.length()-4, 4) != ".ics")) return 0;
     ifstream file;
     string line;
