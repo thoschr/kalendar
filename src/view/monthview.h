@@ -39,7 +39,7 @@
 
 #define TODOSBUTTON_STYLE "QPushButton { border: 1px solid #000000; padding: 5px; font-weight: bold; border-radius: 10px; } QPushButton:hover { color: #2222BB; }"
 
-#define CELL_STYLE "QFrame { background-color: #FFFFFF; border: 1px solid #555555; }" \
+#define CELL_STYLE "QFrame { background-color: #FFFFFF; border: 1px outset #CCCCCC; }" \
                    "QLabel { border: none; font-size: 16px; padding: 5px; background-color:rgba(0,0,0,0); }" \
                    "QLabel#today { background-color: #FFFF88; color: #FF0000; border: 1px solid #FF0000;}" \
                    "QFrame#selected { background-color: #EEEEFF; }" \
