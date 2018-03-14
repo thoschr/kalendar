@@ -35,11 +35,11 @@
 /* Style Sheets */
 #define MAINWINDOW_STYLE "#mainwindow { background-color: #FFFFFF; border: 2px solid #DDDDFF; }"
 
-#define LABELDATE_STYLE "QLabel { qproperty-alignment: AlignCenter; padding-left: 100px; padding-right: 100px; font-size: 20px; }"
+#define LABELDATE_STYLE "QLabel { color: #000000; qproperty-alignment: AlignCenter; padding-left: 100px; padding-right: 100px; font-size: 20px; }"
 
-#define TODOSBUTTON_STYLE "QPushButton { border: 1px solid #000000; padding: 5px; font-weight: bold; border-radius: 10px; } QPushButton:hover { color: #2222BB; }"
+#define TODOSBUTTON_STYLE "QPushButton { border: 1px solid #000000; color: #000000; padding: 5px; font-weight: bold; border-radius: 10px; } QPushButton:hover { color: #2222BB; }"
 
-#define CELL_STYLE "QFrame { background-color: #FFFFFF; border: 1px outset #CCCCCC; }" \
+#define CELL_STYLE "QFrame { background-color: #FFFFFF; color: #000000; border: 1px outset #CCCCCC; }" \
                    "QLabel { border: none; font-size: 16px; padding: 5px; background-color:rgba(0,0,0,0); }" \
                    "QLabel#today { background-color: #FFFF88; color: #FF0000; border: 1px solid #FF0000;}" \
                    "QFrame#selected { background-color: #EEEEFF; }" \
