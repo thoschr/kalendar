@@ -461,8 +461,14 @@ void MonthView::display_days(Date date) {
             if ((x == current_date.getMonthDay()) && (date.getMonth() == current_date.getMonth()) && (date.getYear() == current_date.getYear()))
                 day->setObjectName("today");
             this->frames[i]->layout()->addWidget(day);
-            // mark the cell as enabled
-            this->frames[i]->setObjectName("enabled");
+            //check if the current frame refers to an holiday (i.e. saturday or sunday)
+            if ((i % 7) > 4) { //frame in the last two columns
+                //mark the cell as an holiday
+                this->frames[i]->setObjectName("holiday");
+            } else { //is a generic day
+                // mark the cell as enabled
+                this->frames[i]->setObjectName("enabled");
+            }
             x++;
         } else {
             // mark the cell as disabled
