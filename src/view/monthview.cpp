@@ -13,7 +13,10 @@ void MonthView::on_mouse_move(QFrameExtended *frame) {
                     this->frames[i]->setObjectName("selected");
                     this->frames[i]->setStyleSheet(CELL_STYLE);
                 } else {
-                    this->frames[i]->setObjectName("day");
+                    if ((i % 7) > 4)
+                        this->frames[i]->setObjectName("holiday");
+                    else
+                        this->frames[i]->setObjectName("day");
                     this->frames[i]->setStyleSheet(CELL_STYLE);
                 }
             }
@@ -33,7 +36,10 @@ void MonthView::on_mouse_release(QFrameExtended *frame) {
         /* Clean the selection */
         for (int i = 0; i < 42; i++) {
             if (this->frames[i]->getDate() != NULL) {
-                this->frames[i]->setObjectName("day");
+                if ((i % 7) > 4)
+                    this->frames[i]->setObjectName("holiday");
+                else
+                    this->frames[i]->setObjectName("day");
                 this->frames[i]->setStyleSheet(CELL_STYLE);
             }
         }
