@@ -30,6 +30,7 @@ public:
     void setWeekDay(int wday) { this->wday = wday; }
     void setMonth(int month) { this->month = month; }
     void setYear(int year) { this->year = year; }
+    //TODO: maybe it can be useful to add the method: isHoliday()
 
     int compareTo (Date &d) {
         int ret;

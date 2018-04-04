@@ -1,6 +1,7 @@
 #include "securepmanager.h"
+#include <QDebug>
 
-SecurePManager::SecurePManager() : PManager()
+SecurePManager::SecurePManager(string database) : PManager(database)
 {
 
 }

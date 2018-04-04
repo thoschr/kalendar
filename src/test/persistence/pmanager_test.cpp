@@ -42,7 +42,7 @@ PManagerTest::~PManagerTest() {
 }
 
 void PManagerTest::test_all() {
-    test_remove_all();
+    test_remove_db();
     test_add_event();
     test_get_events_of_month();
     test_remove_event();
@@ -61,10 +61,10 @@ void PManagerTest::test_all() {
     test_export_db_iCal_format();
 }
 
-void PManagerTest::test_remove_all() {
-    Test::print("test_remove_all ");
+void PManagerTest::test_remove_db() {
+    Test::print("test_remove_db ");
     PManager pm;
-    ASSERT (pm.remove_all())
+    ASSERT (pm.remove_db())
 }
 
 void PManagerTest::test_add_event() {
@@ -76,7 +76,7 @@ void PManagerTest::test_add_event() {
            (!(pm.add_event(this->event_with_null_category))) &&
            (pm.add_event(this->specialchars_event)) &&
            (pm.add_event(this->valid_event)))
-    pm.remove_all();
+    pm.remove_db();
 }
 
 void PManagerTest::test_get_events_of_month() {
@@ -102,7 +102,7 @@ void PManagerTest::test_get_events_of_month() {
         delete *it;
     }
     ASSERT (ret && ret2)
-    pm.remove_all();
+    pm.remove_db();
 }
 
 void PManagerTest::test_remove_event() {
@@ -121,14 +121,14 @@ void PManagerTest::test_remove_event() {
         delete *it;
     } else ret = false;
     ASSERT (ret)
-    pm.remove_all();
+    pm.remove_db();
 }
 
 void PManagerTest::test_add_category() {
     Test::print("test_add_category ");
     PManager pm;
     ASSERT ((!(pm.add_category(this->noname_category))) && (pm.add_category(this->valid_category)))
-    pm.remove_all();
+    pm.remove_db();
 }
 
 void PManagerTest::test_get_categories() {
@@ -146,7 +146,7 @@ void PManagerTest::test_get_categories() {
         delete *it;
     }
     ASSERT (ret)
-    pm.remove_all();
+    pm.remove_db();
 }
 
 void PManagerTest::test_remove_category() {
@@ -175,7 +175,7 @@ void PManagerTest::test_remove_category() {
         delete *it;
     } else ret = false;
     ASSERT (ret)
-    pm.remove_all();
+    pm.remove_db();
 }
 
 void PManagerTest::test_get_category() {
@@ -183,7 +183,7 @@ void PManagerTest::test_get_category() {
     PManager pm;
     pm.add_category(this->valid_category);
     ASSERT ((pm.get_category(this->valid_category->getId()))->equals(*this->valid_category))
-    pm.remove_all();
+    pm.remove_db();
 }
 
 void PManagerTest::test_edit_event() {
@@ -192,7 +192,7 @@ void PManagerTest::test_edit_event() {
     pm.add_event(this->valid_event);
     ASSERT (pm.replace_event(this->valid_event, this->valid_event_2) &&
             (!pm.replace_event(this->valid_event_2, this->noname_event)))
-    pm.remove_all();
+    pm.remove_db();
 }
 
 void PManagerTest::test_get_all_events() {
@@ -211,7 +211,7 @@ void PManagerTest::test_get_all_events() {
         delete *it;
     }
     ASSERT (ret && ret2)
-    pm.remove_all();
+    pm.remove_db();
 }
 
 void PManagerTest::test_get_events() {
@@ -234,7 +234,7 @@ void PManagerTest::test_get_events() {
     list<Event*> events = pm.get_events(NULL);
     ret = ret && (events.size() == 2);
     ASSERT (ret)
-    pm.remove_all();
+    pm.remove_db();
 }
 
 void PManagerTest::test_remove_past_events() {
@@ -251,7 +251,7 @@ void PManagerTest::test_remove_past_events() {
         delete *it;
     } else ret = false;
     ASSERT (ret)
-    pm.remove_all();
+    pm.remove_db();
 }
 
 void PManagerTest::test_edit_category() {
@@ -260,7 +260,7 @@ void PManagerTest::test_edit_category() {
     pm.add_category(this->valid_category);
     ASSERT (!pm.replace_category(this->valid_category, this->noname_category) &&
             (pm.replace_category(this->valid_category, this->valid_category_2)))
-    pm.remove_all();
+    pm.remove_db();
 }
 
 void PManagerTest::test_load_db() {
@@ -284,7 +284,7 @@ void PManagerTest::test_load_db() {
         ret = ret && this->valid_event->equals(**it); // *it has type Event*
         delete *it;
     } else ret = false;
-    pm.remove_all();
+    pm.remove_db();
     remove("testdb.kal");
     ASSERT (ret)
 }
@@ -309,7 +309,7 @@ void PManagerTest::test_save_db() {
     getline (file,line);
     ret = ret && (line == "");
     file.close();
-    pm.remove_all();
+    pm.remove_db();
     remove("testdb.kal");
     ASSERT (ret)
 }
@@ -335,7 +335,7 @@ void PManagerTest::test_import_db_iCal_format() {
         ret = ret && ((**it).getStart() < (**it).getEnd());
         delete *it;
     } else ret = false;
-    pm.remove_all();
+    pm.remove_db();
     remove("temp.ics");
     ASSERT (ret)
 }
@@ -379,7 +379,7 @@ void PManagerTest::test_export_db_iCal_format() {
         linenumber++;
     }
     file.close();
-    pm.remove_all();
+    pm.remove_db();
     remove("temp.ics");
     ASSERT (ret)
 }

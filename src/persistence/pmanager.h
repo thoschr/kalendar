@@ -11,28 +11,34 @@
 #include <pwd.h>
 #include <sys/stat.h>
 #include <fstream>
+#include <experimental/filesystem>
 #include "../model/event.h"
 #include "../model/category.h"
 
 #define FOLDER_NAME "kalendar"
-#define DATABASE_NAME "events.sql"
+#define DEFAULT_DATABASE_NAME "default.sql"
 
 using namespace std;
+static string db_name = DEFAULT_DATABASE_NAME;
 
 class PManager
 {
 private:
-    sqlite3 *db;
+    sqlite3 *db = NULL;
     string db_path;
     string filterSpecialChars(string str);
+    void init_db();
 
 public:
-    PManager();
+    PManager(string database = DEFAULT_DATABASE_NAME);
     ~PManager();
+    void set_db(string database);
+    string get_db_name();
+    vector<string> get_db_list();
     bool add_event (Event *e, Event *child = NULL);
     bool replace_event (Event *old_event, Event *new_event); //return true also if old_event doesn't exist
     bool remove_event(Event *e);
-    bool remove_all();
+    bool remove_db();
     list<Event*> get_events_of_month(int month, int year);
     list<Event*> get_events(Category *c);
     list<Event*> get_all_events();

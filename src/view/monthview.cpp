@@ -207,9 +207,9 @@ void MonthView::createMenu() {
     QAction *editCategoriesAct = new QAction(tr("Edit &Categories"), this);
     editCategoriesAct->setStatusTip(tr("Show a dialog to edit the categories"));
     connect(editCategoriesAct, &QAction::triggered, this, &MonthView::edit_categories);
-    QAction *deleteAllAct = new QAction(tr("&Delete all"), this);
+    QAction *deleteAllAct = new QAction(tr("&Delete database"), this);
     deleteAllAct->setStatusTip(tr("Delete all the events and categories"));
-    connect(deleteAllAct, &QAction::triggered, this, &MonthView::delete_all);
+    connect(deleteAllAct, &QAction::triggered, this, &MonthView::delete_db);
     QAction *showAgendaAct = new QAction(tr("Show &Agenda"), this);
     showAgendaAct->setStatusTip(tr("Show a dialog with all the events"));
     connect(showAgendaAct, &QAction::triggered, this, &MonthView::show_agenda);
@@ -230,6 +230,8 @@ void MonthView::createMenu() {
     editMenu->addAction(editCategoriesAct);
     editMenu->addAction(deleteAllAct);
     editMenu->addAction(showOnlyAct);
+    dbMenu = menuBar()->addMenu(tr("&Calendars"));
+    refresh_db_menu();
     QMenu *viewsMenu;
     viewsMenu = menuBar()->addMenu(tr("&Views"));
     viewsMenu->addAction(showAgendaAct);
@@ -245,8 +247,41 @@ void MonthView::createMenu() {
     }
 }
 
+void MonthView::switch_db(string db) {
+    this->pm->set_db(db);
+    this->refresh_events();
+    this->refresh_todos();
+    this->refresh_db_menu();
+}
+
+void MonthView::refresh_db_menu() {
+    this->dbMenu->clear();
+    /* Dinamically generate the databases submenu */
+    for (string db : this->pm->get_db_list()) {
+        string text = db.substr(0, db.find('.'));
+        QAction *t = new QAction(tr(text.c_str()), this);
+        connect(t, &QAction::triggered, this, [this,db]{ switch_db(db); });
+        dbMenu->addAction(t);
+    }
+    QAction *newdb = new QAction(tr("&New database"), this);
+    connect(newdb, &QAction::triggered, this, &MonthView::create_database);
+    dbMenu->addAction(newdb);
+}
+
 void MonthView::run_tool(string tool) {
     this->plm->runTool(tool);
+}
+
+void MonthView::create_database() {
+    bool ok;
+    QString name = QInputDialog::getText(this, tr("QInputDialog::getText()"),
+                                             tr("Database name:"), QLineEdit::Normal,
+                                             "", &ok);
+    if (ok && !name.isEmpty()) {
+        delete this->pm;
+        this->pm = new SecurePManager(name.toStdString() + ".sql");
+        refresh_db_menu();
+    }
 }
 
 void MonthView::contextMenuEvent(QContextMenuEvent *event)
@@ -267,14 +302,19 @@ void MonthView::filter_by_category() {
     refresh_events();
 }
 
-void MonthView::delete_all() {
-    int ret = QMessageBox::question(this, "Confirm", "Do you really want to delete all the events and categories?", QMessageBox::Yes | QMessageBox::No);
+void MonthView::delete_db() {
+    int ret = QMessageBox::question(this, "Confirm", "Do you really want to delete all the events and categories of the current database?", QMessageBox::Yes | QMessageBox::No);
     if (ret == QMessageBox::Yes) {
-        this->pm->remove_all();
-        delete this->pm;
-        this->pm = new SecurePManager;
-        refresh_events();
-        refresh_todos();
+        this->pm->remove_db();
+        if (this->pm->get_db_name() == DEFAULT_DATABASE_NAME) {
+            delete this->pm;
+            this->pm = new SecurePManager;
+            refresh_events();
+            refresh_todos();
+        } else {
+            switch_db(this->pm->get_db_list().at(0));
+        }
+        refresh_db_menu();
     }
 }
 

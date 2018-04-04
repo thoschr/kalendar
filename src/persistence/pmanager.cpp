@@ -2,10 +2,23 @@
 
 #include <QDebug>
 
-PManager::PManager()
+PManager::PManager(string database)
 {
+    if (database != DEFAULT_DATABASE_NAME) db_name = database;
+    init_db();
+}
+
+PManager::~PManager() {
+    sqlite3_close(this->db);
+}
+
+void PManager::init_db() {
+    /* Close an already open database */
+    if (this->db != NULL) {
+        sqlite3_close(this->db);
+    }
     /* Open the database (will be created if it doesn't exist) */
-    this->db_path = string(getpwuid(getuid())->pw_dir) + string("/" FOLDER_NAME "/" DATABASE_NAME);
+    this->db_path = string(getpwuid(getuid())->pw_dir) + string("/" FOLDER_NAME "/" + db_name);
     ifstream dbfile(this->db_path.c_str());
     bool db_no_exists = !dbfile;
     if (db_no_exists) {
@@ -43,8 +56,23 @@ PManager::PManager()
     }
 }
 
-PManager::~PManager() {
-    sqlite3_close(this->db);
+void PManager::set_db(string database) {
+    db_name = database;
+    init_db();
+}
+
+string PManager::get_db_name() {
+    return db_name;
+}
+
+vector<string> PManager::get_db_list() {
+    vector<string> db_list;
+    for (experimental::filesystem::directory_entry e : experimental::filesystem::directory_iterator(this->db_path.substr(0, this->db_path.find_last_of('/') ))) {
+        experimental::filesystem::path p = e.path();
+        if (p.extension() == ".sql")
+            db_list.push_back(p.filename());
+    }
+    return db_list;
 }
 
 string PManager::filterSpecialChars(string str) {
@@ -238,7 +266,7 @@ list<Event*> PManager::get_events_of_month(int month, int year) {
     return result;
 }
 
-bool PManager::remove_all() {
+bool PManager::remove_db() {
     /* Delete the database file, but not the folder */
     return (std::remove(this->db_path.c_str()) == 0);
 }

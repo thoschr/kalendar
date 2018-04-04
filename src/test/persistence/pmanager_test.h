@@ -33,7 +33,7 @@ public:
     void test_get_events_of_month();
     void test_remove_category();
     void test_get_categories();
-    void test_remove_all();
+    void test_remove_db();
     void test_get_category();
     void test_edit_event();
     void test_get_events();

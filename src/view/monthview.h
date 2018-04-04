@@ -15,6 +15,7 @@
 #include <QDir>
 #include <QFileDialog>
 #include <QScrollArea>
+#include <QInputDialog>
 #include "ui_monthview.h"
 #include "eventdialog.h"
 #include "qframe_extended.h"
@@ -68,6 +69,7 @@ private:
     Ui::MonthView *ui;
     PManager *pm;
     QFrameExtended *frames[42]; //I have a 7x7 grid, but without consider the first row I've a total of 6x7 cells
+    QMenu *dbMenu;
     void display_days(Date date);
     void remove_events_from_all_frames();
     void remove_events_from_frame(int i);
@@ -75,8 +77,8 @@ private:
     QFrameExtended *createQFrameExtended(Date *date);
     void createMenu();
     void on_button_extended_click(int index);
-    void run_tool(string tool);
     CustomDialog *show_progress_bar(QString title);
+    void refresh_db_menu();
 
 protected:
     void contextMenuEvent(QContextMenuEvent *event) Q_DECL_OVERRIDE;
@@ -100,7 +102,7 @@ public slots:
 
 private slots:
     void exit();
-    void delete_all();
+    void delete_db();
     void save_database();
     void load_database();
     void import_events();
@@ -109,6 +111,9 @@ private slots:
     void edit_categories();
     void show_agenda(bool only_todos = false);
     void filter_by_category();
+    void run_tool(string tool);
+    void switch_db(string db);
+    void create_database();
 };
 
 #endif // MONTHVIEW_H

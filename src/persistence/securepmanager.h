@@ -8,7 +8,7 @@
 class SecurePManager : public PManager
 {
 public:
-    SecurePManager();
+    SecurePManager(string database = DEFAULT_DATABASE_NAME);
 };
 
 #endif // SECUREPMANAGER_H
