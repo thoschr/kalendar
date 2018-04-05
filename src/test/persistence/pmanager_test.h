@@ -27,6 +27,7 @@ public:
     PManagerTest();
     ~PManagerTest();
     void test_all();
+    void test_init_db();
     void test_add_event();
     void test_remove_event();
     void test_add_category();
@@ -44,6 +45,9 @@ public:
     void test_save_db();
     void test_import_db_iCal_format();
     void test_export_db_iCal_format();
+    void test_get_db_name();
+    void test_set_db();
+    void test_get_db_list();
 };
 
 #endif // PMANAGERTEST_H

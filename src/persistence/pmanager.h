@@ -26,14 +26,16 @@ class PManager
 private:
     sqlite3 *db = NULL;
     string db_path;
+    string db_folder;
     string filterSpecialChars(string str);
-    void init_db();
 
 public:
     PManager(string database = DEFAULT_DATABASE_NAME);
     ~PManager();
+    void init_db(string db_name);
     void set_db(string database);
     string get_db_name();
+    string get_db_folder();
     vector<string> get_db_list();
     bool add_event (Event *e, Event *child = NULL);
     bool replace_event (Event *old_event, Event *new_event); //return true also if old_event doesn't exist

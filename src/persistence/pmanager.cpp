@@ -5,23 +5,28 @@
 PManager::PManager(string database)
 {
     if (database != DEFAULT_DATABASE_NAME) db_name = database;
-    init_db();
+    init_db(db_name);
 }
 
 PManager::~PManager() {
     sqlite3_close(this->db);
 }
 
-void PManager::init_db() {
+string PManager::get_db_folder() {
+    return this->db_folder;
+}
+
+void PManager::init_db(string db_name) {
     /* Close an already open database */
     if (this->db != NULL) {
         sqlite3_close(this->db);
     }
     /* Open the database (will be created if it doesn't exist) */
-    this->db_path = string(getpwuid(getuid())->pw_dir) + string("/" FOLDER_NAME "/" + db_name);
+    this->db_folder = string(getpwuid(getuid())->pw_dir) + string("/" FOLDER_NAME "/");
+    this->db_path = this->db_folder + string(db_name);
     ifstream dbfile(this->db_path.c_str());
-    bool db_no_exists = !dbfile;
-    if (db_no_exists) {
+    bool db_not_exists = !dbfile;
+    if (db_not_exists) {
         mkdir((string(getpwuid(getuid())->pw_dir) + string("/" FOLDER_NAME)).c_str(), S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
         ofstream new_dbfile(this->db_path.c_str());
         new_dbfile.close();
@@ -37,7 +42,7 @@ void PManager::init_db() {
         sqlite3_close(this->db);
     }
 
-    if (db_no_exists) {
+    if (db_not_exists) {
         const char *sql = "CREATE TABLE Categories(id UNSIGNED INTEGER PRIMARY KEY, name TEXT, color TEXT);"
                           "CREATE TABLE Events(id UNSIGNED INTEGER PRIMARY KEY, name TEXT, description TEXT,"
                           "place TEXT, category UNSIGNED INTEGER, start DATETIME, end DATETIME, child UNSIGNED INTEGER,"
@@ -58,7 +63,7 @@ void PManager::init_db() {
 
 void PManager::set_db(string database) {
     db_name = database;
-    init_db();
+    init_db(db_name);
 }
 
 string PManager::get_db_name() {

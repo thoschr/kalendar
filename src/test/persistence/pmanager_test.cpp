@@ -42,7 +42,10 @@ PManagerTest::~PManagerTest() {
 }
 
 void PManagerTest::test_all() {
+    test_get_db_name();
     test_remove_db();
+    test_init_db();
+    test_get_db_list();
     test_add_event();
     test_get_events_of_month();
     test_remove_event();
@@ -55,16 +58,54 @@ void PManagerTest::test_all() {
     test_get_events();
     test_remove_past_events();
     test_edit_category();
+    test_set_db();
     test_load_db();
     test_save_db();
     test_import_db_iCal_format();
     test_export_db_iCal_format();
 }
 
+void PManagerTest::test_get_db_name() {
+    Test::print("test_get_db_name ");
+    PManager pm;
+    bool ret = (pm.get_db_name() == DEFAULT_DATABASE_NAME);
+    PManager pm2("test.sql");
+    ASSERT (ret && (pm2.get_db_name() == "test.sql"))
+    pm.remove_db();
+    pm2.remove_db();
+}
+
 void PManagerTest::test_remove_db() {
     Test::print("test_remove_db ");
     PManager pm;
-    ASSERT (pm.remove_db())
+    bool ret = pm.remove_db();
+    if (pm.get_db_name() != DEFAULT_DATABASE_NAME) {
+        ret = ret && !std::experimental::filesystem::exists(pm.get_db_folder() + pm.get_db_name());
+    } else {
+        ret = ret && std::experimental::filesystem::exists(pm.get_db_folder() + pm.get_db_name());
+    }
+    ASSERT (ret)
+}
+
+void PManagerTest::test_init_db() {
+    Test::print("test_init_db ");
+    PManager pm;
+    pm.init_db("test.sql");
+    ASSERT (std::experimental::filesystem::exists(pm.get_db_folder() + "test.sql"))
+    pm.remove_db();
+}
+
+void PManagerTest::test_get_db_list() {
+    Test::print("test_get_db_list ");
+    string names[] = {"test1.sql", "test2.sql"};
+    PManager pm;
+    pm.remove_db();
+    pm.init_db(names[0]);
+    bool ret = (std::experimental::filesystem::exists(pm.get_db_folder() + names[0]));
+    pm.remove_db();
+    pm.init_db(names[1]);
+    ASSERT (ret && std::experimental::filesystem::exists(pm.get_db_folder() + names[1]))
+    pm.remove_db();
 }
 
 void PManagerTest::test_add_event() {
@@ -260,6 +301,30 @@ void PManagerTest::test_edit_category() {
     pm.add_category(this->valid_category);
     ASSERT (!pm.replace_category(this->valid_category, this->noname_category) &&
             (pm.replace_category(this->valid_category, this->valid_category_2)))
+    pm.remove_db();
+}
+
+void PManagerTest::test_set_db() {
+    Test::print("test_set_db ");
+    PManager pm;
+    pm.init_db("test.sql");
+    pm.set_db(DEFAULT_DATABASE_NAME);
+    bool ret (pm.get_db_name() == DEFAULT_DATABASE_NAME);
+    pm.add_category(this->valid_category);
+    pm.add_event(this->valid_event);
+    pm.set_db("test.sql");
+    ret = ret && (pm.get_db_name() == "test.sql");
+    pm.add_category(this->valid_category_2);
+    pm.add_event(this->valid_event_2);
+    pm.add_event(this->valid_event_3);
+    pm.set_db(DEFAULT_DATABASE_NAME);
+    ret = ret && (pm.get_db_name() == DEFAULT_DATABASE_NAME);
+    ret = ret && ((pm.get_all_events().size() == 1) &&
+                    (pm.get_all_events().front()->equals(*this->valid_event)));
+    pm.remove_db();
+    pm.set_db("test.sql");
+    ret = ret && (pm.get_db_name() == "test.sql");
+    ASSERT (ret && (pm.get_all_events().size() == 2))
     pm.remove_db();
 }
 

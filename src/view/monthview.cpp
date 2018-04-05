@@ -284,8 +284,7 @@ void MonthView::create_database() {
                                              tr("Database name:"), QLineEdit::Normal,
                                              "", &ok);
     if (ok && !name.isEmpty()) {
-        delete this->pm;
-        this->pm = new SecurePManager(name.toStdString() + ".sql");
+        this->pm->init_db(name.toStdString() + ".sql");
         refresh_db_menu();
     }
 }
@@ -670,6 +669,23 @@ void MonthView::remove_events_from_frame(int i) {
             (qobject_cast<QLabelEvent*>(o))->deleteLater();
         }
         else if (o->metaObject()->className() == button.metaObject()->className()) delete o;
+    }
+}
+
+void MonthView::keyPressEvent(QKeyEvent* e) {
+    switch (e->key()) {
+    case Qt::Key_C:
+        for (int i = 0; i < pm->get_db_list().size(); i++) {
+            if (pm->get_db_list().at(i) == pm->get_db_name()) {
+                if (i < pm->get_db_list().size()-1) {
+                    this->switch_db(pm->get_db_list().at(i+1));
+                } else {
+                    this->switch_db(pm->get_db_list().at(0));
+                }
+                break;
+            }
+        }
+        break;
     }
 }
 
