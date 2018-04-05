@@ -286,6 +286,7 @@ void MonthView::create_database() {
     if (ok && !name.isEmpty()) {
         this->pm->init_db(name.toStdString() + ".sql");
         refresh_db_menu();
+        switch_db(name.toStdString() + ".sql");
     }
 }
 
