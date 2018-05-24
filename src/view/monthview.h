@@ -16,18 +16,20 @@
 #include <QFileDialog>
 #include <QScrollArea>
 #include <QInputDialog>
+#include <QSettings>
 #include "ui_monthview.h"
-#include "eventdialog.h"
-#include "qframe_extended.h"
-#include "qwidget_extended.h"
-#include "categorydialog.h"
+#include "view/eventdialog.h"
+#include "view/qframe_extended.h"
+#include "view/qwidget_extended.h"
+#include "view/categorydialog.h"
 #include "view.h"
 #include "util/dateutil.h"
 #include "qlabel_event.h"
 #include "qpushbutton_extended.h"
-#include "customdialog.h"
-#include "categoryselectdialog.h"
+#include "view/customdialog.h"
+#include "view/categoryselectdialog.h"
 #include "util/pluginmanager.h"
+#include "view/settings.h"
 
 /* Gets the current month displayed using an hack. Infact, the cell in the middle will have always a value setted.
  * This should be used when you don't care about the day */
@@ -58,6 +60,7 @@ class MonthView : public QMainWindow, public View
     Q_OBJECT
 
 private:
+    QSettings settings;
     Category *selected_category;
     PluginManager *plm;
     QVBoxLayout *layout;
@@ -116,6 +119,7 @@ private slots:
     void run_tool(string tool);
     void switch_db(string db);
     void create_database();
+    void show_settings();
 };
 
 #endif // MONTHVIEW_H

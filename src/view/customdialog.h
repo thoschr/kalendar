@@ -1,6 +1,7 @@
 #ifndef CUSTOMDIALOG_H
 #define CUSTOMDIALOG_H
 
+#include "ui_customdialog.h"
 #include <QDialog>
 #include <QKeyEvent>
 #include <QLabel>

@@ -1,5 +1,4 @@
 #include "customdialog.h"
-#include "ui_customdialog.h"
 
 #include <QDebug>
 

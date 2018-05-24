@@ -1,6 +1,7 @@
 #ifndef EVENTDIALOG_H
 #define EVENTDIALOG_H
 
+#include "ui_eventdialog.h"
 #include <QDialog>
 #include <QVBoxLayout>
 #include <QHBoxLayout>

@@ -31,7 +31,8 @@ SOURCES += main.cpp\
     persistence/securepmanager.cpp \
     util/eventutil.cpp \
     test/util/eventutil_test.cpp \
-    util/pluginmanager.cpp
+    util/pluginmanager.cpp \
+    view/settings.cpp
 
 HEADERS  += model/event.h \
     persistence/pmanager.h \
@@ -59,7 +60,8 @@ HEADERS  += model/event.h \
     persistence/securepmanager.h \
     util/eventutil.h \
     test/util/eventutil_test.h \
-    util/pluginmanager.h
+    util/pluginmanager.h \
+    view/settings.h
 
 QMAKE_LIBS += -lsqlite3
 QMAKE_LIBS += -lstdc++fs

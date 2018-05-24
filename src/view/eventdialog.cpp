@@ -1,5 +1,4 @@
 #include "eventdialog.h"
-#include "ui_eventdialog.h"
 
 #include <QDebug>
 

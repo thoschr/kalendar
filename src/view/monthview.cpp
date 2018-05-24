@@ -150,8 +150,15 @@ MonthView::MonthView(QWidget *parent) :
     grid_layout->setVerticalSpacing(0);
 
     //Remove events too old
-    Date target = DateUtil::decrease_month(DateUtil::get_first_day_of_month(current_date));
-    this->pm->remove_past_events(QDateTime(QDate(target.getYear(), target.getMonth() , target.getMonthDay())).toTime_t());
+    int past_months = this->settings.value(SettingsValues::past_months_expiration, 0).toInt();
+    if (past_months > 0) {
+        Date target = DateUtil::get_first_day_of_month(current_date);
+        do {
+            target = DateUtil::decrease_month(target);
+            past_months--;
+        } while (past_months > 0);
+        this->pm->remove_past_events(QDateTime(QDate(target.getYear(), target.getMonth() , target.getMonthDay())).toTime_t());
+    }
 
     //Fill the grid with the days of the default month (i.e. the current month)
     display_days(current_date);
@@ -222,6 +229,9 @@ void MonthView::createMenu() {
     QAction *showOnlyAct = new QAction(tr("Show &only..."), this);
     showOnlyAct->setStatusTip(tr("Show only events of a single category"));
     connect(showOnlyAct, &QAction::triggered, this, &MonthView::filter_by_category);
+    QAction *showSettingsAct = new QAction(tr("Settings"), this);
+    showSettingsAct->setStatusTip(tr("Show settings"));
+    connect(showSettingsAct, &QAction::triggered, this, &MonthView::show_settings);
     QMenu *fileMenu;
     fileMenu = menuBar()->addMenu(tr("&File"));
     fileMenu->addAction(loadAct);
@@ -236,6 +246,7 @@ void MonthView::createMenu() {
     editMenu->addAction(editCategoriesAct);
     editMenu->addAction(deleteAllAct);
     editMenu->addAction(showOnlyAct);
+    editMenu->addAction(showSettingsAct);
     dbMenu = menuBar()->addMenu(tr("&Calendars"));
     refresh_db_menu();
     QMenu *viewsMenu;
@@ -288,6 +299,11 @@ void MonthView::create_database() {
         refresh_db_menu();
         switch_db(name.toStdString() + ".sql");
     }
+}
+
+void MonthView::show_settings() {
+    Settings *settings = new Settings();
+    settings->show();
 }
 
 void MonthView::contextMenuEvent(QContextMenuEvent *event)
