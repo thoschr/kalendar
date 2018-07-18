@@ -115,6 +115,7 @@ private slots:
     void add_event();
     void edit_categories();
     void show_agenda(bool only_todos = false);
+    void show_monthview();
     void filter_by_category();
     void run_tool(string tool);
     void switch_db(string db);

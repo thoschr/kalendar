@@ -226,6 +226,9 @@ void MonthView::createMenu() {
     QAction *showAgendaAct = new QAction(tr("Show &Agenda"), this);
     showAgendaAct->setStatusTip(tr("Show a dialog with all the events"));
     connect(showAgendaAct, &QAction::triggered, this, &MonthView::show_agenda);
+    QAction *showMonthviewAct = new QAction(tr("Show &Monthview"), this);
+    showMonthviewAct->setStatusTip(tr("Show a a new window with the month view"));
+    connect(showMonthviewAct, &QAction::triggered, this, &MonthView::show_monthview);
     QAction *showOnlyAct = new QAction(tr("Show &only..."), this);
     showOnlyAct->setStatusTip(tr("Show only events of a single category"));
     connect(showOnlyAct, &QAction::triggered, this, &MonthView::filter_by_category);
@@ -252,6 +255,7 @@ void MonthView::createMenu() {
     QMenu *viewsMenu;
     viewsMenu = menuBar()->addMenu(tr("&Views"));
     viewsMenu->addAction(showAgendaAct);
+    viewsMenu->addAction(showMonthviewAct);
     //TODO: Add the other future views (each view will be displayed in a different window)
     QMenu *toolsMenu;
     toolsMenu = menuBar()->addMenu(tr("&Tools"));
@@ -440,6 +444,11 @@ void MonthView::edit_categories() {
 void MonthView::on_todo_button_click() {
     /* Show only TODOs */
     show_agenda(true);
+}
+
+void MonthView::show_monthview() {
+    MonthView *mv = new MonthView;
+    mv->show();
 }
 
 void MonthView::show_agenda(bool only_todos) {
