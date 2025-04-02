@@ -1,0 +1,5 @@
+src/Kalendar.pro.user
+*.gch
+*.o
+moc_*
+*.exe
