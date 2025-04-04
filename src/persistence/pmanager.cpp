@@ -1,7 +1,7 @@
 #include "pmanager.h"
 
 #include <QDebug>
-#include <filesystem> // Replace experimental with standard filesystem
+#include <filesystem>
 
 PManager::PManager(string database)
 {
@@ -78,7 +78,7 @@ vector<string> PManager::get_db_list() {
     for (std::filesystem::directory_entry e : std::filesystem::directory_iterator(this->db_path.substr(0, this->db_path.find_last_of('/')))) {
         std::filesystem::path p = e.path();
         if (p.extension() == ".sql")
-            db_list.push_back(p.filename().string()); // Use .string() for filename
+            db_list.push_back(p.filename().string());
     }
     return db_list;
 }
