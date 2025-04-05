@@ -20,6 +20,15 @@
 
 using namespace std;
 
+enum class RRULE
+{
+  YEARLY,
+  MONTHLY,
+  WEEKLY,
+  DAILY,
+  NONE
+};
+
 class Event
 {
 private:
@@ -31,6 +40,7 @@ private:
     /* Timestamp */
     time_t start;
     time_t end;
+    RRULE rrule;
 
 public:
     Event(Event &event) {
@@ -41,9 +51,10 @@ public:
         this->id = event.getId();
         this->start = event.getStart();
         this->end = event.getEnd();
+        this->rrule = event.getRRULE();
     }
 
-    Event(unsigned int id, string name, const string &description, const string &place, Category *category, time_t start, time_t end) {
+    Event(unsigned int id, string name, const string &description, const string &place, Category *category, time_t start, time_t end, const RRULE &rrule = RRULE::NONE) {
         this->name = name;
         this->description = description;
         this->place = place;
@@ -82,6 +93,7 @@ public:
     Category *getCategory() { return category; }
     time_t getStart() { return start; }
     time_t getEnd() { return end; }
+    RRULE getRRULE() { return rrule; }
 
     bool equals(Event &e) {
         return (this->id == e.getId());

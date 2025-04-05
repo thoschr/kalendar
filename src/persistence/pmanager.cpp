@@ -473,6 +473,7 @@ int PManager::import_db_iCal_format(string path, Category *category) {
     string summary;
     string location;
     string description;
+    string rrule;
     bool found_description = false;
     int counter = 0;
     struct tm start;
@@ -527,6 +528,12 @@ int PManager::import_db_iCal_format(string path, Category *category) {
             found_description = true;
             description = line.substr(pattern.length(),line.length()-pattern.length());
             if (description.length() < 3) description = "";
+            continue;
+        }
+        pattern = "RRULE:FREQ=";
+        if (line.find(pattern) == 0) {
+            found_description = false;
+            rrule = line.substr(pattern.length(),line.length()-pattern.length());
             continue;
         }
         pattern = "END:VEVENT";
