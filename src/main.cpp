@@ -11,6 +11,10 @@
 
 #define RUN_TESTS 0
 
+#ifdef _WIN32
+  #define OS_WINDOWS
+#endif
+
 int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);

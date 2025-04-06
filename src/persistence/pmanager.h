@@ -1,6 +1,10 @@
 #ifndef PMANAGER_H
 #define PMANAGER_H
 
+#ifndef _WIN32
+  #include <pwd.h>
+#endif
+
 // v3.9.2 has been used by the author. The source lib now has version 3.49.1
 #include "../tools/sqlite3/sqlite3.h" /* Version: 3.9.2 */
 #include <stdio.h>
@@ -9,7 +13,6 @@
 #include <ctime>
 #include <unistd.h>
 #include <sys/types.h>
-// #include <pwd.h>
 #include <sys/stat.h>
 #include <fstream>
 #include <experimental/filesystem>

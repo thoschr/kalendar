@@ -23,14 +23,20 @@ void PManager::init_db(string db_name) {
         sqlite3_close(this->db);
     }
     /* Open the database (will be created if it doesn't exist) */
-    // this->db_folder = string(getpwuid(getuid())->pw_dir) + string("/" FOLDER_NAME "/");
-    this->db_folder = string(std::getenv("USERPROFILE")) + string("/" FOLDER_NAME "/");
+    #ifdef OS_WINDOWS
+      this->db_folder = string(std::getenv("USERPROFILE")) + string("/" FOLDER_NAME "/");
+    #else
+      this->db_folder = string(getpwuid(getuid())->pw_dir) + string("/" FOLDER_NAME "/");
+    #endif
     this->db_path = this->db_folder + string(db_name);
     ifstream dbfile(this->db_path.c_str());
     bool db_not_exists = !dbfile;
     if (db_not_exists) {
-        // mkdir((string(std::getenv("USERPROFILE")) + string("/" FOLDER_NAME)).c_str(), S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
-        mkdir((string(std::getenv("USERPROFILE")) + string("/" FOLDER_NAME)).c_str());
+        #ifdef OS_WINDOWS
+          mkdir((string(std::getenv("USERPROFILE")) + string("/" FOLDER_NAME)).c_str());
+        #else
+          mkdir((string(getpwuid(getuid())->pw_dir) + string("/" FOLDER_NAME)).c_str(), S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
+        #endif
         ofstream new_dbfile(this->db_path.c_str());
         new_dbfile.close();
     }
