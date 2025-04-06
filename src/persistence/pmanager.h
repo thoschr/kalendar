@@ -1,7 +1,9 @@
 #ifndef PMANAGER_H
 #define PMANAGER_H
 
-#ifndef _WIN32
+#ifdef _WIN32
+  #define OS_WINDOWS
+#else
   #include <pwd.h>
 #endif
 
