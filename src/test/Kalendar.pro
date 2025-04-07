@@ -5,6 +5,8 @@ greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 TARGET = test
 TEMPLATE = app
 
+CONFIG += cmdline
+
 
 SOURCES += main.cpp\
     test.cpp\
