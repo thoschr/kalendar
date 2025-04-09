@@ -281,6 +281,10 @@ list<Event*> PManager::get_events_of_month(int month, int year) {
 }
 
 bool PManager::remove_db() {
+    if (this->db != NULL) {
+      sqlite3_close(this->db);
+      this->db = NULL;
+    }
     /* Delete the database file, but not the folder */
     return (std::remove(this->db_path.c_str()) == 0);
 }
