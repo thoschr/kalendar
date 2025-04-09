@@ -151,6 +151,8 @@ void PManagerTest::test_remove_event() {
     Test::print("test_remove_event ");
     bool ret;
     PManager pm;
+    //clear database
+    sqlite3_exec(pm.get_db(), "DELETE FROM Events;", 0, 0, nullptr);
     pm.add_event(this->valid_event);
     pm.add_event(this->valid_event_2);
     ret = pm.remove_event(this->valid_event);

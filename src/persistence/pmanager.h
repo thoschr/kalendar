@@ -61,6 +61,7 @@ public:
     int export_db_iCal_format(list<Event *> events, string path);
     int load_db(string path);
     int import_db_iCal_format(string path,Category *category);
+    sqlite3* get_db() const { return this->db; }
 };
 
 #endif // PMANAGER_H
