@@ -10,7 +10,13 @@ PManager::PManager(string database)
 }
 
 PManager::~PManager() {
-    sqlite3_close(this->db);
+   if (this->db != NULL) {
+      int rc = sqlite3_close(this->db);
+      if (rc != SQLITE_OK) {
+        fprintf(stderr, "Error closing database: %s\n", sqlite3_errmsg(this->db));
+      }
+      this->db = NULL;
+    }
 }
 
 string PManager::get_db_folder() {
