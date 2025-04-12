@@ -42,6 +42,7 @@ public:
     void set_db(string database);
     string get_db_name();
     string get_db_folder();
+    string get_db_path();
     vector<string> get_db_list();
     bool add_event (Event *e, Event *child = NULL);
     bool replace_event (Event *old_event, Event *new_event); //return true also if old_event doesn't exist

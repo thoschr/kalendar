@@ -23,6 +23,10 @@ string PManager::get_db_folder() {
     return this->db_folder;
 }
 
+string PManager::get_db_path() {
+    return this->db_path;
+}
+
 void PManager::init_db(string db_name) {
     /* Close an already open database */
     if (this->db != NULL) {
