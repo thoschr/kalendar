@@ -94,6 +94,7 @@ void PManagerTest::test_init_db() {
     pm.init_db("test.sql");
     ASSERT (std::filesystem::exists(pm.get_db_folder() + "test.sql"))
     pm.remove_db();
+    std::remove((pm.get_db_folder() + "default.sql").c_str());
 }
 
 void PManagerTest::test_get_db_list() {
