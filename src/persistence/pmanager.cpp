@@ -33,7 +33,7 @@ void PManager::init_db(string db_name) {
     bool db_not_exists = !dbfile;
     if (db_not_exists) {
         #ifdef OS_WINDOWS
-          mkdir((string(std::getenv("USERPROFILE")) + string("/" FOLDER_NAME)).c_str());
+          mkdir((string(std::getenv("USERPROFILE")) + string("\\" FOLDER_NAME)).c_str());
         #else
           mkdir((string(getpwuid(getuid())->pw_dir) + string("/" FOLDER_NAME)).c_str(), S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
         #endif
