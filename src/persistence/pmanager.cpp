@@ -24,7 +24,7 @@ void PManager::init_db(string db_name) {
     }
     /* Open the database (will be created if it doesn't exist) */
     #ifdef OS_WINDOWS
-      this->db_folder = string(std::getenv("USERPROFILE")) + string("/" FOLDER_NAME "/");
+      this->db_folder = string(std::getenv("USERPROFILE")) + string("\\" FOLDER_NAME "\\");
     #else
       this->db_folder = string(getpwuid(getuid())->pw_dir) + string("/" FOLDER_NAME "/");
     #endif
