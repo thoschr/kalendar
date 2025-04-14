@@ -496,92 +496,96 @@ int PManager::load_db(string path) {
 
 int PManager::import_db_iCal_format(string path, Category *category) {
     auto category_id = category->getId();
-    if ((path.length() < 5) || (path.substr(path.length()-4, 4) != ".ics")) return 0;
-    ifstream file;
-    string line;
-    string pattern;
-    string summary;
-    string location;
-    string description;
-    bool found_description = false;
-    int counter = 0;
-    struct tm start;
-    start.tm_sec = start.tm_min = start.tm_hour = start.tm_wday = start.tm_yday = start.tm_year = start.tm_mday = start.tm_mon = 0;
-    struct tm end;
-    end.tm_sec = end.tm_min = end.tm_hour = end.tm_wday = end.tm_yday = end.tm_year = end.tm_mday = end.tm_mon = 0;
-    /* Look at the explanation in get_events_of_month */
-    time_t threshold = 26262000; // = 1 November 1970
-    std::tm *t = localtime(&threshold);
-    int s = 0;
-    if (t->tm_isdst > 0) s = 1;
+    if (path.substr(path.length()-4, 4) != ".ics" || path.substr(path.length()-4, 4) != ".ical"){
+      ifstream file;
+      string line;
+      string pattern;
+      string summary;
+      string location;
+      string description;
+      bool found_description = false;
+      int counter = 0;
+      struct tm start;
+      start.tm_sec = start.tm_min = start.tm_hour = start.tm_wday = start.tm_yday = start.tm_year = start.tm_mday = start.tm_mon = 0;
+      struct tm end;
+      end.tm_sec = end.tm_min = end.tm_hour = end.tm_wday = end.tm_yday = end.tm_year = end.tm_mday = end.tm_mon = 0;
+      /* Look at the explanation in get_events_of_month */
+      time_t threshold = 26262000; // = 1 November 1970
+      std::tm *t = localtime(&threshold);
+      int s = 0;
+      if (t->tm_isdst > 0) s = 1;
 
-    file.open(path);
-    while ( getline (file,line) ) {
-        pattern = "DTSTART;VALUE=DATE:";
-        if (line.find(pattern) == 0) { //if line starts with the pattern
-            found_description = false;
-            string date = line.substr(pattern.length(),line.length()-pattern.length());
-            start.tm_year = stoi(date.substr(0,4)) - 1900;
-            start.tm_mon = stoi(date.substr(4,2)) - 1;
-            start.tm_mday = stoi(date.substr(6,2));
-            start.tm_hour = 8;
-            start.tm_isdst = ((start.tm_mon > 2) && (start.tm_mon < 10+s));
-            continue;
-        }
-        pattern = "DTEND;VALUE=DATE:";
-        if (line.find(pattern) == 0) {
-            found_description = false;
-            string date = line.substr(pattern.length(),line.length()-pattern.length());
-            end.tm_year = stoi(date.substr(0,4)) - 1900;
-            end.tm_mon = stoi(date.substr(4,2)) - 1;
-            end.tm_mday = stoi(date.substr(6,2)) - 1; /* -1 is to get the day before, mktime will normalize it */
-            end.tm_hour = 22;
-            end.tm_isdst = ((end.tm_mon > 2) && (end.tm_mon < 10+s));
-            continue;
-        }
-        pattern = "SUMMARY:";
-        if (line.find(pattern) == 0) {
-            found_description = false;
-            summary = line.substr(pattern.length(),line.length()-pattern.length());
-            continue;
-        }
-        pattern = "LOCATION:";
-        if (line.find(pattern) == 0) {
-            found_description = false;
-            location = line.substr(pattern.length(),line.length()-pattern.length());
-            if (location.length() < 3) location = "";
-            continue;
-        }
-        pattern = "DESCRIPTION:";
-        if (line.find(pattern) == 0) {
-            found_description = true;
-            description = line.substr(pattern.length(),line.length()-pattern.length());
-            if (description.length() < 3) description = "";
-            continue;
-        }
-        pattern = "END:VEVENT";
-        if (line.find(pattern) == 0) {
-            found_description = false;
-            if (this->add_event(new Event(0,summary,description,location,this->get_category(category_id),mktime(&start),mktime(&end))))
-                counter++;
-            else
-                printf("Error: %s not imported\n", summary.c_str());
-            /* Reset optional variables to import the next event without old values */
-            location = "";
-            description = "";
-            continue;
-        }
-        if (found_description) { /* Multi-line description */
-            description = description + "\n" + line;
-        }
+      file.open(path);
+      while ( getline (file,line) ) {
+          pattern = "DTSTART;VALUE=DATE:";
+          if (line.find(pattern) == 0) { //if line starts with the pattern
+              found_description = false;
+              string date = line.substr(pattern.length(),line.length()-pattern.length());
+              start.tm_year = stoi(date.substr(0,4)) - 1900;
+              start.tm_mon = stoi(date.substr(4,2)) - 1;
+              start.tm_mday = stoi(date.substr(6,2));
+              start.tm_hour = 8;
+              start.tm_isdst = ((start.tm_mon > 2) && (start.tm_mon < 10+s));
+              continue;
+          }
+          pattern = "DTEND;VALUE=DATE:";
+          if (line.find(pattern) == 0) {
+              found_description = false;
+              string date = line.substr(pattern.length(),line.length()-pattern.length());
+              end.tm_year = stoi(date.substr(0,4)) - 1900;
+              end.tm_mon = stoi(date.substr(4,2)) - 1;
+              end.tm_mday = stoi(date.substr(6,2)) - 1; /* -1 is to get the day before, mktime will normalize it */
+              end.tm_hour = 22;
+              end.tm_isdst = ((end.tm_mon > 2) && (end.tm_mon < 10+s));
+              continue;
+          }
+          pattern = "SUMMARY:";
+          if (line.find(pattern) == 0) {
+              found_description = false;
+              summary = line.substr(pattern.length(),line.length()-pattern.length());
+              continue;
+          }
+          pattern = "LOCATION:";
+          if (line.find(pattern) == 0) {
+              found_description = false;
+              location = line.substr(pattern.length(),line.length()-pattern.length());
+              if (location.length() < 3) location = "";
+              continue;
+          }
+          pattern = "DESCRIPTION:";
+          if (line.find(pattern) == 0) {
+              found_description = true;
+              description = line.substr(pattern.length(),line.length()-pattern.length());
+              if (description.length() < 3) description = "";
+              continue;
+          }
+          pattern = "END:VEVENT";
+          if (line.find(pattern) == 0) {
+              found_description = false;
+              if (this->add_event(new Event(0,summary,description,location,this->get_category(category_id),mktime(&start),mktime(&end))))
+                  counter++;
+              else
+                  printf("Error: %s not imported\n", summary.c_str());
+              /* Reset optional variables to import the next event without old values */
+              location = "";
+              description = "";
+              continue;
+          }
+          if (found_description) { /* Multi-line description */
+              description = description + "\n" + line;
+          }
+      }
+      file.close();
+      return counter;}
+    else {
+      fprintf(stderr, "Error: File %s is not a valid iCal file\n", path.c_str());
+      return 0;
     }
-    file.close();
-    return counter;
 }
 
 int PManager::export_db_iCal_format(list<Event*> events, string path) {
     if (path.length() < 5) return 0;
-    if (path.substr(path.length()-4, 4) != ".ics") path = path + ".ics";
+    if (path.substr(path.length()-4, 4) != ".ics" && path.substr(path.length()-4, 4) != ".ical") path = path + ".ics";
     char buff[9];
     ofstream file;
     file.open(path);
