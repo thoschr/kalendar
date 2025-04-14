@@ -20,13 +20,31 @@
 
 using namespace std;
 
-enum class RRULE
+struct Rrule
 {
-  YEARLY,
-  MONTHLY,
-  WEEKLY,
-  DAILY,
-  NONE
+  enum class Frequency
+  {
+    YEARLY,
+    MONTHLY,
+    WEEKLY,
+    DAILY,
+    NONE
+  };
+  Frequency freq;
+
+  Rrule() : freq(Frequency::NONE) {}
+  Rrule(std::string rruleline){
+    if (rruleline.find("DAILY") != std::string::npos)
+      freq = Frequency::DAILY;
+    else if (rruleline.find("WEEKLY") != std::string::npos)
+      freq = Frequency::WEEKLY;
+    else if (rruleline.find("MONTHLY") != std::string::npos)
+      freq = Frequency::MONTHLY;
+    else if (rruleline.find("YEARLY") != std::string::npos)
+      freq = Frequency::YEARLY;
+    else
+      freq = Frequency::NONE; 
+  };
 };
 
 class Event
@@ -40,7 +58,7 @@ private:
     /* Timestamp */
     time_t start;
     time_t end;
-    RRULE rrule;
+    Rrule rrule;
 
 public:
     Event(Event &event) {
@@ -51,13 +69,15 @@ public:
         this->id = event.getId();
         this->start = event.getStart();
         this->end = event.getEnd();
-        this->rrule = event.getRRULE();
+        this->rrule = event.getRrule();
     }
 
-    Event(unsigned int id, string name, const string &description, const string &place, Category *category, time_t start, time_t end, const RRULE &rrule = RRULE::NONE) {
+    Event(unsigned int id, string name, const string &description, const string &place, Category *category, time_t start, time_t end, const Rrule &rrule = Rrule())
+        : id(id), name(name), description(description), place(place), category(category), start(start), end(end), rrule(rrule) {
         this->name = name;
         this->description = description;
         this->place = place;
+        this->rrule = rrule;  
         if (category == NULL) {
             /* An event with a NULL category is inconsistent, it shouldn't exist */
             this->category = NULL;
@@ -93,7 +113,7 @@ public:
     Category *getCategory() { return category; }
     time_t getStart() { return start; }
     time_t getEnd() { return end; }
-    RRULE getRRULE() { return rrule; }
+    Rrule getRrule() { return rrule; }
 
     bool equals(Event &e) {
         return (this->id == e.getId());

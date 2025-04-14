@@ -501,7 +501,7 @@ int PManager::import_db_iCal_format(string path, Category *category) {
     string summary;
     string location;
     string description;
-    string rrule;
+    Rrule rrule("NONE");
     bool found_description = false;
     int counter = 0;
     struct tm start;
@@ -561,13 +561,14 @@ int PManager::import_db_iCal_format(string path, Category *category) {
         pattern = "RRULE:FREQ=";
         if (line.find(pattern) == 0) {
             found_description = false;
-            rrule = line.substr(pattern.length(),line.length()-pattern.length());
+            std::string rruleline = line.substr(pattern.length(),line.length()-pattern.length());
+            rrule = Rrule(rruleline);
             continue;
         }
         pattern = "END:VEVENT";
         if (line.find(pattern) == 0) {
             found_description = false;
-            if (this->add_event(new Event(0,summary,description,location,this->get_category(category_id),mktime(&start),mktime(&end))))
+            if (this->add_event(new Event(0,summary,description,location,this->get_category(category_id),mktime(&start),mktime(&end),rrule)))
                 counter++;
             else
                 printf("Error: %s not imported\n", summary.c_str());
