@@ -496,6 +496,7 @@ int PManager::load_db(string path) {
 
 int PManager::import_db_iCal_format(string path, Category *category) {
     auto category_id = category->getId();
+    if (path.length() < 5) return 0;
     if (path.substr(path.length()-4, 4) != ".ics" || path.substr(path.length()-4, 4) != ".ical"){
       ifstream file;
       string line;
