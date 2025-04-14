@@ -5,6 +5,7 @@
 
 #include "../test.h"
 #include "../../persistence/pmanager.h"
+#include "../../tools/sqlite3/sqlite3.h"
 
 class PManagerTest
 {

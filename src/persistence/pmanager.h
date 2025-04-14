@@ -1,6 +1,12 @@
 #ifndef PMANAGER_H
 #define PMANAGER_H
 
+#ifdef _WIN32
+  #define OS_WINDOWS
+#else
+  #include <pwd.h>
+#endif
+
 // v3.9.2 has been used by the author. The source lib now has version 3.49.1
 #include "../tools/sqlite3/sqlite3.h" /* Version: 3.9.2 */
 #include <stdio.h>
@@ -9,7 +15,6 @@
 #include <ctime>
 #include <unistd.h>
 #include <sys/types.h>
-// #include <pwd.h>
 #include <sys/stat.h>
 #include <fstream>
 #include <experimental/filesystem>
@@ -37,6 +42,7 @@ public:
     void set_db(string database);
     string get_db_name();
     string get_db_folder();
+    string get_db_path();
     vector<string> get_db_list();
     bool add_event (Event *e, Event *child = NULL);
     bool replace_event (Event *old_event, Event *new_event); //return true also if old_event doesn't exist
@@ -56,6 +62,7 @@ public:
     int export_db_iCal_format(list<Event *> events, string path);
     int load_db(string path);
     int import_db_iCal_format(string path,Category *category);
+    sqlite3* get_db() const { return this->db; }
 };
 
 #endif // PMANAGER_H

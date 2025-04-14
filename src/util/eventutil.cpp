@@ -16,7 +16,7 @@ Event* EventUtil::parseString(const string &str_event) {
     if ((i < 5) || (token[0] == "")) return NULL;
     token[5] = str;
     Category *category = NULL;
-    SecurePManager spm;
+    PManager spm;
     vector<Category*> categories = spm.get_categories();
     for (Category *c : categories) {
         if (token[3] == c->getName()) {

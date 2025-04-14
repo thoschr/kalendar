@@ -10,11 +10,21 @@ PManager::PManager(string database)
 }
 
 PManager::~PManager() {
-    sqlite3_close(this->db);
+   if (this->db != NULL) {
+      int rc = sqlite3_close(this->db);
+      if (rc != SQLITE_OK) {
+        fprintf(stderr, "Error closing database: %s\n", sqlite3_errmsg(this->db));
+      }
+      this->db = NULL;
+    }
 }
 
 string PManager::get_db_folder() {
     return this->db_folder;
+}
+
+string PManager::get_db_path() {
+    return this->db_path;
 }
 
 void PManager::init_db(string db_name) {
@@ -23,14 +33,20 @@ void PManager::init_db(string db_name) {
         sqlite3_close(this->db);
     }
     /* Open the database (will be created if it doesn't exist) */
-    // this->db_folder = string(getpwuid(getuid())->pw_dir) + string("/" FOLDER_NAME "/");
-    this->db_folder = string(std::getenv("USERPROFILE")) + string("/" FOLDER_NAME "/");
+    #ifdef OS_WINDOWS
+      this->db_folder = string(std::getenv("USERPROFILE")) + string("\\" FOLDER_NAME "\\");
+    #else
+      this->db_folder = string(getpwuid(getuid())->pw_dir) + string("/" FOLDER_NAME "/");
+    #endif
     this->db_path = this->db_folder + string(db_name);
     ifstream dbfile(this->db_path.c_str());
     bool db_not_exists = !dbfile;
     if (db_not_exists) {
-        // mkdir((string(std::getenv("USERPROFILE")) + string("/" FOLDER_NAME)).c_str(), S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
-        mkdir((string(std::getenv("USERPROFILE")) + string("/" FOLDER_NAME)).c_str());
+        #ifdef OS_WINDOWS
+          mkdir((string(std::getenv("USERPROFILE")) + string("\\" FOLDER_NAME)).c_str());
+        #else
+          mkdir((string(getpwuid(getuid())->pw_dir) + string("/" FOLDER_NAME)).c_str(), S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
+        #endif
         ofstream new_dbfile(this->db_path.c_str());
         new_dbfile.close();
     }
@@ -275,6 +291,18 @@ list<Event*> PManager::get_events_of_month(int month, int year) {
 }
 
 bool PManager::remove_db() {
+    if (this->db != NULL) {
+      sqlite3_stmt *stmt;
+      while ((stmt = sqlite3_next_stmt(this->db, NULL)) != NULL) {
+          sqlite3_finalize(stmt); // Finalize all prepared statements
+      }
+      int rc = sqlite3_close(this->db);
+      if (rc != SQLITE_OK) {
+          fprintf(stderr, "Error closing database: %s\n", sqlite3_errmsg(this->db));
+          return false;
+      }
+      this->db = NULL;
+    }
     /* Delete the database file, but not the folder */
     return (std::remove(this->db_path.c_str()) == 0);
 }

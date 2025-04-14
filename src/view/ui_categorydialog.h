@@ -10,7 +10,7 @@
 #define UI_CATEGORYDIALOG_H
 
 #include <QtCore/QVariant>
-#include <QtGUI/QAction>
+#include <QtGui/QAction>
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QButtonGroup>
 #include <QtWidgets/QDialog>
