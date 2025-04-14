@@ -408,7 +408,7 @@ CustomDialog* MonthView::show_progress_bar(QString title) {
 }
 
 void MonthView::import_events() {
-    QString path = QFileDialog::getOpenFileName(this, "Import events from other calendars", QDir::homePath(), "iCal Files (*.ics)");
+    QString path = QFileDialog::getOpenFileName(this, "Import events from other calendars", QDir::homePath(), "iCal Files (*.ics *.ical)");
     if (path != "") {
         CategorySelectDialog *dialog = new CategorySelectDialog(this,"Select a category for the imported events: ");
         dialog->setModal(true);
