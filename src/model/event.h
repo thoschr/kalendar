@@ -22,30 +22,31 @@ using namespace std;
 
 struct Rrule
 {
-  enum class Frequency
-  {
-    YEARLY,
-    MONTHLY,
-    WEEKLY,
-    DAILY,
-    NONE
-  };
-  Frequency freq;
+  public:
+  std::string freq;
 
-  Rrule() : freq(Frequency::NONE) {}
+  Rrule() : freq("NONE") {}
   Rrule(std::string rruleline){
     if (rruleline.find("DAILY") != std::string::npos)
-      freq = Frequency::DAILY;
+      freq = "DAILY";
     else if (rruleline.find("WEEKLY") != std::string::npos)
-      freq = Frequency::WEEKLY;
+      freq = "WEEKLY";
     else if (rruleline.find("MONTHLY") != std::string::npos)
-      freq = Frequency::MONTHLY;
+      freq = "MONTHLY";
     else if (rruleline.find("YEARLY") != std::string::npos)
-      freq = Frequency::YEARLY;
+      freq = "YEARLY";
+    else if (rruleline.find("NONE") != std::string::npos)
+      freq = "NONE";
     else
-      freq = Frequency::NONE; 
+      fprintf(stderr, "Error while processing Rrule: %s\n", rruleline.c_str());
   };
 };
+
+// std::ostream& operator<<(std::ostream& os, const Rrule& rrule);
+inline std::ostream& operator<<(std::ostream& os, Rrule const & rrule) {
+  os << "Rrule Frequency: " << rrule.freq.c_str();
+  return os;
+}
 
 class Event
 {
@@ -72,12 +73,12 @@ public:
         this->rrule = event.getRrule();
     }
 
-    Event(unsigned int id, string name, const string &description, const string &place, Category *category, time_t start, time_t end, const Rrule &rrule = Rrule())
+    Event(unsigned int id, string name, const string &description, const string &place, Category *category, time_t start, time_t end, std::string rrule = "NONE")
         : id(id), name(name), description(description), place(place), category(category), start(start), end(end), rrule(rrule) {
         this->name = name;
         this->description = description;
         this->place = place;
-        this->rrule = rrule;  
+        this->rrule = Rrule(rrule);  
         if (category == NULL) {
             /* An event with a NULL category is inconsistent, it shouldn't exist */
             this->category = NULL;

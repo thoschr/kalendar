@@ -8,6 +8,7 @@ PManagerTest::PManagerTest()
     time_t timestamp = 966038400L; // = 20/12/1999 I think it's better than time(NULL);
     string test("test_string");
     string specialchars("'/--\"#@");
+    std::string rrule("FREQ=NONE");
     /* Categories */
     this->valid_default_category = new Category(1, string("Default"), string("#1022A0"));
     this->valid_category = new Category(0, test, test);
@@ -15,15 +16,15 @@ PManagerTest::PManagerTest()
     this->noname_category = new Category(0, string(""), test);
     this->specialchars_category = new Category(0, specialchars, specialchars);
     /* Events */
-    this->valid_event = new Event(0, test, test, test, this->valid_default_category, timestamp, timestamp + 100);
-    this->valid_event_2 = new Event(100, test, test, test, this->valid_default_category, timestamp - 500, timestamp + 1000000); //starts from current month, ends the next month
-    this->valid_event_3 = new Event(80, test, test, test, this->valid_category_2, timestamp - 500, timestamp + 1000000);
+    this->valid_event = new Event(0, test, test, test, this->valid_default_category, timestamp, timestamp + 100, rrule);
+    this->valid_event_2 = new Event(100, test, test, test, this->valid_default_category, timestamp - 500, timestamp + 1000000, rrule); //starts from current month, ends the next month
+    this->valid_event_3 = new Event(80, test, test, test, this->valid_category_2, timestamp - 500, timestamp + 1000000, rrule);
     /* Invalid Events */
-    this->event_with_null_category = new Event(0, test, test, test, NULL, timestamp, timestamp);
-    this->event_with_invalid_category = new Event(0, test, test, test, new Category(99, test, test), timestamp, timestamp);
-    this->noname_event = new Event(1, string(""), test, test, new Category(1, test, test), timestamp, timestamp + 100);
-    this->invalid_time_event = new Event(1, test, test, test,  new Category(1, test, test), timestamp, timestamp - 100);
-    this->specialchars_event = new Event(1, specialchars, specialchars, specialchars, new Category(1, specialchars, specialchars), timestamp, timestamp + 100);
+    this->event_with_null_category = new Event(0, test, test, test, NULL, timestamp, timestamp, rrule);
+    this->event_with_invalid_category = new Event(0, test, test, test, new Category(99, test, test), timestamp, timestamp, rrule);
+    this->noname_event = new Event(1, string(""), test, test, new Category(1, test, test), timestamp, timestamp + 100, rrule);
+    this->invalid_time_event = new Event(1, test, test, test,  new Category(1, test, test), timestamp, timestamp - 100, rrule);
+    this->specialchars_event = new Event(1, specialchars, specialchars, specialchars, new Category(1, specialchars, specialchars), timestamp, timestamp + 100, rrule);
 }
 
 PManagerTest::~PManagerTest() {
@@ -337,7 +338,7 @@ void PManagerTest::test_load_db() {
     ofstream file;
     file.open("testdb.kal");
     file << "INSERT INTO Categories VALUES(" << this->valid_category->getId() << ",'" << this->valid_category->getName() << "','" << this->valid_category->getColor() << "');" << endl;
-    file << "INSERT INTO Events VALUES(" << this->valid_event->getId() << ",'" << this->valid_event->getName() << "','" << this->valid_event->getDescription() << "','" << this->valid_event->getPlace() << "'," << this->valid_event->getCategory()->getId() << "," << this->valid_event->getStart() << "," << this->valid_event->getEnd() << ", NULL);" << endl;
+    file << "INSERT INTO Events VALUES(" << this->valid_event->getId() << ",'" << this->valid_event->getName() << "','" << this->valid_event->getDescription() << "','" << this->valid_event->getPlace() << "'," << this->valid_event->getCategory()->getId() << "," << this->valid_event->getStart() << "," << this->valid_event->getEnd() << ",'" << this->valid_event->getRrule().freq << "'," << "NULL" << ");" << endl;
     file.close();
     ret = pm.load_db("");
     ret = !ret && pm.load_db("notexist");
