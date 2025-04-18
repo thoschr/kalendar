@@ -23,30 +23,35 @@ using namespace std;
 struct Rrule
 {
   public:
-  std::string freq;
+    Rrule() : freq("NONE") {}
+    Rrule(std::string rruleline){
+      if (rruleline.find("DAILY") != std::string::npos)
+        freq = "DAILY";
+      else if (rruleline.find("WEEKLY") != std::string::npos)
+        freq = "WEEKLY";
+      else if (rruleline.find("MONTHLY") != std::string::npos)
+        freq = "MONTHLY";
+      else if (rruleline.find("YEARLY") != std::string::npos)
+        freq = "YEARLY";
+      else if (rruleline.find("NONE") != std::string::npos)
+        freq = "NONE";
+      else
+        fprintf(stderr, "Error while processing Rrule: %s\n", rruleline.c_str());
+    };
+    bool isset(){ if (freq == "DAILY" || freq == "WEEKLY" || freq == "MONTHLY" || freq == "YEARLY") return true; else return false; }
+    void reset(){ freq = "NONE"; }
+    std::string get_freq(){ return freq; }
+  
+  private:
+    std::string freq;
 
-  Rrule() : freq("NONE") {}
-  Rrule(std::string rruleline){
-    if (rruleline.find("DAILY") != std::string::npos)
-      freq = "DAILY";
-    else if (rruleline.find("WEEKLY") != std::string::npos)
-      freq = "WEEKLY";
-    else if (rruleline.find("MONTHLY") != std::string::npos)
-      freq = "MONTHLY";
-    else if (rruleline.find("YEARLY") != std::string::npos)
-      freq = "YEARLY";
-    else if (rruleline.find("NONE") != std::string::npos)
-      freq = "NONE";
-    else
-      fprintf(stderr, "Error while processing Rrule: %s\n", rruleline.c_str());
-  };
 };
 
 // std::ostream& operator<<(std::ostream& os, const Rrule& rrule);
-inline std::ostream& operator<<(std::ostream& os, Rrule const & rrule) {
-  os << "Rrule Frequency: " << rrule.freq.c_str();
-  return os;
-}
+// inline std::ostream& operator<<(std::ostream& os, Rrule const & rrule) {
+//   os << "Rrule Frequency: " << rrule.freq.c_str();
+//   return os;
+// }
 
 class Event
 {

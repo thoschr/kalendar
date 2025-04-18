@@ -62,6 +62,7 @@ public:
     int export_db_iCal_format(list<Event *> events, string path);
     int load_db(string path);
     int import_db_iCal_format(string path,Category *category);
+    int add_recurring_event(Event *e, const Rrule& rrule);
     sqlite3* get_db() const { return this->db; }
 };
 

@@ -66,7 +66,7 @@ void PManager::init_db(string db_name) {
     if (db_not_exists) {
         const char *sql = "CREATE TABLE Categories(id UNSIGNED INTEGER PRIMARY KEY, name TEXT, color TEXT);"
                           "CREATE TABLE Events(id UNSIGNED INTEGER PRIMARY KEY, name TEXT, description TEXT,"
-                          "place TEXT, category UNSIGNED INTEGER, start DATETIME, end DATETIME, rrule TEXT,"
+                          "place TEXT, category UNSIGNED INTEGER, start DATETIME, end DATETIME,"
                           "child UNSIGNED INTEGER, FOREIGN KEY(category) REFERENCES Categories(id) ON DELETE RESTRICT,"
                           "FOREIGN KEY(child) REFERENCES Events(id) ON DELETE CASCADE);"
                           "INSERT INTO Categories VALUES(1, 'Default', '#1022A0');"
@@ -117,7 +117,7 @@ bool PManager::add_event(Event *e, Event *child) {
     sqlite3_stmt *stmt;
     string filteredName, filteredDescription, filteredPlace;
     if ((e->getName().length() < 3) || (difftime(e->getStart(), e->getEnd()) > 0) || (e->getCategory() == NULL)) return false;
-    int rc = sqlite3_prepare_v2(this->db, "INSERT INTO Events VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?);", -1, &stmt, NULL);
+    int rc = sqlite3_prepare_v2(this->db, "INSERT INTO Events VALUES(?, ?, ?, ?, ?, ?, ?, ?);", -1, &stmt, NULL);
     if (rc != SQLITE_OK ) {
         fprintf(stderr, "SQL error in prepare: %s\n", sqlite3_errmsg(this->db));
         sqlite3_free(err_msg);
@@ -134,11 +134,10 @@ bool PManager::add_event(Event *e, Event *child) {
     sqlite3_bind_int64(stmt, 5, e->getCategory()->getId());
     sqlite3_bind_int64(stmt, 6, e->getStart());
     sqlite3_bind_int64(stmt, 7, e->getEnd());
-    sqlite3_bind_text(stmt, 8, e->getRrule().freq.c_str(), e->getRrule().freq.length(), 0);
     if (child != NULL)
-        sqlite3_bind_int64(stmt, 9, child->getId());
+        sqlite3_bind_int64(stmt, 8, child->getId());
     else
-        sqlite3_bind_null(stmt, 9);
+        sqlite3_bind_null(stmt, 8);
     //commit
     rc = sqlite3_step(stmt);
     if (rc != SQLITE_DONE ) {
@@ -427,8 +426,7 @@ list<Event*> PManager::get_all_events() {
         }
         time_t start = (unsigned long)sqlite3_column_int64(res, 5);
         time_t end = (unsigned long)sqlite3_column_int64(res, 6);
-        std::string rrule((const char*)sqlite3_column_text(res, 7));
-        Event *e = new Event(id, name, description, place, category, start, end, rrule);
+        Event *e = new Event(id, name, description, place, category, start, end);
 
         result.push_front(e);
     }
@@ -496,6 +494,13 @@ int PManager::load_db(string path) {
     return counter;
 }
 
+int PManager::add_recurring_event(Event *event, const Rrule& rrule) {
+  int count = 0;
+  this->add_event(event);
+  count += 1;
+  return count;
+}
+
 int PManager::import_db_iCal_format(string path, Category *category) {
     auto category_id = category->getId();
     if (path.length() < 5) return 0;
@@ -507,7 +512,7 @@ int PManager::import_db_iCal_format(string path, Category *category) {
       string location;
       string description;
       bool found_description = false;
-      std::string rruleline("FREQ::NONE");
+      Rrule rrule;
       int counter = 0;
       struct tm start;
       start.tm_sec = start.tm_min = start.tm_hour = start.tm_wday = start.tm_yday = start.tm_year = start.tm_mday = start.tm_mon = 0;
@@ -566,13 +571,20 @@ int PManager::import_db_iCal_format(string path, Category *category) {
           pattern = "RRULE:FREQ=";
           if (line.find(pattern) == 0) {
               found_description = false;
-              rruleline = line.substr(pattern.length(),line.length()-pattern.length());
+              std::string rruleline = line.substr(pattern.length(),line.length()-pattern.length());
+              rrule = Rrule(rruleline);
               continue;
           }
           pattern = "END:VEVENT";
           if (line.find(pattern) == 0) {
               found_description = false;
-            if (this->add_event(new Event(0,summary,description,location,this->get_category(category_id),mktime(&start),mktime(&end),rruleline)))
+              // Event* event = new Event(0,summary,description,location,this->get_category(category_id),mktime(&start),mktime(&end));
+              // if (rrule.isset()) {
+              //   std::cout << "add recurring event here" << std::endl;
+              //   counter += this->add_recurring_event(event, rrule);
+              //   rrule.reset();
+              // }
+              if (this->add_event(new Event(0,summary,description,location,this->get_category(category_id),mktime(&start),mktime(&end))))
                   counter++;
               else
                   printf("Error: %s not imported\n", summary.c_str());
