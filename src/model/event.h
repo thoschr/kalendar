@@ -23,16 +23,26 @@ using namespace std;
 struct Rrule
 {
   public:
-    Rrule() : freq("NONE") {}
+    Rrule() : freq("NONE"), increment(0) {}
     Rrule(std::string rruleline){
-      if (rruleline.find("DAILY") != std::string::npos)
+      increment = 0;
+      if (rruleline.find("DAILY") != std::string::npos){
         freq = "DAILY";
-      else if (rruleline.find("WEEKLY") != std::string::npos)
+        repetitions = 730;
+      }
+      else if (rruleline.find("WEEKLY") != std::string::npos){
         freq = "WEEKLY";
-      else if (rruleline.find("MONTHLY") != std::string::npos)
+        repetitions = 730;
+      }
+      else if (rruleline.find("MONTHLY") != std::string::npos){
         freq = "MONTHLY";
-      else if (rruleline.find("YEARLY") != std::string::npos)
+        repetitions = 730;
+      }
+      else if (rruleline.find("YEARLY") != std::string::npos){
         freq = "YEARLY";
+        repetitions = 5;
+        increment = 31536000;
+      } 
       else if (rruleline.find("NONE") != std::string::npos)
         freq = "NONE";
       else
@@ -41,9 +51,13 @@ struct Rrule
     bool isset(){ if (freq == "DAILY" || freq == "WEEKLY" || freq == "MONTHLY" || freq == "YEARLY") return true; else return false; }
     void reset(){ freq = "NONE"; }
     std::string get_freq(){ return freq; }
+    int get_repetitions() const { return repetitions; }
+    int get_increment() const { return increment; }
   
   private:
     std::string freq;
+    int repetitions;
+    int increment;
 
 };
 
@@ -120,6 +134,10 @@ public:
     time_t getStart() { return start; }
     time_t getEnd() { return end; }
     Rrule getRrule() { return rrule; }
+
+    void setStart(time_t start) { this->start = start; }
+    void setEnd(time_t end) { this->end = end; }
+    void setId(unsigned int id) { this->id = id; }
 
     bool equals(Event &e) {
         return (this->id == e.getId());

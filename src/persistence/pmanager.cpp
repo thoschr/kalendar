@@ -498,6 +498,18 @@ int PManager::add_recurring_event(Event *event, const Rrule& rrule) {
   int count = 0;
   this->add_event(event);
   count += 1;
+  time_t start = event->getStart();
+  time_t end = event->getEnd();
+  //TODO implement increment functions that determines increment in seconds based on given year
+  for( int i = 0; i <= rrule.get_repetitions(); i++ ){
+    start += rrule.get_increment();
+    end += rrule.get_increment();
+    event->setStart(start);
+    event->setEnd(end);
+    event->setId(static_cast<unsigned int> (hash<string>()(event->getName() + event->getDescription() + event->getPlace())) + (event->getCategory() ? event->getCategory()->getId() : 0) + static_cast<unsigned int> ((event->getStart() / 1000) + (event->getEnd() - event->getStart())));
+    this->add_event(event);
+    count += 1;
+  }
   return count;
 }
 
