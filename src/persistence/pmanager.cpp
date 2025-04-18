@@ -578,13 +578,12 @@ int PManager::import_db_iCal_format(string path, Category *category) {
           pattern = "END:VEVENT";
           if (line.find(pattern) == 0) {
               found_description = false;
-              // Event* event = new Event(0,summary,description,location,this->get_category(category_id),mktime(&start),mktime(&end));
-              // if (rrule.isset()) {
-              //   std::cout << "add recurring event here" << std::endl;
-              //   counter += this->add_recurring_event(event, rrule);
-              //   rrule.reset();
-              // }
-              if (this->add_event(new Event(0,summary,description,location,this->get_category(category_id),mktime(&start),mktime(&end))))
+              Event* event = new Event(0,summary,description,location,this->get_category(category_id),mktime(&start),mktime(&end));
+              if (rrule.isset()) {
+                counter += this->add_recurring_event(event, rrule);
+                rrule.reset();
+              }
+              else if (this->add_event(event))
                   counter++;
               else
                   printf("Error: %s not imported\n", summary.c_str());
