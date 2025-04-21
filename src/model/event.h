@@ -23,7 +23,7 @@ using namespace std;
 struct Rrule
 {
   public:
-    Rrule() : freq("NONE"), increment(0) {}
+    Rrule() : freq("NONE") {};
     Rrule(std::string rruleline){
       if (rruleline.find("DAILY") != std::string::npos){
         freq = "DAILY";
