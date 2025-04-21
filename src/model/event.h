@@ -25,7 +25,6 @@ struct Rrule
   public:
     Rrule() : freq("NONE"), increment(0) {}
     Rrule(std::string rruleline){
-      increment = 0;
       if (rruleline.find("DAILY") != std::string::npos){
         freq = "DAILY";
         repetitions = 730;
@@ -40,8 +39,7 @@ struct Rrule
       }
       else if (rruleline.find("YEARLY") != std::string::npos){
         freq = "YEARLY";
-        repetitions = 5;
-        increment = 31536000;
+        repetitions = 50;
       } 
       else if (rruleline.find("NONE") != std::string::npos)
         freq = "NONE";
@@ -52,12 +50,10 @@ struct Rrule
     void reset(){ freq = "NONE"; }
     std::string get_freq(){ return freq; }
     int get_repetitions() const { return repetitions; }
-    int get_increment() const { return increment; }
   
   private:
     std::string freq;
     int repetitions;
-    int increment;
 
 };
 

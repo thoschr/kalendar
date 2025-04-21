@@ -494,22 +494,44 @@ int PManager::load_db(string path) {
     return counter;
 }
 
+time_t PManager::apply_rrule(time_t date, Rrule rrule){
+  struct tm date_tm;
+  localtime_r(&date, &date_tm);
+  if( rrule.get_freq() == "DAILY" ){
+    fprintf(stderr, "Error: %s\n", "Not implemented yet.");
+    exit(1);
+  } else if( rrule.get_freq() == "WEEKLY" ){
+    fprintf(stderr, "Error: %s\n", "Not implemented yet.");
+    exit(1);
+  } else if( rrule.get_freq() == "MONTHLY" ){
+    date_tm.tm_mon += 1;
+  } else if( rrule.get_freq() == "YEARLY" ){
+    date_tm.tm_year += 1;
+  }
+  return mktime(&date_tm);
+}
+
 int PManager::add_recurring_event(Event *event, const Rrule& rrule) {
   int count = 0;
   this->add_event(event);
   count += 1;
-  time_t start = event->getStart();
-  time_t end = event->getEnd();
-  //TODO implement increment functions that determines increment in seconds based on given year
+  time_t start_old = event->getStart();
+  time_t start_new = start_old; 
+  time_t end_old = event->getEnd();
+  time_t end_new = end_old;
+
   for( int i = 0; i <= rrule.get_repetitions(); i++ ){
-    start += rrule.get_increment();
-    end += rrule.get_increment();
-    event->setStart(start);
-    event->setEnd(end);
-    event->setId(static_cast<unsigned int> (hash<string>()(event->getName() + event->getDescription() + event->getPlace())) + (event->getCategory() ? event->getCategory()->getId() : 0) + static_cast<unsigned int> ((event->getStart() / 1000) + (event->getEnd() - event->getStart())));
+    start_new = apply_rrule(start_old, rrule);
+    end_new = apply_rrule(end_old, rrule);
+    event->setStart(start_new);
+    event->setEnd(end_new);
+    event->setId(static_cast<unsigned int> (hash<string>()(event->getName() + event->getDescription() + event->getPlace())) + (event->getCategory() ? event->getCategory()->getId() : 0) + static_cast<unsigned int> ((start_new / 1000) + (end_new - start_new)));
     this->add_event(event);
     count += 1;
+    start_old = start_new;
+    end_old = end_new;
   }
+
   return count;
 }
 
