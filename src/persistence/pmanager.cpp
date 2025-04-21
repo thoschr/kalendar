@@ -498,11 +498,9 @@ time_t PManager::apply_rrule(time_t date, Rrule rrule){
   struct tm date_tm;
   localtime_r(&date, &date_tm);
   if( rrule.get_freq() == "DAILY" ){
-    fprintf(stderr, "Error: %s\n", "Not implemented yet.");
-    exit(1);
+    date_tm.tm_mday += 1;
   } else if( rrule.get_freq() == "WEEKLY" ){
-    fprintf(stderr, "Error: %s\n", "Not implemented yet.");
-    exit(1);
+    date_tm.tm_mday += 7;
   } else if( rrule.get_freq() == "MONTHLY" ){
     date_tm.tm_mon += 1;
   } else if( rrule.get_freq() == "YEARLY" ){
