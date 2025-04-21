@@ -8,9 +8,9 @@ So far i have:
 -changed to use the sqlite source in compilation
 -Updated to Qt 6
 -moved from experimental/filesystem to filesystem
+-added support for recurrent events
 
 # TODO
--update tests
--add back linux support
--recurrent events
-
+-add tests for recurrent events
+-export of .ics files with recurrent events
+-stress test
