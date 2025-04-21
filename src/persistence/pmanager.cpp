@@ -494,7 +494,7 @@ int PManager::load_db(string path) {
     return counter;
 }
 
-time_t PManager::apply_rrule(time_t date, Rrule rrule){
+time_t PManager::apply_rrule(const time_t& date, const Rrule& rrule) const{
   struct tm date_tm;
   localtime_r(&date, &date_tm);
   if( rrule.get_freq() == "DAILY" ){

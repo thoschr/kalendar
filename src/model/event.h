@@ -48,7 +48,7 @@ struct Rrule
     };
     bool isset(){ if (freq == "DAILY" || freq == "WEEKLY" || freq == "MONTHLY" || freq == "YEARLY") return true; else return false; }
     void reset(){ freq = "NONE"; }
-    std::string get_freq(){ return freq; }
+    std::string get_freq() const { return freq; }
     int get_repetitions() const { return repetitions; }
   
   private:

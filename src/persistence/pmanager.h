@@ -64,7 +64,7 @@ public:
     int import_db_iCal_format(string path,Category *category);
     int add_recurring_event(Event *e, const Rrule& rrule);
     sqlite3* get_db() const { return this->db; }
-    time_t apply_rrule(time_t date, Rrule rrule);
+    time_t apply_rrule(const time_t& date, const Rrule& rrule) const;
 };
 
 #endif // PMANAGER_H
