@@ -39,7 +39,7 @@ struct Rrule
       }
       else if (rruleline.find("YEARLY") != std::string::npos){
         freq = "YEARLY";
-        repetitions = 50;
+        repetitions = 120;
       } 
       else if (rruleline.find("NONE") != std::string::npos)
         freq = "NONE";
