@@ -14,3 +14,4 @@ So far i have:
 -add tests for recurrent events
 -export of .ics files with recurrent events
 -stress test
+-add recurrent events until keyword
