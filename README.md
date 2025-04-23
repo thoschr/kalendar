@@ -11,7 +11,6 @@ So far i have:
 -added support for recurrent events
 
 # TODO
--add tests for recurrent events
 -export of .ics files with recurrent events
 -stress test
 -add recurrent events until keyword
