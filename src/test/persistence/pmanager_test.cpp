@@ -391,7 +391,7 @@ void PManagerTest::test_import_db_iCal_format() {
     ret = !ret && !pm.import_db_iCal_format("notexists",this->valid_default_category);
     file.open("temp.ics");
     file << "BEGIN:VEVENT" << endl << "UID:0" << endl << "DTSTART;VALUE=DATE:20161231" << endl << "DTEND;VALUE=DATE:20170101" << endl << "SUMMARY:test" << endl << "DESCRIPTION:multi\nline\ndescription" << endl << "END:VEVENT" << endl;
-    file << "BEGIN:VEVENT" << endl << "UID:1" << endl << "DTSTART;VALUE=DATE:20130512" << endl << "DTEND;VALUE=DATE:20130513" << endl << "SUMMARY:test2" << endl << "END:VEVENT" << endl;
+    file << "BEGIN:VEVENT" << endl << "UID:1" << endl << "DTSTART:20130512T173000Z" << endl << "DTEND;VALUE=DATE:20130513" << endl << "SUMMARY:test2" << endl << "END:VEVENT" << endl;
     file.close();
     ret = ret && pm.import_db_iCal_format("temp.ics",this->valid_default_category);
     list<Event*> events = pm.get_all_events();
@@ -401,6 +401,10 @@ void PManagerTest::test_import_db_iCal_format() {
         ret = ret && ((**it).getCategory()->getId() == this->valid_default_category->getId());
         //TODO: checks if the following test is correct
         ret = ret && ((**it).getStart() < (**it).getEnd());
+        struct tm date_tm;
+        time_t start_time = (*it)->getStart();
+        localtime_r(&start_time, &date_tm);
+        ret = ret && ((date_tm.tm_min == 30));
         delete *it;
     } else ret = false;
     pm.remove_db();

@@ -558,25 +558,55 @@ int PManager::import_db_iCal_format(string path, Category *category) {
 
       file.open(path);
       while ( getline (file,line) ) {
-          pattern = "DTSTART;VALUE=DATE:";
+          pattern = "DTSTART";
           if (line.find(pattern) == 0) { //if line starts with the pattern
               found_description = false;
-              string date = line.substr(pattern.length(),line.length()-pattern.length());
+              size_t pos = line.find(':');
+              if (pos == std::string::npos){
+                  fprintf(stderr, "Expected a colon in DTSTART line.\n");
+              }
+              string date = line.substr(pos+1,line.length()-pos+1);
+              pos = date.find('T');
+              if (pos != std::string::npos){//found time specification
+                std::string time = date.substr(pos,date.length());
+                // Remove all non-digit characters
+                time.erase(std::remove_if(time.begin(), time.end(), [](char c) { return !std::isdigit(c); }), time.end());
+                date = date.substr(0,pos);
+                start.tm_hour = std::stoi(time.substr(0,2));
+                start.tm_min = std::stoi(time.substr(2,2));
+              }
+              else{
+                start.tm_hour = 8;
+              }
               start.tm_year = stoi(date.substr(0,4)) - 1900;
               start.tm_mon = stoi(date.substr(4,2)) - 1;
               start.tm_mday = stoi(date.substr(6,2));
-              start.tm_hour = 8;
               start.tm_isdst = ((start.tm_mon > 2) && (start.tm_mon < 10+s));
               continue;
           }
-          pattern = "DTEND;VALUE=DATE:";
+          pattern = "DTEND";
           if (line.find(pattern) == 0) {
               found_description = false;
-              string date = line.substr(pattern.length(),line.length()-pattern.length());
+              size_t pos = line.find(':');
+              if (pos == std::string::npos){
+                  fprintf(stderr, "Expected a colon in DTEND line.\n");
+              }
+              string date = line.substr(pos+1,line.length()-pos+1);
+              pos = date.find('T');
+              if (pos != std::string::npos){//found time specification
+                std::string time = date.substr(pos,date.length());
+                // Remove all non-digit characters
+                time.erase(std::remove_if(time.begin(), time.end(), [](char c) { return !std::isdigit(c); }), time.end());
+                date = date.substr(0,pos);
+                end.tm_hour = std::stoi(time.substr(0,2));
+                end.tm_min = std::stoi(time.substr(2,2));
+              }
+              else{
+                end.tm_hour = 8;
+              }
               end.tm_year = stoi(date.substr(0,4)) - 1900;
               end.tm_mon = stoi(date.substr(4,2)) - 1;
-              end.tm_mday = stoi(date.substr(6,2)) - 1; /* -1 is to get the day before, mktime will normalize it */
-              end.tm_hour = 22;
+              end.tm_mday = stoi(date.substr(6,2));
               end.tm_isdst = ((end.tm_mon > 2) && (end.tm_mon < 10+s));
               continue;
           }
