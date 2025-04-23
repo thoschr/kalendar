@@ -49,6 +49,7 @@ public:
     void test_get_db_name();
     void test_set_db();
     void test_get_db_list();
+    void test_recurrent_events();
 };
 
 #endif // PMANAGERTEST_H

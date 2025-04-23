@@ -518,7 +518,7 @@ int PManager::add_recurring_event(Event *event, const Rrule& rrule) {
   time_t end_old = event->getEnd();
   time_t end_new = end_old;
 
-  for( int i = 0; i <= rrule.get_repetitions(); i++ ){
+  for( uint i = 0; i < rrule.get_repetitions()-1; i++ ){
     start_new = apply_rrule(start_old, rrule);
     end_new = apply_rrule(end_old, rrule);
     event->setStart(start_new);

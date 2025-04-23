@@ -64,6 +64,7 @@ void PManagerTest::test_all() {
     test_save_db();
     test_import_db_iCal_format();
     test_export_db_iCal_format();
+    test_recurrent_events();
 }
 
 void PManagerTest::test_get_db_name() {
@@ -446,6 +447,32 @@ void PManagerTest::test_export_db_iCal_format() {
         linenumber++;
     }
     file.close();
+    pm.remove_db();
+    remove("temp.ics");
+    ASSERT (ret)
+}
+
+void PManagerTest::test_recurrent_events() {
+    Test::print("test_recurrent_events  ");
+    PManager pm;
+    ofstream file;
+    bool ret;
+    file.open("temp.ics");
+    file << "BEGIN:VEVENT" << endl << "UID:0" << endl << "DTSTART;VALUE=DATE:20161230" << endl << "DTEND;VALUE=DATE:20161231" << endl << "SUMMARY:test" << endl << "RRULE:FREQ=YEARLY" << endl << "END:VEVENT" << endl;
+    file.close();
+    ret = pm.import_db_iCal_format("temp.ics",this->valid_default_category);
+    list<Event*> events = pm.get_all_events();
+    if (events.size() == Rrule("YEARLY").get_repetitions()) {
+        list<Event*>::iterator it = events.begin();
+        ret = ((**it).getName() == "test");
+        ret = ret && ((**it).getCategory()->getId() == this->valid_default_category->getId());
+        ret = ret && ((**it).getStart() < (**it).getEnd());
+        delete *it;
+    } 
+    else{
+        fprintf(stderr, "Event list has unexpected size. Expected %i got: %zu\n", Rrule("YEARLY").get_repetitions(), events.size());
+       ret = false;
+    }
     pm.remove_db();
     remove("temp.ics");
     ASSERT (ret)
