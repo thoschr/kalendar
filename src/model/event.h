@@ -47,12 +47,16 @@ struct Rrule
         fprintf(stderr, "Error while processing Rrule: %s\n", rruleline.c_str());
       size_t pos = rruleline.find("UNTIL");
       if (pos != std::string::npos){
+        pos += 6;
+        std::string fromuntil = rruleline.substr(pos,rruleline.length());
+        size_t endpos = fromuntil.find(';');
+        if (endpos == std::string::npos)
+          endpos = rruleline.length();
         time_t threshold = 26262000; // = 1 November 1970
         std::tm *t = localtime(&threshold);
         int s = 0;
         if (t->tm_isdst > 0) s = 1;
-        pos += 6;
-        DateTime dtime(rruleline.substr(pos,rruleline.length()));
+        DateTime dtime(fromuntil.substr(0,endpos));
         struct tm date_tm;
         date_tm.tm_year = dtime.date.getYear() - 1900;
         date_tm.tm_mon = dtime.date.getMonth() - 1;
