@@ -143,3 +143,20 @@ Date DateUtil::decrease_year(Date date) {
         weekday = ((weekday - 1) % 7) ?: 7;
     return Date(date.getMonthDay(), weekday, date.getMonth(), date.getYear() - 1);
 }
+
+Time::Time(const std::string& timestring){
+    this->hour = std::stoi(timestring.substr(0,2));
+    this->min = std::stoi(timestring.substr(2,2));
+}
+
+DateTime::DateTime(std::string datetimestring){
+  size_t pos = datetimestring.find('T');
+  if (pos != std::string::npos){//found time specification
+    std::string time = datetimestring.substr(pos,datetimestring.length());
+    // Remove all non-digit characters
+    time.erase(std::remove_if(time.begin(), time.end(), [](char c) { return !std::isdigit(c); }), time.end());
+    this->time = Time(time);
+    datetimestring = datetimestring.substr(0,pos);
+  }
+  this->date = Date(datetimestring);
+}

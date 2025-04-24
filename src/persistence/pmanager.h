@@ -20,6 +20,7 @@
 #include <experimental/filesystem>
 #include "../model/event.h"
 #include "../model/category.h"
+#include "../util/dateutil.h"
 
 #define FOLDER_NAME "kalendar"
 #define DEFAULT_DATABASE_NAME "default.sql"

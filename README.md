@@ -9,8 +9,8 @@ So far i have:
 -Updated to Qt 6
 -moved from experimental/filesystem to filesystem
 -added support for recurrent events
+-improved parser
 
 # TODO
 -export of .ics files with recurrent events
 -stress test
--add recurrent events until keyword

@@ -11,6 +11,21 @@
 
 using namespace std;
 
+struct Time {
+  int hour = -1;
+  int min = -1;
+  int sec = -1;
+  Time() = default;
+  Time(const std::string& timestring);
+};
+
+struct DateTime {
+  DateTime(){};
+  DateTime(std::string datetimestring);
+  Time time;
+  Date date;
+};
+
 class DateUtil
 {
 public:

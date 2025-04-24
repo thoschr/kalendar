@@ -15,7 +15,11 @@ private:
     int year;
 public:
     Date() {}
-
+    Date(std::string datestring){
+      this->year = stoi(datestring.substr(0,4));
+      this->month = stoi(datestring.substr(4,2));
+      this->mday = stoi(datestring.substr(6,2));
+    };
     Date(int mday, int wday, int month, int year) {
         this->mday = mday;
         this->wday = wday;

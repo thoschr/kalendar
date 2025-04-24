@@ -521,6 +521,7 @@ int PManager::add_recurring_event(Event *event, const Rrule& rrule) {
   for( uint i = 0; i < rrule.get_repetitions()-1; i++ ){
     start_new = apply_rrule(start_old, rrule);
     end_new = apply_rrule(end_old, rrule);
+    if( rrule.until < end_new ) break;
     event->setStart(start_new);
     event->setEnd(end_new);
     event->setId(static_cast<unsigned int> (hash<string>()(event->getName() + event->getDescription() + event->getPlace())) + (event->getCategory() ? event->getCategory()->getId() : 0) + static_cast<unsigned int> ((start_new / 1000) + (end_new - start_new)));
@@ -566,21 +567,17 @@ int PManager::import_db_iCal_format(string path, Category *category) {
                   fprintf(stderr, "Expected a colon in DTSTART line.\n");
               }
               string date = line.substr(pos+1,line.length()-pos+1);
-              pos = date.find('T');
-              if (pos != std::string::npos){//found time specification
-                std::string time = date.substr(pos,date.length());
-                // Remove all non-digit characters
-                time.erase(std::remove_if(time.begin(), time.end(), [](char c) { return !std::isdigit(c); }), time.end());
-                date = date.substr(0,pos);
-                start.tm_hour = std::stoi(time.substr(0,2));
-                start.tm_min = std::stoi(time.substr(2,2));
+              DateTime dtime(date);
+              if (dtime.time.min != -1){//found time specification
+                start.tm_hour = dtime.time.hour;
+                start.tm_min = dtime.time.min;
               }
               else{
                 start.tm_hour = 8;
               }
-              start.tm_year = stoi(date.substr(0,4)) - 1900;
-              start.tm_mon = stoi(date.substr(4,2)) - 1;
-              start.tm_mday = stoi(date.substr(6,2));
+              start.tm_year = dtime.date.getYear() - 1900;
+              start.tm_mon = dtime.date.getMonth() - 1;
+              start.tm_mday = dtime.date.getMonthDay();
               start.tm_isdst = ((start.tm_mon > 2) && (start.tm_mon < 10+s));
               continue;
           }
@@ -592,21 +589,17 @@ int PManager::import_db_iCal_format(string path, Category *category) {
                   fprintf(stderr, "Expected a colon in DTEND line.\n");
               }
               string date = line.substr(pos+1,line.length()-pos+1);
-              pos = date.find('T');
-              if (pos != std::string::npos){//found time specification
-                std::string time = date.substr(pos,date.length());
-                // Remove all non-digit characters
-                time.erase(std::remove_if(time.begin(), time.end(), [](char c) { return !std::isdigit(c); }), time.end());
-                date = date.substr(0,pos);
-                end.tm_hour = std::stoi(time.substr(0,2));
-                end.tm_min = std::stoi(time.substr(2,2));
+              DateTime dtime(date);
+              if (dtime.time.min != -1){//found time specification
+                end.tm_hour = dtime.time.hour;
+                end.tm_min = dtime.time.min;
               }
               else{
-                end.tm_hour = 8;
+                end.tm_hour = 22;
               }
-              end.tm_year = stoi(date.substr(0,4)) - 1900;
-              end.tm_mon = stoi(date.substr(4,2)) - 1;
-              end.tm_mday = stoi(date.substr(6,2));
+              end.tm_year = dtime.date.getYear() - 1900;
+              end.tm_mon = dtime.date.getMonth() - 1;
+              end.tm_mday = dtime.date.getMonthDay();
               end.tm_isdst = ((end.tm_mon > 2) && (end.tm_mon < 10+s));
               continue;
           }

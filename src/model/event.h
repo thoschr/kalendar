@@ -2,8 +2,8 @@
 #define EVENT_H
 
 #include <ctime>
-
 #include "category.h"
+#include "../util/dateutil.h"
 
 /* A todo is defined as an event with special dates, they are the following:
  * start = end = 29/01/2105 09:40 , the UTC timestamp is: 4262665200
@@ -45,11 +45,31 @@ struct Rrule
         freq = "NONE";
       else
         fprintf(stderr, "Error while processing Rrule: %s\n", rruleline.c_str());
+      size_t pos = rruleline.find("UNTIL");
+      if (pos != std::string::npos){
+        time_t threshold = 26262000; // = 1 November 1970
+        std::tm *t = localtime(&threshold);
+        int s = 0;
+        if (t->tm_isdst > 0) s = 1;
+        pos += 6;
+        DateTime dtime(rruleline.substr(pos,rruleline.length()));
+        struct tm date_tm;
+        date_tm.tm_year = dtime.date.getYear() - 1900;
+        date_tm.tm_mon = dtime.date.getMonth() - 1;
+        date_tm.tm_mday = dtime.date.getMonthDay();
+        date_tm.tm_hour = dtime.time.hour;
+        date_tm.tm_min = dtime.time.min;
+        date_tm.tm_sec = 0;
+        date_tm.tm_wday = 0;
+        date_tm.tm_isdst = ((date_tm.tm_mon > 2) && (date_tm.tm_mon < 10+s));
+        this->until = mktime(&date_tm);
+      }
     };
     bool isset(){ if (freq == "DAILY" || freq == "WEEKLY" || freq == "MONTHLY" || freq == "YEARLY") return true; else return false; }
     void reset(){ freq = "NONE"; }
     std::string get_freq() const { return freq; }
     uint get_repetitions() const { return repetitions; }
+    time_t until;
   
   private:
     std::string freq;

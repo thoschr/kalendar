@@ -460,13 +460,18 @@ void PManagerTest::test_recurrent_events() {
     Test::print("test_recurrent_events  ");
     PManager pm;
     ofstream file;
+    ofstream file2;
     bool ret;
+    bool ret2;
     file.open("temp.ics");
-    file << "BEGIN:VEVENT" << endl << "UID:0" << endl << "DTSTART;VALUE=DATE:20161230" << endl << "DTEND;VALUE=DATE:20161231" << endl << "SUMMARY:test" << endl << "RRULE:FREQ=YEARLY" << endl << "END:VEVENT" << endl;
+    file << "BEGIN:VEVENT" << endl << "UID:0" << endl << "DTSTART;VALUE=DATE:20161230" << endl << "DTEND;VALUE=DATE:20161230" << endl << "SUMMARY:test" << endl << "RRULE:FREQ=WEEKLY;UNTIL=20170121" << endl << "END:VEVENT" << endl;
     file.close();
+    file2.open("temp2.ics");
+    file2 << "BEGIN:VEVENT" << endl << "UID:0" << endl << "DTSTART;VALUE=DATE:20161230" << endl << "DTEND;VALUE=DATE:20161230" << endl << "SUMMARY:test" << endl << "RRULE:FREQ=YEARLY" << endl << "END:VEVENT" << endl;
+    file2.close();
     ret = pm.import_db_iCal_format("temp.ics",this->valid_default_category);
     list<Event*> events = pm.get_all_events();
-    if (events.size() == Rrule("YEARLY").get_repetitions()) {
+    if (events.size() == 4) {
         list<Event*>::iterator it = events.begin();
         ret = ((**it).getName() == "test");
         ret = ret && ((**it).getCategory()->getId() == this->valid_default_category->getId());
@@ -474,10 +479,26 @@ void PManagerTest::test_recurrent_events() {
         delete *it;
     } 
     else{
-        fprintf(stderr, "Event list has unexpected size. Expected %i got: %zu\n", Rrule("YEARLY").get_repetitions(), events.size());
+        fprintf(stderr, "Event list has unexpected size. Expected %i got: %zu\n", 4, events.size());
        ret = false;
     }
     pm.remove_db();
     remove("temp.ics");
-    ASSERT (ret)
+    PManager pm2("test.sql");
+    ret2 = pm2.import_db_iCal_format("temp2.ics",this->valid_default_category);
+    list<Event*> events2 = pm2.get_all_events();
+    if (events2.size() == Rrule("YEARLY").get_repetitions()) {
+        list<Event*>::iterator it = events2.begin();
+        ret2 = ((**it).getName() == "test");
+        ret2 = ret2 && ((**it).getCategory()->getId() == this->valid_default_category->getId());
+        ret2 = ret2 && ((**it).getStart() < (**it).getEnd());
+        delete *it;
+    } 
+    else{
+        fprintf(stderr, "Event list has unexpected size. Expected %i got: %zu\n", Rrule("YEARLY").get_repetitions(), events2.size());
+        ret2 = false;
+    }
+    pm2.remove_db();
+    remove("temp2.ics");
+    ASSERT (ret && ret2)
 }
