@@ -1,6 +1,11 @@
 #ifndef PMANAGERTEST_H
 #define PMANAGERTEST_H
 
+#ifdef _WIN32
+  //needed for localtime_r with mingw
+  #define _POSIX_THREAD_SAFE_FUNCTIONS
+#endif
+
 #include <stdlib.h>
 
 #include "../test.h"

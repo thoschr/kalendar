@@ -3,6 +3,8 @@
 
 #ifdef _WIN32
   #define OS_WINDOWS
+  //needed for localtime_r with mingw
+  #define _POSIX_THREAD_SAFE_FUNCTIONS
 #else
   #include <pwd.h>
 #endif
