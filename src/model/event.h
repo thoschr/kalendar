@@ -2,8 +2,8 @@
 #define EVENT_H
 
 #include <ctime>
-
 #include "category.h"
+#include "../util/dateutil.h"
 
 /* A todo is defined as an event with special dates, they are the following:
  * start = end = 29/01/2105 09:40 , the UTC timestamp is: 4262665200
@@ -20,6 +20,73 @@
 
 using namespace std;
 
+struct Rrule
+{
+  public:
+    Rrule() : freq("NONE") {};
+    Rrule(std::string rruleline){
+      if (rruleline.find("DAILY") != std::string::npos){
+        freq = "DAILY";
+        repetitions = 730;
+      }
+      else if (rruleline.find("WEEKLY") != std::string::npos){
+        freq = "WEEKLY";
+        repetitions = 730;
+      }
+      else if (rruleline.find("MONTHLY") != std::string::npos){
+        freq = "MONTHLY";
+        repetitions = 730;
+      }
+      else if (rruleline.find("YEARLY") != std::string::npos){
+        freq = "YEARLY";
+        repetitions = 120;
+      } 
+      else if (rruleline.find("NONE") != std::string::npos)
+        freq = "NONE";
+      else
+        fprintf(stderr, "Error while processing Rrule: %s\n", rruleline.c_str());
+      size_t pos = rruleline.find("UNTIL");
+      if (pos != std::string::npos){
+        pos += 6;
+        std::string fromuntil = rruleline.substr(pos,rruleline.length());
+        size_t endpos = fromuntil.find(';');
+        if (endpos == std::string::npos)
+          endpos = rruleline.length();
+        time_t threshold = 26262000; // = 1 November 1970
+        std::tm *t = localtime(&threshold);
+        int s = 0;
+        if (t->tm_isdst > 0) s = 1;
+        DateTime dtime(fromuntil.substr(0,endpos));
+        struct tm date_tm;
+        date_tm.tm_year = dtime.date.getYear() - 1900;
+        date_tm.tm_mon = dtime.date.getMonth() - 1;
+        date_tm.tm_mday = dtime.date.getMonthDay();
+        date_tm.tm_hour = dtime.time.hour;
+        date_tm.tm_min = dtime.time.min;
+        date_tm.tm_sec = 0;
+        date_tm.tm_wday = 0;
+        date_tm.tm_isdst = ((date_tm.tm_mon > 2) && (date_tm.tm_mon < 10+s));
+        this->until = mktime(&date_tm);
+      }
+    };
+    bool isset(){ if (freq == "DAILY" || freq == "WEEKLY" || freq == "MONTHLY" || freq == "YEARLY") return true; else return false; }
+    void reset(){ freq = "NONE"; }
+    std::string get_freq() const { return freq; }
+    unsigned int get_repetitions() const { return repetitions; }
+    time_t until;
+  
+  private:
+    std::string freq;
+    unsigned int repetitions;
+
+};
+
+// std::ostream& operator<<(std::ostream& os, const Rrule& rrule);
+// inline std::ostream& operator<<(std::ostream& os, Rrule const & rrule) {
+//   os << "Rrule Frequency: " << rrule.freq.c_str();
+//   return os;
+// }
+
 class Event
 {
 private:
@@ -31,6 +98,7 @@ private:
     /* Timestamp */
     time_t start;
     time_t end;
+    Rrule rrule;
 
 public:
     Event(Event &event) {
@@ -41,12 +109,15 @@ public:
         this->id = event.getId();
         this->start = event.getStart();
         this->end = event.getEnd();
+        this->rrule = event.getRrule();
     }
 
-    Event(unsigned int id, string name, const string &description, const string &place, Category *category, time_t start, time_t end) {
+    Event(unsigned int id, string name, const string &description, const string &place, Category *category, time_t start, time_t end, std::string rrule = "NONE")
+        : id(id), name(name), description(description), place(place), category(category), start(start), end(end), rrule(rrule) {
         this->name = name;
         this->description = description;
         this->place = place;
+        this->rrule = Rrule(rrule);  
         if (category == NULL) {
             /* An event with a NULL category is inconsistent, it shouldn't exist */
             this->category = NULL;
@@ -82,6 +153,11 @@ public:
     Category *getCategory() { return category; }
     time_t getStart() { return start; }
     time_t getEnd() { return end; }
+    Rrule getRrule() { return rrule; }
+
+    void setStart(time_t start) { this->start = start; }
+    void setEnd(time_t end) { this->end = end; }
+    void setId(unsigned int id) { this->id = id; }
 
     bool equals(Event &e) {
         return (this->id == e.getId());

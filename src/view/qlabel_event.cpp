@@ -46,7 +46,7 @@ bool QLabelEvent::drawInvalidEvent() {
     this->setText(QString("<s>") + QString(this->event->getName().c_str()) + QString("</s>"));
     this->setStyleSheet(QString("QLabel { font-size: 14px; background-color : #AAAAAA; color: #000000; };"));
     this->setFixedHeight(26);
-    this->setMargin(0);
+    this->setContentsMargins(0,0,0,0);
     this->setEnabled(false);
     return true;
 }
@@ -61,7 +61,7 @@ bool QLabelEvent::drawUI() {
         textColor = "#FFFFFF";
     this->setStyleSheet(QString("QLabel#selected {border-top: 1px solid #FF0000; border-bottom: 1px solid #FF0000; font-weight: bold; font-size: 13px;} QLabel { font-size: 14px; border-radius: 2px; background-color : ") + QString(this->event->getCategory()->getColor().c_str()) + QString("; color: ") + textColor + QString("};"));
     this->setFixedHeight(26);
-    this->setMargin(0);
+    this->setContentsMargins(0,0,0,0);
     QString tooltip_text;
     if (this->event->getName().length() > 20)
         tooltip_text = QString("<b>Name: </b>") + this->event->getName().c_str() + QString("\n");

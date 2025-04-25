@@ -1,6 +1,7 @@
 #include "pmanager.h"
 
 #include <QDebug>
+#include <filesystem>
 
 PManager::PManager(string database)
 {
@@ -9,11 +10,21 @@ PManager::PManager(string database)
 }
 
 PManager::~PManager() {
-    sqlite3_close(this->db);
+   if (this->db != NULL) {
+      int rc = sqlite3_close(this->db);
+      if (rc != SQLITE_OK) {
+        fprintf(stderr, "Error closing database: %s\n", sqlite3_errmsg(this->db));
+      }
+      this->db = NULL;
+    }
 }
 
 string PManager::get_db_folder() {
     return this->db_folder;
+}
+
+string PManager::get_db_path() {
+    return this->db_path;
 }
 
 void PManager::init_db(string db_name) {
@@ -22,12 +33,22 @@ void PManager::init_db(string db_name) {
         sqlite3_close(this->db);
     }
     /* Open the database (will be created if it doesn't exist) */
-    this->db_folder = string(getpwuid(getuid())->pw_dir) + string("/" FOLDER_NAME "/");
+    #ifdef OS_WINDOWS
+      //QT will transform the slashes for windows internally.
+      this->db_folder = string(std::getenv("USERPROFILE")) + string("/" FOLDER_NAME "/");
+    #else
+      this->db_folder = string(getpwuid(getuid())->pw_dir) + string("/" FOLDER_NAME "/");
+    #endif
     this->db_path = this->db_folder + string(db_name);
     ifstream dbfile(this->db_path.c_str());
     bool db_not_exists = !dbfile;
     if (db_not_exists) {
-        mkdir((string(getpwuid(getuid())->pw_dir) + string("/" FOLDER_NAME)).c_str(), S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
+        #ifdef OS_WINDOWS
+          //QT will transform the slashes for windows internally.
+          mkdir((string(std::getenv("USERPROFILE")) + string("/" FOLDER_NAME)).c_str());
+        #else
+          mkdir((string(getpwuid(getuid())->pw_dir) + string("/" FOLDER_NAME)).c_str(), S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
+        #endif
         ofstream new_dbfile(this->db_path.c_str());
         new_dbfile.close();
     }
@@ -45,8 +66,8 @@ void PManager::init_db(string db_name) {
     if (db_not_exists) {
         const char *sql = "CREATE TABLE Categories(id UNSIGNED INTEGER PRIMARY KEY, name TEXT, color TEXT);"
                           "CREATE TABLE Events(id UNSIGNED INTEGER PRIMARY KEY, name TEXT, description TEXT,"
-                          "place TEXT, category UNSIGNED INTEGER, start DATETIME, end DATETIME, child UNSIGNED INTEGER,"
-                          "FOREIGN KEY(category) REFERENCES Categories(id) ON DELETE RESTRICT,"
+                          "place TEXT, category UNSIGNED INTEGER, start DATETIME, end DATETIME,"
+                          "child UNSIGNED INTEGER, FOREIGN KEY(category) REFERENCES Categories(id) ON DELETE RESTRICT,"
                           "FOREIGN KEY(child) REFERENCES Events(id) ON DELETE CASCADE);"
                           "INSERT INTO Categories VALUES(1, 'Default', '#1022A0');"
                           "PRAGMA foreign_keys = ON;";
@@ -72,10 +93,10 @@ string PManager::get_db_name() {
 
 vector<string> PManager::get_db_list() {
     vector<string> db_list;
-    for (experimental::filesystem::directory_entry e : experimental::filesystem::directory_iterator(this->db_path.substr(0, this->db_path.find_last_of('/') ))) {
-        experimental::filesystem::path p = e.path();
+    for (std::filesystem::directory_entry e : std::filesystem::directory_iterator(this->db_path.substr(0, this->db_path.find_last_of('/')))) {
+        std::filesystem::path p = e.path();
         if (p.extension() == ".sql")
-            db_list.push_back(p.filename());
+            db_list.push_back(p.filename().string());
     }
     return db_list;
 }
@@ -272,6 +293,18 @@ list<Event*> PManager::get_events_of_month(int month, int year) {
 }
 
 bool PManager::remove_db() {
+    if (this->db != NULL) {
+      sqlite3_stmt *stmt;
+      while ((stmt = sqlite3_next_stmt(this->db, NULL)) != NULL) {
+          sqlite3_finalize(stmt); // Finalize all prepared statements
+      }
+      int rc = sqlite3_close(this->db);
+      if (rc != SQLITE_OK) {
+          fprintf(stderr, "Error closing database: %s\n", sqlite3_errmsg(this->db));
+          return false;
+      }
+      this->db = NULL;
+    }
     /* Delete the database file, but not the folder */
     return (std::remove(this->db_path.c_str()) == 0);
 }
@@ -461,94 +494,174 @@ int PManager::load_db(string path) {
     return counter;
 }
 
+time_t PManager::apply_rrule(const time_t& date, const Rrule& rrule) const{
+  struct tm date_tm;
+  localtime_r(&date, &date_tm);
+  if( rrule.get_freq() == "DAILY" ){
+    date_tm.tm_mday += 1;
+  } else if( rrule.get_freq() == "WEEKLY" ){
+    date_tm.tm_mday += 7;
+  } else if( rrule.get_freq() == "MONTHLY" ){
+    date_tm.tm_mon += 1;
+  } else if( rrule.get_freq() == "YEARLY" ){
+    date_tm.tm_year += 1;
+  }
+  return mktime(&date_tm);
+}
+
+int PManager::add_recurring_event(Event *event, const Rrule& rrule) {
+  int count = 0;
+  this->add_event(event);
+  count += 1;
+  time_t start_old = event->getStart();
+  time_t start_new = start_old; 
+  time_t end_old = event->getEnd();
+  time_t end_new = end_old;
+
+  for( unsigned int i = 0; i < rrule.get_repetitions()-1; i++ ){
+    start_new = apply_rrule(start_old, rrule);
+    end_new = apply_rrule(end_old, rrule);
+    if( rrule.until < end_new ) break;
+    event->setStart(start_new);
+    event->setEnd(end_new);
+    event->setId(static_cast<unsigned int> (hash<string>()(event->getName() + event->getDescription() + event->getPlace())) + (event->getCategory() ? event->getCategory()->getId() : 0) + static_cast<unsigned int> ((start_new / 1000) + (end_new - start_new)));
+    this->add_event(event);
+    count += 1;
+    start_old = start_new;
+    end_old = end_new;
+  }
+
+  return count;
+}
+
 int PManager::import_db_iCal_format(string path, Category *category) {
     auto category_id = category->getId();
-    if ((path.length() < 5) || (path.substr(path.length()-4, 4) != ".ics")) return 0;
-    ifstream file;
-    string line;
-    string pattern;
-    string summary;
-    string location;
-    string description;
-    bool found_description = false;
-    int counter = 0;
-    struct tm start;
-    start.tm_sec = start.tm_min = start.tm_hour = start.tm_wday = start.tm_yday = start.tm_year = start.tm_mday = start.tm_mon = 0;
-    struct tm end;
-    end.tm_sec = end.tm_min = end.tm_hour = end.tm_wday = end.tm_yday = end.tm_year = end.tm_mday = end.tm_mon = 0;
-    /* Look at the explanation in get_events_of_month */
-    time_t threshold = 26262000; // = 1 November 1970
-    std::tm *t = localtime(&threshold);
-    int s = 0;
-    if (t->tm_isdst > 0) s = 1;
+    if (path.length() < 5) return 0;
+    if (path.substr(path.length()-4, 4) != ".ics" || path.substr(path.length()-4, 4) != ".ical"){
+      ifstream file;
+      string line;
+      string pattern;
+      string summary;
+      string location;
+      string description;
+      bool found_description = false;
+      Rrule rrule;
+      int counter = 0;
+      struct tm start;
+      start.tm_sec = start.tm_min = start.tm_hour = start.tm_wday = start.tm_yday = start.tm_year = start.tm_mday = start.tm_mon = 0;
+      struct tm end;
+      end.tm_sec = end.tm_min = end.tm_hour = end.tm_wday = end.tm_yday = end.tm_year = end.tm_mday = end.tm_mon = 0;
+      /* Look at the explanation in get_events_of_month */
+      time_t threshold = 26262000; // = 1 November 1970
+      std::tm *t = localtime(&threshold);
+      int s = 0;
+      if (t->tm_isdst > 0) s = 1;
 
-    file.open(path);
-    while ( getline (file,line) ) {
-        pattern = "DTSTART;VALUE=DATE:";
-        if (line.find(pattern) == 0) { //if line starts with the pattern
-            found_description = false;
-            string date = line.substr(pattern.length(),line.length()-pattern.length());
-            start.tm_year = stoi(date.substr(0,4)) - 1900;
-            start.tm_mon = stoi(date.substr(4,2)) - 1;
-            start.tm_mday = stoi(date.substr(6,2));
-            start.tm_hour = 8;
-            start.tm_isdst = ((start.tm_mon > 2) && (start.tm_mon < 10+s));
-            continue;
-        }
-        pattern = "DTEND;VALUE=DATE:";
-        if (line.find(pattern) == 0) {
-            found_description = false;
-            string date = line.substr(pattern.length(),line.length()-pattern.length());
-            end.tm_year = stoi(date.substr(0,4)) - 1900;
-            end.tm_mon = stoi(date.substr(4,2)) - 1;
-            end.tm_mday = stoi(date.substr(6,2)) - 1; /* -1 is to get the day before, mktime will normalize it */
-            end.tm_hour = 22;
-            end.tm_isdst = ((end.tm_mon > 2) && (end.tm_mon < 10+s));
-            continue;
-        }
-        pattern = "SUMMARY:";
-        if (line.find(pattern) == 0) {
-            found_description = false;
-            summary = line.substr(pattern.length(),line.length()-pattern.length());
-            continue;
-        }
-        pattern = "LOCATION:";
-        if (line.find(pattern) == 0) {
-            found_description = false;
-            location = line.substr(pattern.length(),line.length()-pattern.length());
-            if (location.length() < 3) location = "";
-            continue;
-        }
-        pattern = "DESCRIPTION:";
-        if (line.find(pattern) == 0) {
-            found_description = true;
-            description = line.substr(pattern.length(),line.length()-pattern.length());
-            if (description.length() < 3) description = "";
-            continue;
-        }
-        pattern = "END:VEVENT";
-        if (line.find(pattern) == 0) {
-            found_description = false;
-            if (this->add_event(new Event(0,summary,description,location,this->get_category(category_id),mktime(&start),mktime(&end))))
-                counter++;
-            else
-                printf("Error: %s not imported\n", summary.c_str());
-            /* Reset optional variables to import the next event without old values */
-            location = "";
-            description = "";
-            continue;
-        }
-        if (found_description) { /* Multi-line description */
-            description = description + "\n" + line;
-        }
+      file.open(path);
+      while ( getline (file,line) ) {
+          pattern = "DTSTART";
+          if (line.find(pattern) == 0) { //if line starts with the pattern
+              found_description = false;
+              size_t pos = line.find(':');
+              if (pos == std::string::npos){
+                  fprintf(stderr, "Expected a colon in DTSTART line.\n");
+              }
+              string date = line.substr(pos+1,line.length()-pos+1);
+              DateTime dtime(date);
+              if (dtime.time.min != -1){//found time specification
+                start.tm_hour = dtime.time.hour;
+                start.tm_min = dtime.time.min;
+              }
+              else{
+                start.tm_hour = 8;
+              }
+              start.tm_year = dtime.date.getYear() - 1900;
+              start.tm_mon = dtime.date.getMonth() - 1;
+              start.tm_mday = dtime.date.getMonthDay();
+              start.tm_isdst = ((start.tm_mon > 2) && (start.tm_mon < 10+s));
+              continue;
+          }
+          pattern = "DTEND";
+          if (line.find(pattern) == 0) {
+              found_description = false;
+              size_t pos = line.find(':');
+              if (pos == std::string::npos){
+                  fprintf(stderr, "Expected a colon in DTEND line.\n");
+              }
+              string date = line.substr(pos+1,line.length()-pos+1);
+              DateTime dtime(date);
+              if (dtime.time.min != -1){//found time specification
+                end.tm_hour = dtime.time.hour;
+                end.tm_min = dtime.time.min;
+              }
+              else{
+                end.tm_hour = 22;
+              }
+              end.tm_year = dtime.date.getYear() - 1900;
+              end.tm_mon = dtime.date.getMonth() - 1;
+              end.tm_mday = dtime.date.getMonthDay();
+              end.tm_isdst = ((end.tm_mon > 2) && (end.tm_mon < 10+s));
+              continue;
+          }
+          pattern = "SUMMARY:";
+          if (line.find(pattern) == 0) {
+              found_description = false;
+              summary = line.substr(pattern.length(),line.length()-pattern.length());
+              continue;
+          }
+          pattern = "LOCATION:";
+          if (line.find(pattern) == 0) {
+              found_description = false;
+              location = line.substr(pattern.length(),line.length()-pattern.length());
+              if (location.length() < 3) location = "";
+              continue;
+          }
+          pattern = "DESCRIPTION:";
+          if (line.find(pattern) == 0) {
+              found_description = true;
+              description = line.substr(pattern.length(),line.length()-pattern.length());
+              if (description.length() < 3) description = "";
+              continue;
+          }
+          pattern = "RRULE:FREQ=";
+          if (line.find(pattern) == 0) {
+              found_description = false;
+              std::string rruleline = line.substr(pattern.length(),line.length()-pattern.length());
+              rrule = Rrule(rruleline);
+              continue;
+          }
+          pattern = "END:VEVENT";
+          if (line.find(pattern) == 0) {
+              found_description = false;
+              Event* event = new Event(0,summary,description,location,this->get_category(category_id),mktime(&start),mktime(&end));
+              if (rrule.isset()) {
+                counter += this->add_recurring_event(event, rrule);
+                rrule.reset();
+              }
+              else if (this->add_event(event))
+                  counter++;
+              else
+                  printf("Error: %s not imported\n", summary.c_str());
+              /* Reset optional variables to import the next event without old values */
+              location = "";
+              description = "";
+              continue;
+          }
+          if (found_description) { /* Multi-line description */
+              description = description + "\n" + line;
+          }
+      }
+      file.close();
+      return counter;}
+    else {
+      fprintf(stderr, "Error: File %s is not a valid iCal file\n", path.c_str());
+      return 0;
     }
-    file.close();
-    return counter;
 }
 
 int PManager::export_db_iCal_format(list<Event*> events, string path) {
     if (path.length() < 5) return 0;
-    if (path.substr(path.length()-4, 4) != ".ics") path = path + ".ics";
+    if (path.substr(path.length()-4, 4) != ".ics" && path.substr(path.length()-4, 4) != ".ical") path = path + ".ics";
     char buff[9];
     ofstream file;
     file.open(path);

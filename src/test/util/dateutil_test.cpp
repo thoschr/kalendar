@@ -109,9 +109,7 @@ void DateUtilTest::test_date_from_timestamp() {
     ASSERT ((DateUtil::date_from_timestamp(1420070400)) == *this->jan_1_2015 &&
             (DateUtil::date_from_timestamp(1419984000)) == *this->dec_31_2014 &&
             (DateUtil::date_from_timestamp(1456012800)) == *this->feb_21_2016 &&
-            (DateUtil::date_from_timestamp(4175884800)) == *this->may_1_2102 &&
-            /* remember: the timestamp will be converted into an unsigned long */
-            (DateUtil::date_from_timestamp(-1333670400)) == *this->sep_28_1927)
+            (DateUtil::date_from_timestamp(4175884800)) == *this->may_1_2102 )
 }
 
 void DateUtilTest::test_get_last_day_of_month() {

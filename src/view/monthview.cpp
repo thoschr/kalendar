@@ -131,7 +131,7 @@ MonthView::MonthView(QWidget *parent) :
         wday_name->setObjectName("header");
         frame->setObjectName("header");
         hl->addWidget(wday_name);
-        hl->setMargin(0);
+        hl->setContentsMargins(0,0,0,0);
         frame->setLayout(hl);
         frame->setStyleSheet(CELL_STYLE);
         grid_layout->addWidget(frame, 0, j);
@@ -157,7 +157,7 @@ MonthView::MonthView(QWidget *parent) :
             target = DateUtil::decrease_month(target);
             past_months--;
         } while (past_months > 0);
-        this->pm->remove_past_events(QDateTime(QDate(target.getYear(), target.getMonth() , target.getMonthDay())).toTime_t());
+        this->pm->remove_past_events(QDateTime(QDate(target.getYear(), target.getMonth() , target.getMonthDay()),QTime(0,0,0)).toSecsSinceEpoch());
     }
 
     //Fill the grid with the days of the default month (i.e. the current month)
@@ -166,7 +166,7 @@ MonthView::MonthView(QWidget *parent) :
     //Load the events for the current month
     display_events(current_date, this->selected_category);
 
-    grid_layout->setMargin(5);
+    grid_layout->setContentsMargins(5,5,5,5);
     this->layout->addLayout(grid_layout);
 
      // Set layout in QWidget
@@ -408,7 +408,7 @@ CustomDialog* MonthView::show_progress_bar(QString title) {
 }
 
 void MonthView::import_events() {
-    QString path = QFileDialog::getOpenFileName(this, "Import events from other calendars", QDir::homePath(), "iCal Files (*.ics)");
+    QString path = QFileDialog::getOpenFileName(this, "Import events from other calendars", QDir::homePath(), "iCal Files (*.ics *.ical)");
     if (path != "") {
         CategorySelectDialog *dialog = new CategorySelectDialog(this,"Select a category for the imported events: ");
         dialog->setModal(true);
@@ -620,7 +620,7 @@ QFrameExtended* MonthView::createQFrameExtended(Date *date) {
     frame->setDate(date);
     frame->setObjectName("day");
     vl->setAlignment(Qt::AlignTop | Qt::AlignLeft);
-    vl->setMargin(0);
+    vl->setContentsMargins(0,0,0,0);
     vl->setSpacing(1);
     vl->addWidget(new QLabel);
     frame->setMinimumWidth(150);
@@ -646,8 +646,8 @@ void MonthView::on_button_extended_click(int index) {
     char stime[14];
     for (QLabelEvent *label_event : this->frames[index]->findChildren<QLabelEvent*>()) {
         Event *event = new Event(*label_event->getEvent());
-        QTime start = QDateTime::fromTime_t(event->getStart()).time();
-        QTime end = QDateTime::fromTime_t(event->getEnd()).time();
+        QTime start = QDateTime::fromSecsSinceEpoch(event->getStart()).time();
+        QTime end = QDateTime::fromSecsSinceEpoch(event->getEnd()).time();
         snprintf(stime, 14, "%02d:%02d - %02d:%02d", start.hour(), start.minute(), end.hour(), end.minute());
         QLabel *time = new QLabel(stime);
         QHBoxLayout *hl = new QHBoxLayout;

@@ -1,6 +1,7 @@
 #include "pmanager_test.h"
 
 #include <QDebug>
+#include <filesystem> // Replace experimental with standard filesystem
 
 PManagerTest::PManagerTest()
 {
@@ -63,6 +64,7 @@ void PManagerTest::test_all() {
     test_save_db();
     test_import_db_iCal_format();
     test_export_db_iCal_format();
+    test_recurrent_events();
 }
 
 void PManagerTest::test_get_db_name() {
@@ -80,9 +82,9 @@ void PManagerTest::test_remove_db() {
     PManager pm;
     bool ret = pm.remove_db();
     if (pm.get_db_name() != DEFAULT_DATABASE_NAME) {
-        ret = ret && !std::experimental::filesystem::exists(pm.get_db_folder() + pm.get_db_name());
+        ret = ret && !std::filesystem::exists(pm.get_db_folder() + pm.get_db_name());
     } else {
-        ret = ret && std::experimental::filesystem::exists(pm.get_db_folder() + pm.get_db_name());
+        ret = ret && std::filesystem::exists(pm.get_db_folder() + pm.get_db_name());
     }
     ASSERT (ret)
 }
@@ -91,8 +93,9 @@ void PManagerTest::test_init_db() {
     Test::print("test_init_db ");
     PManager pm;
     pm.init_db("test.sql");
-    ASSERT (std::experimental::filesystem::exists(pm.get_db_folder() + "test.sql"))
+    ASSERT (std::filesystem::exists(pm.get_db_folder() + "test.sql"))
     pm.remove_db();
+    std::remove((pm.get_db_folder() + "default.sql").c_str());
 }
 
 void PManagerTest::test_get_db_list() {
@@ -101,10 +104,10 @@ void PManagerTest::test_get_db_list() {
     PManager pm;
     pm.remove_db();
     pm.init_db(names[0]);
-    bool ret = (std::experimental::filesystem::exists(pm.get_db_folder() + names[0]));
+    bool ret = (std::filesystem::exists(pm.get_db_folder() + names[0]));
     pm.remove_db();
     pm.init_db(names[1]);
-    ASSERT (ret && std::experimental::filesystem::exists(pm.get_db_folder() + names[1]))
+    ASSERT (ret && std::filesystem::exists(pm.get_db_folder() + names[1]))
     pm.remove_db();
 }
 
@@ -335,7 +338,7 @@ void PManagerTest::test_load_db() {
     ofstream file;
     file.open("testdb.kal");
     file << "INSERT INTO Categories VALUES(" << this->valid_category->getId() << ",'" << this->valid_category->getName() << "','" << this->valid_category->getColor() << "');" << endl;
-    file << "INSERT INTO Events VALUES(" << this->valid_event->getId() << ",'" << this->valid_event->getName() << "','" << this->valid_event->getDescription() << "','" << this->valid_event->getPlace() << "'," << this->valid_event->getCategory()->getId() << "," << this->valid_event->getStart() << "," << this->valid_event->getEnd() << ", NULL);" << endl;
+    file << "INSERT INTO Events VALUES(" << this->valid_event->getId() << ",'" << this->valid_event->getName() << "','" << this->valid_event->getDescription() << "','" << this->valid_event->getPlace() << "'," << this->valid_event->getCategory()->getId() << "," << this->valid_event->getStart() << "," << this->valid_event->getEnd() << "," << "NULL" << ");" << endl;
     file.close();
     ret = pm.load_db("");
     ret = !ret && pm.load_db("notexist");
@@ -388,7 +391,7 @@ void PManagerTest::test_import_db_iCal_format() {
     ret = !ret && !pm.import_db_iCal_format("notexists",this->valid_default_category);
     file.open("temp.ics");
     file << "BEGIN:VEVENT" << endl << "UID:0" << endl << "DTSTART;VALUE=DATE:20161231" << endl << "DTEND;VALUE=DATE:20170101" << endl << "SUMMARY:test" << endl << "DESCRIPTION:multi\nline\ndescription" << endl << "END:VEVENT" << endl;
-    file << "BEGIN:VEVENT" << endl << "UID:1" << endl << "DTSTART;VALUE=DATE:20130512" << endl << "DTEND;VALUE=DATE:20130513" << endl << "SUMMARY:test2" << endl << "END:VEVENT" << endl;
+    file << "BEGIN:VEVENT" << endl << "UID:1" << endl << "DTSTART:20130512T173000Z" << endl << "DTEND;VALUE=DATE:20130513" << endl << "SUMMARY:test2" << endl << "END:VEVENT" << endl;
     file.close();
     ret = ret && pm.import_db_iCal_format("temp.ics",this->valid_default_category);
     list<Event*> events = pm.get_all_events();
@@ -398,6 +401,10 @@ void PManagerTest::test_import_db_iCal_format() {
         ret = ret && ((**it).getCategory()->getId() == this->valid_default_category->getId());
         //TODO: checks if the following test is correct
         ret = ret && ((**it).getStart() < (**it).getEnd());
+        struct tm date_tm;
+        time_t start_time = (*it)->getStart();
+        localtime_r(&start_time, &date_tm);
+        ret = ret && ((date_tm.tm_min == 30));
         delete *it;
     } else ret = false;
     pm.remove_db();
@@ -447,4 +454,51 @@ void PManagerTest::test_export_db_iCal_format() {
     pm.remove_db();
     remove("temp.ics");
     ASSERT (ret)
+}
+
+void PManagerTest::test_recurrent_events() {
+    Test::print("test_recurrent_events  ");
+    PManager pm;
+    ofstream file;
+    ofstream file2;
+    bool ret;
+    bool ret2;
+    file.open("temp.ics");
+    file << "BEGIN:VEVENT" << endl << "UID:0" << endl << "DTSTART;VALUE=DATE:20161230" << endl << "DTEND;VALUE=DATE:20161230" << endl << "SUMMARY:test" << endl << "RRULE:FREQ=WEEKLY;UNTIL=20170121" << endl << "END:VEVENT" << endl;
+    file.close();
+    file2.open("temp2.ics");
+    file2 << "BEGIN:VEVENT" << endl << "UID:0" << endl << "DTSTART;VALUE=DATE:20161230" << endl << "DTEND;VALUE=DATE:20161230" << endl << "SUMMARY:test" << endl << "RRULE:FREQ=YEARLY" << endl << "END:VEVENT" << endl;
+    file2.close();
+    ret = pm.import_db_iCal_format("temp.ics",this->valid_default_category);
+    list<Event*> events = pm.get_all_events();
+    if (events.size() == 4) {
+        list<Event*>::iterator it = events.begin();
+        ret = ((**it).getName() == "test");
+        ret = ret && ((**it).getCategory()->getId() == this->valid_default_category->getId());
+        ret = ret && ((**it).getStart() < (**it).getEnd());
+        delete *it;
+    } 
+    else{
+        fprintf(stderr, "Event list has unexpected size. Expected %i got: %zu\n", 4, events.size());
+       ret = false;
+    }
+    pm.remove_db();
+    remove("temp.ics");
+    PManager pm2("test.sql");
+    ret2 = pm2.import_db_iCal_format("temp2.ics",this->valid_default_category);
+    list<Event*> events2 = pm2.get_all_events();
+    if (events2.size() == Rrule("YEARLY").get_repetitions()) {
+        list<Event*>::iterator it = events2.begin();
+        ret2 = ((**it).getName() == "test");
+        ret2 = ret2 && ((**it).getCategory()->getId() == this->valid_default_category->getId());
+        ret2 = ret2 && ((**it).getStart() < (**it).getEnd());
+        delete *it;
+    } 
+    else{
+        fprintf(stderr, "Event list has unexpected size. Expected %i got: %zu\n", Rrule("YEARLY").get_repetitions(), events2.size());
+        ret2 = false;
+    }
+    pm2.remove_db();
+    remove("temp2.ics");
+    ASSERT (ret && ret2)
 }

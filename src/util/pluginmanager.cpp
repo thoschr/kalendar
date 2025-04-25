@@ -2,20 +2,20 @@
 
 PluginManager::PluginManager()
 {
-    experimental::filesystem::path dir(TOOLS_FOLDER);
-    experimental::filesystem::create_directory(dir);
-    for (experimental::filesystem::directory_entry e : experimental::filesystem::directory_iterator(TOOLS_FOLDER)) {
-        experimental::filesystem::path p = e.path();
+    std::filesystem::path dir(TOOLS_FOLDER);
+    std::filesystem::create_directory(dir); // Create the directory if it doesn't exist
+    for (const auto& e : std::filesystem::directory_iterator(TOOLS_FOLDER)) {
+        std::filesystem::path p = e.path();
         if ((p.extension() == ".sh") || (p.extension() == ".bat"))
-            this->tools.push_back(p.filename());
+            this->tools.push_back(p.filename().string()); // Convert filename to string
     }
 }
 
-void PluginManager::runTool(const string &name) {
-    string cmd = string(TOOLS_FOLDER) + "/\"" + name +"\"";
-    system(cmd.c_str());
+void PluginManager::runTool(const std::string &name) {
+    std::string cmd = std::string(TOOLS_FOLDER) + "/\"" + name + "\"";
+    system(cmd.c_str()); // Execute the tool
 }
 
-vector<string> PluginManager::get_tools() {
+std::vector<std::string> PluginManager::get_tools() {
     return this->tools;
 }

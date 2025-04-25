@@ -1,3 +1,15 @@
+# Updates in this fork
+
+* support for Windows 
+* changed to use the sqlite source in compilation
+* Updated to Qt 6
+* added support for recurrent events in import
+* improved parser
+
+# Planned TODOs
+* export of .ics files with recurrent events
+* search function
+
 # Kalendar
 
 ![project status](https://img.shields.io/badge/project%20status-active-brightgreen.svg)

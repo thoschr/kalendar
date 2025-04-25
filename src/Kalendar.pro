@@ -14,6 +14,7 @@ TEMPLATE = app
 
 SOURCES += main.cpp\
     persistence/pmanager.cpp \
+    tools/sqlite3/sqlite3.c \
     test/test.cpp \
     test/persistence/pmanager_test.cpp \
     view/monthview.cpp \
@@ -35,6 +36,7 @@ SOURCES += main.cpp\
     view/settings.cpp
 
 HEADERS  += model/event.h \
+    tools/sqlite3/sqlite3.h \
     persistence/pmanager.h \
     model/category.h \
     test/test.h \
@@ -63,9 +65,8 @@ HEADERS  += model/event.h \
     util/pluginmanager.h \
     view/settings.h
 
-QMAKE_LIBS += -lsqlite3
 QMAKE_LIBS += -lstdc++fs
-QMAKE_CXXFLAGS += -std=c++11
+QMAKE_CXXFLAGS += -std=c++17
 
 #For DEBUG purpose
 #QMAKE_CXXFLAGS += -g

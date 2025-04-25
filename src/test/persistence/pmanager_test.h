@@ -1,10 +1,16 @@
 #ifndef PMANAGERTEST_H
 #define PMANAGERTEST_H
 
+#ifdef _WIN32
+  //needed for localtime_r with mingw
+  #define _POSIX_THREAD_SAFE_FUNCTIONS
+#endif
+
 #include <stdlib.h>
 
 #include "../test.h"
 #include "../../persistence/pmanager.h"
+#include "../../tools/sqlite3/sqlite3.h"
 
 class PManagerTest
 {
@@ -48,6 +54,7 @@ public:
     void test_get_db_name();
     void test_set_db();
     void test_get_db_list();
+    void test_recurrent_events();
 };
 
 #endif // PMANAGERTEST_H

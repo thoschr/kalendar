@@ -20,14 +20,14 @@ void EventDialog::setEvent(Event *event) {
         if (event->getStart() == TODO_DATE) {
             Date today = DateUtil::get_current_date();
             /* Set the current date, so if the user uncheck the "TODO" there is already a valid date set */
-            this->edit_start->setDateTime(QDateTime(QDate(today.getYear(), today.getMonth(), today.getMonthDay())));
+            this->edit_start->setDateTime(QDateTime(QDate(today.getYear(), today.getMonth(), today.getMonthDay()),QTime(0,0,0)));
             this->edit_start->setEnabled(false);
-            this->edit_end->setDateTime(QDateTime(QDate(today.getYear(), today.getMonth(), today.getMonthDay())));
+            this->edit_end->setDateTime(QDateTime(QDate(today.getYear(), today.getMonth(), today.getMonthDay()),QTime(0,0,0)));
             this->edit_end->setEnabled(false);
             this->cbtodo->setChecked(true);
         } else {
-            this->edit_start->setDateTime(QDateTime::fromTime_t(event->getStart()));
-            this->edit_end->setDateTime(QDateTime::fromTime_t(event->getEnd()));
+            this->edit_start->setDateTime(QDateTime::fromSecsSinceEpoch(event->getStart()));
+            this->edit_end->setDateTime(QDateTime::fromSecsSinceEpoch(event->getEnd()));
         }
         this->button_delete->setEnabled(true);
     }
@@ -86,8 +86,8 @@ EventDialog::EventDialog(View *parentView, Date start_date, Date end_date, QWidg
     QLabel *label_start = new QLabel("Start: ");
     this->edit_start = new QDateTimeEdit;
     this->edit_start->setCalendarPopup(true);
-    QDateTime todoDate = QDateTime::fromTime_t(TODO_DATE);
-    this->edit_start->setDateTime(QDateTime(QDate(start_date.getYear(), start_date.getMonth(), start_date.getMonthDay())));
+    QDateTime todoDate = QDateTime::fromSecsSinceEpoch(TODO_DATE);
+    this->edit_start->setDateTime(QDateTime(QDate(start_date.getYear(), start_date.getMonth(), start_date.getMonthDay()),QTime(0,0,0)));
     //I set a specific hour because the default is the midnight, but this could lead more easily problems caused by daylight saving time
     this->edit_start->setTime(QTime(8,0,0));
     connect(this->edit_start, &QDateTimeEdit::dateTimeChanged, this, &EventDialog::on_date_start_change);
@@ -98,7 +98,7 @@ EventDialog::EventDialog(View *parentView, Date start_date, Date end_date, QWidg
     QLabel *label_end = new QLabel("End: ");
     this->edit_end = new QDateTimeEdit;
     this->edit_end->setCalendarPopup(true);
-    this->edit_end->setDateTime(QDateTime(QDate(end_date.getYear(), end_date.getMonth(), end_date.getMonthDay())));
+    this->edit_end->setDateTime(QDateTime(QDate(end_date.getYear(), end_date.getMonth(), end_date.getMonthDay()),QTime(0,0,0)));
     this->edit_end->setTime(QTime(9,0,0));
     sixth_row->addWidget(label_end);
     sixth_row->addWidget(this->edit_end);
@@ -164,7 +164,7 @@ void EventDialog::on_button_save_click() {
     }
 
     if (isTodo) {
-        QDateTime todoDate = QDateTime::fromTime_t(TODO_DATE);
+        QDateTime todoDate = QDateTime::fromSecsSinceEpoch(TODO_DATE);
         this->edit_start->setDateTime(todoDate);
         this->edit_end->setDateTime(todoDate);
     } else {
@@ -184,7 +184,7 @@ void EventDialog::on_button_save_click() {
 
     QDateTime start = this->edit_start->dateTime();
     QDateTime end = this->edit_end->dateTime();
-    Event *newEvent = new Event(0, this->edit_name->text().toStdString(), this->edit_description->toPlainText().toStdString(), this->edit_place->text().toStdString(), category, start.toTime_t(), end.toTime_t());
+    Event *newEvent = new Event(0, this->edit_name->text().toStdString(), this->edit_description->toPlainText().toStdString(), this->edit_place->text().toStdString(), category, start.toSecsSinceEpoch(), end.toSecsSinceEpoch());
 
     /* If the users has changed an existent event, I'll call the right function */
     if ((this->event != NULL) && (this->pm->replace_event(this->event, newEvent))) {
@@ -210,7 +210,7 @@ void EventDialog::on_button_save_click() {
                     start = start.addYears(1);
                     end = end.addYears(1);
                 }
-                newEvent = new Event(0, this->edit_name->text().toStdString(), this->edit_description->toPlainText().toStdString(), this->edit_place->text().toStdString(), category, start.toTime_t(), end.toTime_t());
+                newEvent = new Event(0, this->edit_name->text().toStdString(), this->edit_description->toPlainText().toStdString(), this->edit_place->text().toStdString(), category, start.toSecsSinceEpoch(), end.toSecsSinceEpoch());
                 bar->setValue(i);
                 QCoreApplication::processEvents();
             }

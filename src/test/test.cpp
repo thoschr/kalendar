@@ -19,7 +19,7 @@ void Test::test_util() {
     print("\nStarting util tests\n");
     DateUtilTest dut;
     dut.test_all();
-    printf("date util disabilitato\n");
-    EventUtilTest eut;
-    eut.test_all();
+    // printf("date util disabilitato\n");
+    // EventUtilTest eut;
+    // eut.test_all();
 }

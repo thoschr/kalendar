@@ -1,19 +1,28 @@
 #ifndef PMANAGER_H
 #define PMANAGER_H
 
-#include <sqlite3.h> /* Version: 3.9.2 */
+#ifdef _WIN32
+  #define OS_WINDOWS
+  //needed for localtime_r with mingw
+  #define _POSIX_THREAD_SAFE_FUNCTIONS
+#else
+  #include <pwd.h>
+#endif
+
+// v3.9.2 has been used by the author. The source lib now has version 3.49.1
+#include "../tools/sqlite3/sqlite3.h" /* Version: 3.9.2 */
 #include <stdio.h>
 #include <list>
 #include <vector>
 #include <ctime>
 #include <unistd.h>
 #include <sys/types.h>
-#include <pwd.h>
 #include <sys/stat.h>
 #include <fstream>
 #include <experimental/filesystem>
 #include "../model/event.h"
 #include "../model/category.h"
+#include "../util/dateutil.h"
 
 #define FOLDER_NAME "kalendar"
 #define DEFAULT_DATABASE_NAME "default.sql"
@@ -36,6 +45,7 @@ public:
     void set_db(string database);
     string get_db_name();
     string get_db_folder();
+    string get_db_path();
     vector<string> get_db_list();
     bool add_event (Event *e, Event *child = NULL);
     bool replace_event (Event *old_event, Event *new_event); //return true also if old_event doesn't exist
@@ -55,6 +65,9 @@ public:
     int export_db_iCal_format(list<Event *> events, string path);
     int load_db(string path);
     int import_db_iCal_format(string path,Category *category);
+    int add_recurring_event(Event *e, const Rrule& rrule);
+    sqlite3* get_db() const { return this->db; }
+    time_t apply_rrule(const time_t& date, const Rrule& rrule) const;
 };
 
 #endif // PMANAGER_H
