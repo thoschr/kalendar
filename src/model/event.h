@@ -72,12 +72,12 @@ struct Rrule
     bool isset(){ if (freq == "DAILY" || freq == "WEEKLY" || freq == "MONTHLY" || freq == "YEARLY") return true; else return false; }
     void reset(){ freq = "NONE"; }
     std::string get_freq() const { return freq; }
-    uint get_repetitions() const { return repetitions; }
+    unsigned int get_repetitions() const { return repetitions; }
     time_t until;
   
   private:
     std::string freq;
-    uint repetitions;
+    unsigned int repetitions;
 
 };
 
