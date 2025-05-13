@@ -66,6 +66,7 @@ private:
     QVBoxLayout *layout;
     QLabel *label_date;
     QLabelEvent *selected_event;
+    QPushButton *searchbutton;
     QPushButton *todobutton;
     Date *selection_start;
     Date *selection_end;
@@ -102,6 +103,7 @@ public slots:
     void on_event_click(QLabelEvent *label_event, Qt::MouseButton button);
     void on_event_key_press(int key);
     void on_todo_button_click();
+    void on_search_button_click();
     void keyPressEvent(QKeyEvent* e);
 
 

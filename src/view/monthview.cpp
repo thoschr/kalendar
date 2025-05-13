@@ -97,6 +97,7 @@ MonthView::MonthView(QWidget *parent) :
     QPushButton *back = new QPushButton("<");
     QPushButton *next = new QPushButton(">");
     this->todobutton = new QPushButton;
+    this->searchbutton = new QPushButton;
     refresh_todos();
     back->setMaximumWidth(60);
     next->setMaximumWidth(60);
@@ -108,13 +109,17 @@ MonthView::MonthView(QWidget *parent) :
     back->setToolTip("Go to the previous month, press ctrl to move to the previous year");
     this->todobutton->setToolTip("Show the list of TODOs");
     this->todobutton->setStyleSheet(TODOSBUTTON_STYLE);
+    this->searchbutton->setStyleSheet(TODOSBUTTON_STYLE);
+    this->searchbutton->setToolTip("Search for events");
     connect(back, &QPushButton::clicked, this, &MonthView::on_back_button_click);
     connect(next, &QPushButton::clicked, this, &MonthView::on_next_button_click);
     connect(this->todobutton, &QPushButton::clicked, this, &MonthView::on_todo_button_click);
+    connect(this->searchbutton, &QPushButton::clicked, this, &MonthView::on_search_button_click);
     QHBoxLayout *hl = new QHBoxLayout;
     hl->addWidget(back, 1, Qt::AlignRight);
     hl->addWidget(label_date, 1, Qt::AlignCenter);
     hl->addWidget(next, 1, Qt::AlignLeft);
+    hl->addWidget(this->searchbutton);
     hl->addWidget(this->todobutton);
     this->layout->addLayout(hl);
 
@@ -444,6 +449,85 @@ void MonthView::edit_categories() {
 void MonthView::on_todo_button_click() {
     /* Show only TODOs */
     show_agenda(true);
+}
+
+void MonthView::on_search_button_click() {
+      // Create search input dialog
+    bool ok;
+    QString searchText = QInputDialog::getText(this, tr("Search Events"),
+                                             tr("Enter search text:"), QLineEdit::Normal,
+                                             "", &ok);
+    if (!ok || searchText.isEmpty())
+        return;
+
+    // Get all events and filter them
+    list<Event*> allEvents = this->pm->get_all_events();
+    list<Event*> matchingEvents;
+    
+    // Search in event names and descriptions
+    for (Event* event : allEvents) {
+        QString eventName = QString::fromStdString(event->getName());
+        QString eventDesc = QString::fromStdString(event->getDescription());
+        QString eventPlace = QString::fromStdString(event->getPlace());
+        
+        if (eventName.contains(searchText, Qt::CaseInsensitive) ||
+            eventDesc.contains(searchText, Qt::CaseInsensitive) ||
+            eventPlace.contains(searchText, Qt::CaseInsensitive)) {
+            matchingEvents.push_back(event);
+        }
+    }
+
+    // Create results dialog
+    QFrameExtended *frame = createQFrameExtended(NULL);
+    QLabel *header = static_cast<QLabel*>(frame->children().at(1));
+    header->setStyleSheet("QLabel { background-color: #ffffb3; border-bottom: 1px solid #000000; margin-bottom: 2px; }");
+    header->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
+    
+    // Show number of results
+    QString title = QString(" Search Results for '%1'").arg(searchText);
+    header->setText(QString::number(matchingEvents.size()) + title);
+
+    // Add matching events to the frame
+    for (Event *event : matchingEvents) {
+        QHBoxLayout *hl = new QHBoxLayout;
+        
+        // Add date/time
+        Date start = DateUtil::date_from_timestamp(event->getStart());
+        Date end = DateUtil::date_from_timestamp(event->getEnd());
+        QString dateText = QString(start.toString(false).c_str()) + 
+                         QString(" - ") + 
+                         QString(end.toString(false).c_str());
+        QLabel *dateLabel = new QLabel(dateText);
+        dateLabel->setFixedWidth(215);
+        hl->addWidget(dateLabel);
+        
+        // Add event label
+        QLabelEvent *eventLabel = createLabelEvent(event);
+        hl->addWidget(eventLabel);
+        
+        (static_cast<QVBoxLayout*>(frame->layout()))->addLayout(hl);
+    }
+
+    // Create scrollable dialog
+    QVBoxLayout *main_layout = new QVBoxLayout;
+    QScrollArea *scroll_area = new QScrollArea;
+    scroll_area->setMaximumHeight(600);
+    scroll_area->setWidget(frame);
+    scroll_area->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+    frame->setFixedWidth(scroll_area->width());
+    main_layout->addWidget(scroll_area);
+
+    CustomDialog *custom_dialog = new CustomDialog(main_layout);
+    custom_dialog->setFixedWidth(500);
+    custom_dialog->setWindowTitle("Search Results");
+    custom_dialog->show();
+
+    // Cleanup non-matching events
+    for (Event* event : allEvents) {
+        if (std::find(matchingEvents.begin(), matchingEvents.end(), event) == matchingEvents.end()) {
+            delete event;
+        }
+    }
 }
 
 void MonthView::show_monthview() {
