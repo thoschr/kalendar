@@ -114,18 +114,12 @@ public:
 
     Event(unsigned int id, string name, const string &description, const string &place, Category *category, time_t start, time_t end, std::string rrule = "NONE")
         : id(id), name(name), description(description), place(place), category(category), start(start), end(end), rrule(rrule) {
-        this->name = name;
-        this->description = description;
-        this->place = place;
-        this->rrule = Rrule(rrule);  
         if (category == NULL) {
             /* An event with a NULL category is inconsistent, it shouldn't exist */
             this->category = NULL;
             fprintf(stderr, "Event %d (%s) received NULL category.\n", id, name.c_str());
         } else
             this->category = new Category(*category);
-        this->start = start;
-        this->end = end;
         if (id == 0)
             /* The returned value from the hash function could be bigger than an integer, so be careful with normal integers.
              * I use an unsigned integer to have always a positive number (also with the overflow). */
