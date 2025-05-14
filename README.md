@@ -5,10 +5,10 @@
 * Updated to Qt 6
 * added support for recurrent events in import
 * improved parser
+* implemented search function
 
 # Planned TODOs
 * export of .ics files with recurrent events
-* search function
 
 # Kalendar
 
