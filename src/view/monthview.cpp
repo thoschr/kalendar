@@ -109,7 +109,8 @@ MonthView::MonthView(QWidget *parent) :
     back->setToolTip("Go to the previous month, press ctrl to move to the previous year");
     this->todobutton->setToolTip("Show the list of TODOs");
     this->todobutton->setStyleSheet(TODOSBUTTON_STYLE);
-    this->searchbutton->setStyleSheet(TODOSBUTTON_STYLE);
+    this->searchbutton->setText("🔍");  // Unicode search symbol
+    this->searchbutton->setStyleSheet(SEARCHBUTTON_STYLE);
     this->searchbutton->setToolTip("Search for events");
     connect(back, &QPushButton::clicked, this, &MonthView::on_back_button_click);
     connect(next, &QPushButton::clicked, this, &MonthView::on_next_button_click);

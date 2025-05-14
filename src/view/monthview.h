@@ -41,6 +41,7 @@
 #define LABELDATE_STYLE "QLabel { color: #000000; qproperty-alignment: AlignCenter; padding-left: 100px; padding-right: 100px; font-size: 20px; }"
 
 #define TODOSBUTTON_STYLE "QPushButton { border: 1px solid #000000; color: #000000; padding: 5px; font-weight: bold; border-radius: 10px; } QPushButton:hover { color: #2222BB; }"
+#define SEARCHBUTTON_STYLE "QPushButton { border: 1px solid #000000; color: #000000; padding: 10px; font-weight: bold; border-radius: 10px; font-size: 20px } QPushButton:hover { color: #2222BB; }"
 
 #define CELL_STYLE "QFrame { background-color: #FFFFFF; color: #000000; border: 1px outset #CCCCCC; }" \
                    "QFrame#holiday { background-color: #FFF5F5; }" \
