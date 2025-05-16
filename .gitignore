@@ -3,3 +3,8 @@ src/Kalendar.pro.user
 *.o
 moc_*
 *.exe
+src/test/Makefile
+src/test/test
+src/Makefile
+src/Kalendar
+src/.qmake.stash
