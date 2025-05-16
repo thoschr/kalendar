@@ -23,8 +23,8 @@ using namespace std;
 struct Rrule
 {
   public:
-    Rrule() : freq("NONE") {};
-    Rrule(std::string rruleline){
+    Rrule() : freq("NONE"), until(0) {};
+    Rrule(std::string rruleline) : freq("NONE"), until(0){
       if (rruleline.find("DAILY") != std::string::npos){
         freq = "DAILY";
         repetitions = 730;
@@ -91,6 +91,7 @@ class Event
 {
 private:
     unsigned int id;
+    unsigned int rid;
     string name;
     string description;
     string place;
@@ -110,10 +111,11 @@ public:
         this->start = event.getStart();
         this->end = event.getEnd();
         this->rrule = event.getRrule();
+        this->rid = event.getRid();
     }
 
-    Event(unsigned int id, string name, const string &description, const string &place, Category *category, time_t start, time_t end, std::string rrule = "NONE")
-        : id(id), name(name), description(description), place(place), category(category), start(start), end(end), rrule(rrule) {
+    Event(unsigned int id, string name, const string &description, const string &place, Category *category, time_t start, time_t end, Rrule rrule = Rrule("NONE"), unsigned int rid = 0)
+        : id(id), name(name), description(description), place(place), category(category), start(start), end(end), rrule(rrule), rid(rid) {
         if (category == NULL) {
             /* An event with a NULL category is inconsistent, it shouldn't exist */
             this->category = NULL;
@@ -148,10 +150,12 @@ public:
     time_t getStart() { return start; }
     time_t getEnd() { return end; }
     Rrule getRrule() { return rrule; }
+    unsigned int getRid() { return rid; }
 
     void setStart(time_t start) { this->start = start; }
     void setEnd(time_t end) { this->end = end; }
     void setId(unsigned int id) { this->id = id; }
+    void setRid(unsigned int rid) { this->rid = rid; }
 
     bool equals(Event &e) {
         return (this->id == e.getId());

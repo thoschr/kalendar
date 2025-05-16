@@ -6,9 +6,10 @@
 * added support for recurrent events in import
 * improved parser
 * implemented search function
+* export of .ics files with recurrent events
 
 # Planned TODOs
-* export of .ics files with recurrent events
+* jumping function for monthview
 
 # Kalendar
 

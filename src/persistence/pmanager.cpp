@@ -67,7 +67,7 @@ void PManager::init_db(string db_name) {
         const char *sql = "CREATE TABLE Categories(id UNSIGNED INTEGER PRIMARY KEY, name TEXT, color TEXT);"
                           "CREATE TABLE Events(id UNSIGNED INTEGER PRIMARY KEY, name TEXT, description TEXT,"
                           "place TEXT, category UNSIGNED INTEGER, start DATETIME, end DATETIME,"
-                          "child UNSIGNED INTEGER, FOREIGN KEY(category) REFERENCES Categories(id) ON DELETE RESTRICT,"
+                          "child UNSIGNED INTEGER, rrule TEXT, rid UNSIGNED INTEGER, FOREIGN KEY(category) REFERENCES Categories(id) ON DELETE RESTRICT,"
                           "FOREIGN KEY(child) REFERENCES Events(id) ON DELETE CASCADE);"
                           "INSERT INTO Categories VALUES(1, 'Default', '#1022A0');"
                           "PRAGMA foreign_keys = ON;";
@@ -116,8 +116,12 @@ bool PManager::add_event(Event *e, Event *child) {
     char *err_msg = 0;
     sqlite3_stmt *stmt;
     string filteredName, filteredDescription, filteredPlace;
+    std::string rrule = e->getRrule().get_freq();
+    if (e->getRrule().until != 0) {
+        rrule += ";UNTIL=" + std::to_string(e->getRrule().until);
+    }
     if ((e->getName().length() < 3) || (difftime(e->getStart(), e->getEnd()) > 0) || (e->getCategory() == NULL)) return false;
-    int rc = sqlite3_prepare_v2(this->db, "INSERT INTO Events VALUES(?, ?, ?, ?, ?, ?, ?, ?);", -1, &stmt, NULL);
+    int rc = sqlite3_prepare_v2(this->db, "INSERT INTO Events VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?);", -1, &stmt, NULL);
     if (rc != SQLITE_OK ) {
         fprintf(stderr, "SQL error in prepare: %s\n", sqlite3_errmsg(this->db));
         sqlite3_free(err_msg);
@@ -138,6 +142,8 @@ bool PManager::add_event(Event *e, Event *child) {
         sqlite3_bind_int64(stmt, 8, child->getId());
     else
         sqlite3_bind_null(stmt, 8);
+    sqlite3_bind_text(stmt, 9, rrule.c_str(), rrule.length(), 0);
+    sqlite3_bind_int64(stmt, 10, e->getRid());
     //commit
     rc = sqlite3_step(stmt);
     if (rc != SQLITE_DONE ) {
@@ -220,7 +226,9 @@ list<Event*> PManager::get_events(Category *c) {
         }
         time_t start = (unsigned long)sqlite3_column_int64(res, 5);
         time_t end = (unsigned long)sqlite3_column_int64(res, 6);
-        Event *e = new Event(id, name, description, place, category, start, end);
+        std::string rrule = (const char*)sqlite3_column_text(res, 8);
+        unsigned long rid = (unsigned long)sqlite3_column_int64(res, 9);
+        Event *e = new Event(id, name, description, place, category, start, end, rrule, rid);
 
         result.push_front(e);
     }
@@ -426,7 +434,9 @@ list<Event*> PManager::get_all_events() {
         }
         time_t start = (unsigned long)sqlite3_column_int64(res, 5);
         time_t end = (unsigned long)sqlite3_column_int64(res, 6);
-        Event *e = new Event(id, name, description, place, category, start, end);
+        std::string rrule = (const char*)sqlite3_column_text(res, 8);
+        unsigned int rid = (unsigned long)sqlite3_column_int64(res, 9);
+        Event *e = new Event(id, name, description, place, category, start, end, rrule, rid);
 
         result.push_front(e);
     }
@@ -521,7 +531,7 @@ int PManager::add_recurring_event(Event *event, const Rrule& rrule) {
   for( unsigned int i = 0; i < rrule.get_repetitions()-1; i++ ){
     start_new = apply_rrule(start_old, rrule);
     end_new = apply_rrule(end_old, rrule);
-    if( rrule.until < end_new ) break;
+    if( rrule.until != 0 && rrule.until < end_new ) break;
     event->setStart(start_new);
     event->setEnd(end_new);
     event->setId(static_cast<unsigned int> (hash<string>()(event->getName() + event->getDescription() + event->getPlace())) + (event->getCategory() ? event->getCategory()->getId() : 0) + static_cast<unsigned int> ((start_new / 1000) + (end_new - start_new)));
@@ -537,7 +547,7 @@ int PManager::add_recurring_event(Event *event, const Rrule& rrule) {
 int PManager::import_db_iCal_format(string path, Category *category) {
     auto category_id = category->getId();
     if (path.length() < 5) return 0;
-    if (path.substr(path.length()-4, 4) != ".ics" || path.substr(path.length()-4, 4) != ".ical"){
+    if (path.substr(path.length()-4, 4) == ".ics" || path.substr(path.length()-5, 5) == ".ical"){
       ifstream file;
       string line;
       string pattern;
@@ -545,7 +555,8 @@ int PManager::import_db_iCal_format(string path, Category *category) {
       string location;
       string description;
       bool found_description = false;
-      Rrule rrule;
+      Rrule rrule("NONE");
+      unsigned int rid = 0;
       int counter = 0;
       struct tm start;
       start.tm_sec = start.tm_min = start.tm_hour = start.tm_wday = start.tm_yday = start.tm_year = start.tm_mday = start.tm_mon = 0;
@@ -633,7 +644,12 @@ int PManager::import_db_iCal_format(string path, Category *category) {
           pattern = "END:VEVENT";
           if (line.find(pattern) == 0) {
               found_description = false;
-              Event* event = new Event(0,summary,description,location,this->get_category(category_id),mktime(&start),mktime(&end));
+              Event *event = NULL;
+              if (rrule.isset()) {
+                rid = static_cast<unsigned int> (hash<string>()(summary + description + rrule.get_freq()));
+                event = new Event(0,summary,description,location,this->get_category(category_id),mktime(&start),mktime(&end), rrule, rid);}
+              else
+                event = new Event(0,summary,description,location,this->get_category(category_id),mktime(&start),mktime(&end));
               if (rrule.isset()) {
                 counter += this->add_recurring_event(event, rrule);
                 rrule.reset();
@@ -659,11 +675,35 @@ int PManager::import_db_iCal_format(string path, Category *category) {
     }
 }
 
+void PManager::prune_recurring_events(std::list<Event*>& events) {
+  std::map<unsigned int, Event*> map_revents;
+  for (auto events_it = events.begin(); events_it != events.end();) {
+    if ((*events_it)->getRrule().isset()) {
+      auto map_it = map_revents.find((*events_it)->getRid());
+      if (map_it == map_revents.end()) {
+        map_revents[(*events_it)->getRid()] = *events_it;
+      } 
+      else if((*events_it)->getStart() < map_it->second->getStart()) {
+        // If the new event starts before the existing one, replace it
+        map_it->second = *events_it;
+      }
+      events_it = events.erase(events_it);
+    }
+    else {
+      ++events_it;
+    }
+  }
+  for (auto it : map_revents) {
+    events.push_back(it.second);
+  }
+}
+
 int PManager::export_db_iCal_format(list<Event*> events, string path) {
     if (path.length() < 5) return 0;
-    if (path.substr(path.length()-4, 4) != ".ics" && path.substr(path.length()-4, 4) != ".ical") path = path + ".ics";
+    if (path.substr(path.length()-4, 4) != ".ics" && path.substr(path.length()-5, 5) != ".ical") path = path + ".ics";
     char buff[9];
     ofstream file;
+    prune_recurring_events(events);
     file.open(path);
     file << "BEGIN:VCALENDAR" << endl;
     file << "CALSCALE:GREGORIAN" << endl;
@@ -674,13 +714,20 @@ int PManager::export_db_iCal_format(list<Event*> events, string path) {
         file << "DTSTART;VALUE=DATE:" << buff << endl;
         tmp = event->getEnd();
         struct tm *end = localtime((const time_t*)&tmp);
-        end->tm_mday += 1;
         tmp = mktime(end);
         strftime(buff, sizeof(buff),"%Y%m%d",localtime((const time_t*)&tmp));
         file << "DTEND;VALUE=DATE:" << buff << endl;
+        if( event->getRid() != 0 )
+            file << "RRULE:FREQ=" << event->getRrule().get_freq();
+        if( event->getRrule().until != 0 )
+            file << "; UNTIL=" << event->getRrule().until << endl;
+        else if ( event->getRid() != 0 )
+            file << endl;
         file << "UID:" << to_string(event->getId()) << endl;
-        file << "DESCRIPTION:" << event->getDescription() << endl;
-        file << "LOCATION:" << event->getPlace() << endl;
+        if (! event->getDescription().empty())
+          file << "DESCRIPTION:" << event->getDescription() << endl;
+        if (! event->getPlace().empty())
+          file << "LOCATION:" << event->getPlace() << endl;
         file << "SUMMARY:" << event->getName() << endl;
         file << "END:VEVENT" << endl;
     }

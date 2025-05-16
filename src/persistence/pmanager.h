@@ -19,6 +19,7 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fstream>
+#include <list>
 #include <experimental/filesystem>
 #include "../model/event.h"
 #include "../model/category.h"
@@ -66,6 +67,7 @@ public:
     int load_db(string path);
     int import_db_iCal_format(string path,Category *category);
     int add_recurring_event(Event *e, const Rrule& rrule);
+    void prune_recurring_events(std::list<Event*>& events);
     sqlite3* get_db() const { return this->db; }
     time_t apply_rrule(const time_t& date, const Rrule& rrule) const;
 };

@@ -338,7 +338,7 @@ void PManagerTest::test_load_db() {
     ofstream file;
     file.open("testdb.kal");
     file << "INSERT INTO Categories VALUES(" << this->valid_category->getId() << ",'" << this->valid_category->getName() << "','" << this->valid_category->getColor() << "');" << endl;
-    file << "INSERT INTO Events VALUES(" << this->valid_event->getId() << ",'" << this->valid_event->getName() << "','" << this->valid_event->getDescription() << "','" << this->valid_event->getPlace() << "'," << this->valid_event->getCategory()->getId() << "," << this->valid_event->getStart() << "," << this->valid_event->getEnd() << "," << "NULL" << ");" << endl;
+    file << "INSERT INTO Events VALUES(" << this->valid_event->getId() << ",'" << this->valid_event->getName() << "','" << this->valid_event->getDescription() << "','" << this->valid_event->getPlace() << "'," << this->valid_event->getCategory()->getId() << "," << this->valid_event->getStart() << "," << this->valid_event->getEnd() << "," << "NULL" << ",'" << this->valid_event->getRrule().get_freq() << "'," << this->valid_event->getRid() << ");" << endl;
     file.close();
     ret = pm.load_db("");
     ret = !ret && pm.load_db("notexist");
